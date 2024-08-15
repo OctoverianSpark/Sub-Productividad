@@ -1,0 +1,19 @@
+.boton-morado-block{
+    @include boton($morado,block)
+}
+.boton-morado-inline{
+    @include boton($morado,inline-block)
+}
+
+.boton-rojo-block{
+    @include boton($rojo,block)
+}
+.boton-rojo-inline{
+    @include boton($rojo,inline-block)
+}
+.boton-fucsia-block{
+    @include boton(darken($fucsia,20),block)
+}
+.boton-fucsia-inline{
+    @include boton(darken($fucsia,20),inline-block)
+}

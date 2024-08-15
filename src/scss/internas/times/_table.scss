@@ -1,0 +1,10 @@
+.tabla-empleados{
+    @include tabla(100%);
+
+
+
+}
+
+.tabla-clientes{
+    @include tabla(90%)
+}

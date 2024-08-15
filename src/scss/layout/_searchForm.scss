@@ -1,0 +1,56 @@
+
+.form-search{
+    display: flex;
+    align-items: center;
+    justify-content:center ;
+    gap: 3rem;
+    
+    margin: 4rem;
+
+
+    button{
+        margin-top: 1.2rem;
+    }
+}
+
+.container-inputs-search{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row !important;
+    
+    gap: 2rem;
+
+    
+}
+
+#date-search{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container-input-search{
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+
+    label{
+        font-weight: 700;
+        width: 100%;
+        font-size: 2rem;
+        color: $morado;
+        text-align: center;
+    }
+
+    input,select{
+        border: none;
+        outline: none;
+        border-radius: 1rem;
+        padding: .5rem;
+    }
+}

@@ -1,0 +1,44 @@
+
+
+
+/*  Bases  */
+@import "base/variables";
+@import "base/fonts";
+@import "base/globales";
+@import "base/mixins";
+@import "base/variables";
+@import "base/animations";
+@import "base/normalize";
+@import "base/botones";
+@import "base/utilidades";
+@import "base/modals";
+@import "base/forms";
+
+
+
+
+/*  Layout  */
+@import "layout/header";
+@import "layout/footer";
+@import "layout/searchForm";
+
+
+
+
+/*  Internas  */
+@import "internas";
+//Horas
+@import "internas/times/time";
+@import "internas/times/table";
+@import "internas/times/client";
+
+
+
+//Settings
+@import "internas/settings";
+@import "internas/settings/empleados";
+@import "internas/settings/clientes";
+
+
+//Login
+@import "internas/login";

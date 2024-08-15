@@ -1,0 +1,63 @@
+.main-settings-clientes{
+    
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    flex-direction: column;
+
+}
+
+
+
+.container-clientes{
+    @include grid(2,5rem);
+
+    max-height: 70vh;
+    overflow-y: scroll;
+
+}
+
+.actions{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+.container-datos-cliente{
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h2{
+        font-weight: 700;
+        color: $morado;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        
+    
+
+
+        &::after{
+            content: "";
+            display: block;
+            height: .5rem;
+            background-color: $morado;
+            width: 40rem;
+            text-align: center;
+
+        }
+    
+
+
+    }
+
+    p{
+        font-weight: 700;
+        color: $morado;
+    }
+
+}

@@ -1,0 +1,44 @@
+.contenedor-tiempo-empleado{
+    @include grid(2,5rem)
+
+}
+
+.container-updates>.container-input{
+    display: flex;
+    gap: 2rem;
+    justify-content: flex-start;
+
+    label{
+        font-weight: 700;
+    }
+}
+
+
+.form-actualizaciones{
+    margin: 1rem;
+    padding: 0;
+    
+    fieldset{
+        width: 100%;
+    }
+
+}
+
+
+.container-info{
+    h2{
+        font-size: 2.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 2rem;
+        text-transform: uppercase;
+
+        span{
+            font-size: 2.4rem;
+            color: darken($fucsia,40);
+
+        }
+    }
+}

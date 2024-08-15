@@ -1,0 +1,84 @@
+/** Media Queries **/
+@mixin telefono {
+    @media (min-width: #{$telefono}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: #{$tablet}) {
+        @content;
+    }
+}
+  
+@mixin desktop {
+    @media (min-width: #{$desktop}) {
+        @content;
+    }
+}
+@mixin grid($columnas, $espaciado ) {
+    display: grid;
+    gap: $espaciado;
+    grid-template-columns: repeat($columnas, 1fr);
+}
+
+
+
+@mixin boton($bgColor,$display){
+    background-color: $bgColor;
+    color: $blanco;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 1rem 3rem;
+    text-align: center;
+    margin-top: 2.5rem;
+    border-radius: 2rem;
+    display: $display;
+    border: none;
+
+
+    &:hover{
+        background-color: darken($color: $bgColor, $amount: 5);
+        cursor: pointer;
+    }
+}
+
+@mixin tabla($width:90%){
+    
+    border: 1px solid $negro;
+    margin: 5rem;
+    max-width: $width;
+    border-spacing: 0;
+    display: block;
+    min-height: 10vh;
+    max-height:  60vh;
+    text-align: center;
+    position: relative;
+    overflow-y: scroll;
+    scrollbar-color: rgba($morado, .5) rgba($morado, 0);
+    scrollbar-width: thin;
+    
+    
+    thead{
+        position: sticky;
+        inset: 0;
+        background-color: $fucsia;
+        th{
+        
+            border: 1px solid $negro;
+            max-height: 20%;
+            height: 20%;
+        }
+    }
+    tbody{
+        
+        td{
+            width: 15rem;
+            padding: 1rem;
+            border: 1px solid $negro;
+        }
+    }
+
+
+
+}

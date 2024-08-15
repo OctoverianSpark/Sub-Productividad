@@ -1,0 +1,47 @@
+.title{
+    font-size: 4rem;
+    font-weight: 700;
+    color: $morado;
+}
+
+.subtitle{
+    font-weight: 700;
+    color: $morado;
+    font-size: 3rem;
+}
+
+.container-message{
+    display: grid;
+    place-items: center;
+}
+
+.error{
+    background-color: $rojo;
+    padding: 1rem;
+    color: $blanco;
+    border-radius: 2rem;
+    font-weight: 700;
+}
+.hidden{
+    opacity: 1;
+    display: none;
+}
+
+.appear{
+    opacity: 1;
+    transition: opacity 2s ease-in;
+}
+
+.label-title{
+    font-size: 2.8rem;
+    color: $morado;
+    font-weight: 700;
+    text-align: center;
+    
+}
+
+
+.w-100{
+    width: 100%;
+}
+

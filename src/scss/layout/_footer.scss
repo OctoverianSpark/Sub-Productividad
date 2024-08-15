@@ -1,0 +1,40 @@
+footer{
+    background-color: $fucsia;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+
+    padding: 1rem;
+
+
+    
+}
+
+
+.mainLogoFooter{
+    text-align: center;
+    h1{
+        text-transform: uppercase;
+        color: $morado;
+        font-size: 3rem;
+
+
+        span:first-child{
+            color: darken($celeste,70);
+        }
+
+        span:last-child{
+            color: darken($fucsia,50);
+            font-weight: 700;
+        }
+
+    }
+}
+
+
+
+a{
+    color: $negro;
+}

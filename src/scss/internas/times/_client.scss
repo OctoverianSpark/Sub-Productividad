@@ -1,0 +1,10 @@
+.tabla-historial{
+    @include tabla(100%)
+    
+}
+
+
+.datos-cliente{
+    display: grid;
+    place-items: center;
+}

@@ -1,0 +1,118 @@
+.barra{
+    background-color: $fucsia;
+    margin: 0;
+    padding: 4rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+
+
+    
+    ul{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5rem;
+        padding: 3rem;
+        flex-direction: column;
+
+        a{
+            font-size: 2.5rem;
+            color: $morado;
+            font-weight: 600;
+
+
+
+        }
+    }
+
+}
+
+.center{
+    flex-direction: column !important;
+    height: auto;
+    display: flex;
+    justify-content: center;
+}
+
+
+@include desktop{
+    .barra{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+
+
+    
+    ul{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5rem;
+        padding: 3rem;
+        flex-direction: row;
+
+        a{
+            font-size: 2.5rem;
+            color: $morado;
+            font-weight: 600;
+
+
+
+        }
+    }
+    }
+}
+
+
+
+.mainLogoHeader{
+    text-align: center;
+    padding: 1rem;
+    margin-top: -5.5rem;
+    h1{
+        
+        text-transform: uppercase;
+        color: $morado;
+
+        &::after{
+            content: "";
+            display:block;
+            width: 0;
+            height: .5rem;
+            background-color: $morado;
+            animation: extend 1s infinite alternate ease-in-out;
+            animation-delay: .4s;
+            margin-top: -1.5rem;
+        }
+        &::before{
+            content: "";
+            display:block;
+            width: 0;
+            height: .5rem;
+            background-color: $morado;
+            animation: extend 1s infinite alternate ease-in-out;
+            animation-delay:  .2s;
+            margin-bottom: -1.5rem;
+        }
+
+        span:first-child{
+            color: darken($celeste,70);
+        }
+
+        span:last-child{
+            color: darken($fucsia,50);
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+    }
+}
+
+
+
+a{
+    color: $negro;
+}
