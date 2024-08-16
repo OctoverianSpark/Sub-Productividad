@@ -26,6 +26,7 @@ class Times{
 
         if($_SERVER["REQUEST_METHOD"] === "POST"){
 
+            debuguear($_POST);
             
             $_POST["horas"]["inicio"]=str_replace("T"," ",$_POST["horas"]["inicio"]);
             $_POST["horas"]["final"]=str_replace("T"," ",$_POST["horas"]["final"]);

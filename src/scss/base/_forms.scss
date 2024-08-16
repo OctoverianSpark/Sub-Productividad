@@ -198,8 +198,7 @@ form{
     border: 2px solid $morado;
     padding: 2rem;
     border-radius: 2rem;
-    width: 50%;
-
+    width: 100%;
 
     legend{
         color: $morado;
@@ -233,4 +232,28 @@ form{
         display: flex;
         justify-content: space-around;
     }
+}
+
+
+
+.form-times{
+
+
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    fieldset{
+        width: 70%;
+    }
+
+}
+
+
+
+.container-add-remove{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
 }

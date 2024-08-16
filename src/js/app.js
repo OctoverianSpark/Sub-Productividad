@@ -78,6 +78,8 @@ function changeForm(){
 
 }
 
+
+
 function rangeValue(){
 
     const ranges = document.querySelectorAll("input[type='range']")
