@@ -66,7 +66,7 @@ input[type="range"]{
 input[type="radio"]{
     -webkit-appearance: none;
     appearance: none;
-    background-color: #fff;
+    background-color: rgba(darken($fucsia,10),.7);
     margin: 0;
     width: 2.5rem;
     height: 2.5rem;
@@ -210,6 +210,7 @@ form{
 
     &:disabled{
         background-color: rgba($blanco,.3);
+        z-index: -1;
 
         .container-input{
             opacity: .5;
@@ -217,6 +218,14 @@ form{
     }
 }
 
+
+input{
+    &:disabled{
+        opacity: .5;
+
+
+    }
+}
   
 
 .container-fieldsets{
@@ -244,16 +253,52 @@ form{
     align-items: center;
     flex-direction: column;
     fieldset{
-        width: 70%;
+        width: 100%;
     }
 
 }
 
 
 
-.container-add-remove{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
+
+
+
+
+.logo-1,.logo-2,.logo-3,.logo-4,.logo-5,.logo-6{
+    width: 20rem;
+    opacity: .5;
+    position: absolute;
+}
+
+
+
+.logo-1{
+    transform: rotate(35deg);
+    top: 100%;
+}
+
+
+.logo-2{
+    right: 0;
+    top: 120%;
+}
+.logo-3{
+    top: 140%;
+}
+
+
+.logo-4{
+    top: 180%;
+    right: 0;
+}
+
+.logo-5{
+    inset: 0;
+    width: 100%;
+    opacity: .2;
+    z-index: -1;
+}
+
+.logo-6{
+    left: 40%;
 }

@@ -38,11 +38,8 @@
     background-color: $blanco;
     border-radius: 2rem;
     z-index: 1;
-    position: absolute;
-    left: 30%;
-    right: 30%;
-    top: 40%;
-    max-width: 120rem;
+    position: fixed;
+    inset: 20%;
     opacity: 0;
 
     display: flex;
@@ -68,5 +65,46 @@
             color: lighten($negro,20);
         }
 
+    }
+}
+
+
+.modal-confirmacion{
+
+    height: 30rem;
+
+
+
+}
+
+.container-confirm{
+    display: flex;
+    flex-direction: row;
+    gap: 5rem;
+
+
+    button{
+        width: 10rem;
+        height: 5rem;
+        border: none;
+        border-radius: 2rem;
+        font-size: 1.7rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;   
+        flex-direction: row;
+        color: #e1e1e1;
+        cursor: pointer;
+    }
+
+    .confirm-button{
+        background-color:rgb(62, 173, 62) ;
+        font-family: Pangram-Black;
+        letter-spacing: 2px;
+    }
+    .deny-button{
+        background-color:$rojo ;
+        font-family: Pangram-Black;
+        letter-spacing: 2px;
     }
 }

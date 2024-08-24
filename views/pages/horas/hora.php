@@ -66,9 +66,10 @@
                     <textarea name="horas[comentarios]" id="comentarios"><?php echo $hora->comentarios ?></textarea>
                 </div>
 
+                <input type="submit" value="Actualizar" class="boton-morado-inline">
             </fieldset>
 
-
+            
 
         </form>
 

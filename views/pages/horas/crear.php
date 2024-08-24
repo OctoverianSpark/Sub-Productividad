@@ -6,6 +6,7 @@
 <form method="post" class="form-times">
 
     <?php include "formulario.php" ?>
-
-    <input type="submit" value="Cargar Horas" class="boton-morado-inline">
+    
+    <button type="button" id="button-charge" class="boton-morado-inline">Cargar Horas</button>
+    <?php include_once "../includes/templates/confirm-modal.php" ?>
 </form>

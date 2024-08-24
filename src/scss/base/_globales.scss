@@ -3,18 +3,23 @@
 html {
     font-size: 62.5%;
     box-sizing: border-box;
-    scrollbar-color: rgba(0, 0, 0, .5) rgba(0, 0, 0, .1);
-    scrollbar-width: thin;
 
 
 }
-
-*:-webkit-scrollbar-thumb {
-    background-color: #797979;
-    border-radius: 20px;
-    border: 2px solid #f1f2f3;
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+width: 5px;
 }
 
+*::-webkit-scrollbar-track {
+background: rgba($morado,.1);
+}
+
+*::-webkit-scrollbar-thumb {
+background-color: rgba($morado,.6);
+border-radius: .5rem;
+border: 3px solid rgba($morado,.1);
+}
 
 
 *, *:before, *:after {

@@ -1,7 +1,32 @@
 
+<picture class="logo-1" loading="lazy">
+    <source srcset="/build/img/collectsLogo.webp" type="image/webp">
+    <img src="/build/img/collectsLogo.png" type="image/png">
+</picture>
+<picture class="logo-2" loading="lazy">
+    <source srcset="/build/img/fullTimeLogo.webp" type="image/webp">
+    <img src="/build/img/fullTimeLogo.png" type="image/png">
+</picture>
+<picture class="logo-3" loading="lazy">
+    <source srcset="/build/img/partTimeLogo.webp" type="image/webp">
+    <img src="/build/img/partTimeLogo.png" type="image/png">
+</picture>
+<picture class="logo-4" loading="lazy">
+    <source srcset="/build/img/paymentsLogo.webp" type="image/webp">
+    <img src="/build/img/paymentsLogo.png" type="image/png">
+</picture>
+<picture class="logo-5" loading="lazy">
+    <source srcset="/build/img/reportsLogo.webp" type="image/webp">
+    <img src="/build/img/reportsLogo.png" type="image/png">
+</picture>
+
+
+
+
 <?php if(!empty($errores)){ ?>
     <?php include_once "../includes/templates/error-modal.php" ?>
 <?php } ?>
+
 <fieldset class="container-inputs">
     <legend>INFORMACION PRINCIPAL</legend>
     <div class="container-input input-horas">
@@ -23,14 +48,7 @@
     </div>
 
 </fieldset>
-
-<div class="container-add-remove">
-    <button type="button" class="boton-morado-inline">Cargar una Entrada</button>
-    <button type="button" class="boton-rojo-inline">Eliminar una Entrada</button>
-</div>
-
 <div class="container-multifields">
-
 
     <fieldset class="container-inputs">
         <legend>INFORMACION DE JORNADA</legend>
@@ -54,7 +72,7 @@
                 </div>
                 <div class="radio-input">
                     <label for="almuerzo-2">2</label>
-                    <input type="radio" name="horas[almuerzo]" value="2" id="almuerzo-2" <?php echo ($time->almuerzo == 2)? "checked":"" ?>>
+                    <input type="radio" name="horas[almuerzo]" value="2" id="almuerzo-2" <?php echo ($time->almuerzo == 2 || !$time->almuerzo)? "checked":"" ?>>
 
                 </div>
 
@@ -73,13 +91,13 @@
         <legend>REGISTRO DE HORAS</legend>
         <div class="container-input input-horas">
             <label for="diurnas_ordinarias">DIURNAS ORDINARIAS</label>
-            <input type="range" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias" value="0" max="10" step="0.1">
+            <input type="range" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias" value="0" max="8" step="0.1">
             <input type="number" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias_value" value="0" class="calcTime">
         </div>
 
         <div class="container-input input-horas">
             <label for="nocturnas_ordinarias">NOCTURNAS ORDINARIAS</label>
-            <input type="range" name="horas[nocturnas_ordinarias]" id="nocturnas_ordinarias" value="0" max="10" step="0.1">
+            <input type="range" name="horas[nocturnas_ordinarias]" id="nocturnas_ordinarias" value="0" max="8" step="0.1">
             <input type="number"name="horas[nocturnas_ordinarias]"  id="nocturnas_ordinarias_value" value="0" class="calcTime">
         </div>
         <div class="container-input input-horas">

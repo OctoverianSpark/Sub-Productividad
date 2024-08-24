@@ -54,7 +54,6 @@
     <?php } ?>
 
     </header>
-
     <?php echo $contenido ?>
 
     <script src="/build/js/bundle.min.js"></script>

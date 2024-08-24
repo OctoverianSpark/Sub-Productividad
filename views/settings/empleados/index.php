@@ -22,15 +22,15 @@
 
         <table class="tabla-empleados">
             <thead>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Tipo de Documento</th>
-                <th>Documento</th>
-                <th>Sede</th>
-                <th>Modalidad</th>
-                <th>Cargo</th>
-                <th>Salario</th>
-                <th>Acciones</th>
+                <th>NOMBRE</th>
+                <th>APELLIDO</th>
+                <th>TIPO DE DOCUMENTO</th>
+                <th>DOCUMENTO</th>
+                <th>SEDE</th>
+                <th>MODALIDAD</th>
+                <th>CARGO</th>
+                <th>BASE SALARIAL</th>
+                <th>ACCIONES</th>
             </thead>
             <tbody>
                 <?php foreach($empleados as $empleado): ?>

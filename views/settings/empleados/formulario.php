@@ -45,6 +45,6 @@
     <input type="text" id="cargo" name="empleados[cargo]" value="<?php echo strtoupper($empleados->cargo) ?>">
 </div>
 <div class="container-input input-empleados">
-    <label for="munny">SALARIO MENSUAL</label>
+    <label for="munny">BASE SALARIAL</label>
     <input type="number" name="empleados[salario]" id="munny" value=<?php echo floatval($empleados->salario) ?>>
 </div>

@@ -7,8 +7,9 @@ function EventListenters(){
     rangeValue()
     requestHours()
     activateUpdates()
-
+    calculate()
     changeForm()
+    confirmForm()
 }
 
 
@@ -148,6 +149,290 @@ function activateUpdates(){
     }
 }
 
+
+function calculate() {
+    
+
+    const inicio = document.querySelector("#inicio")
+    const final = document.querySelector("#final")
+    const radioAlm = document.querySelectorAll(".radio-input")
+    const diurnasOrdinariasSlider = document.querySelector("#diurnas_ordinarias")
+    const diurnasOrdinariasValue = document.querySelector("#diurnas_ordinarias_value")
+    const nocturnasOrdinariasSlider = document.querySelector("#nocturnas_ordinarias")
+    const nocturnasOrdinariasValue = document.querySelector("#nocturnas_ordinarias_value")
+    const diurnasExtrasSlider = document.querySelector("#diurnas_extras")
+    const diurnasExtrasValue = document.querySelector("#diurnas_extras_value")
+    const nocturnasExtrasSlider = document.querySelector("#nocturnas_extras")
+    const nocturnasExtrasValue = document.querySelector("#nocturnas_extras_value")
+
+    if(inicio){
+        let dateTimeInicio = new Date(inicio.value)
+        let dateTimeFinal = new Date(final.value)
+    
+        let alm = 2
+    
+        let valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
+        let extrasDiurnas
+        let extrasNocturnas
+            
+        const rangoNocturnas = [21,22,23,0,1,2,3,4,5,6]
+    
+    
+        radioAlm.forEach(radio => {
+            radio.addEventListener("input",e=>{
+                    
+                alm = e.target.value
+    
+    
+    
+                dateTimeInicio = new Date(inicio.value)
+                dateTimeFinal = new Date(final.value)
+                
+                valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
+        
+        
+                if(dateTimeFinal.getHours()<=21 && dateTimeFinal.getHours() >6){
+                    extrasDiurnas = valorOrdinarias - 8
+                }
+        
+        
+                if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
+                    
+        
+                    extrasDiurnas = 5 - alm
+        
+                    extrasNocturnas = valorOrdinarias - 11
+        
+        
+        
+        
+                }  
+        
+                if(valorOrdinarias >8){
+                    diurnasOrdinariasSlider.value = 8
+                    diurnasOrdinariasValue.value = 8
+                }else{
+                    diurnasOrdinariasSlider.value = valorOrdinarias ? valorOrdinarias:0
+                    diurnasOrdinariasValue.value = valorOrdinarias ? valorOrdinarias:0
+    
+                }
+    
+    
+    
+                if (extrasDiurnas < 0) {
+                    diurnasExtrasSlider.value = 0
+                    diurnasExtrasValue.value =  0
+                    
+                }else{
+                    diurnasExtrasSlider.value = extrasDiurnas ? extrasDiurnas : 0
+                    diurnasExtrasValue.value = extrasDiurnas ? extrasDiurnas : 0
+    
+                }
+        
+        
+        
+        
+        
+                nocturnasExtrasSlider.value= extrasNocturnas ? extrasNocturnas : 0
+                nocturnasExtrasValue.value= extrasNocturnas ? extrasNocturnas : 0
+                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    
+    
+    
+    
+            })
+        })
+    
+    
+        inicio.addEventListener("input",e=>{
+            
+    
+    
+            dateTimeInicio = new Date(inicio.value)
+            dateTimeFinal = new Date(final.value)
+            
+            valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
+    
+    
+            if(dateTimeFinal.getHours()<=21 && dateTimeFinal.getHours() >6){
+                extrasDiurnas = valorOrdinarias - 8
+            }
+    
+    
+            if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
+                
+    
+                extrasDiurnas = 5 - alm
+    
+                extrasNocturnas = valorOrdinarias - 11
+    
+    
+    
+    
+            }  
+    
+            if(valorOrdinarias >8){
+                diurnasOrdinariasSlider.value = 8
+                diurnasOrdinariasValue.value = 8
+            }else{
+                diurnasOrdinariasSlider.value = valorOrdinarias ? valorOrdinarias:0
+                diurnasOrdinariasValue.value = valorOrdinarias ? valorOrdinarias:0
+    
+            }
+    
+    
+    
+            if (extrasDiurnas < 0) {
+                diurnasExtrasSlider.value = 0
+                diurnasExtrasValue.value =  0
+                
+            }else{
+                diurnasExtrasSlider.value = extrasDiurnas ? extrasDiurnas : 0
+                diurnasExtrasValue.value = extrasDiurnas ? extrasDiurnas : 0
+    
+            }
+    
+    
+    
+    
+    
+            nocturnasExtrasSlider.value= extrasNocturnas ? extrasNocturnas : 0
+            nocturnasExtrasValue.value= extrasNocturnas ? extrasNocturnas : 0
+            
+    
+        })
+    
+    
+        
+    
+        final.addEventListener("input",e=>{
+            
+    
+    
+            dateTimeInicio = new Date(inicio.value)
+            dateTimeFinal = new Date(final.value)
+            
+            valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
+    
+    
+            if(dateTimeFinal.getHours()<=21 && dateTimeFinal.getHours() >6){
+                extrasDiurnas = valorOrdinarias - 8
+            }
+    
+    
+            if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
+                
+    
+                extrasDiurnas = 5 - alm
+    
+                extrasNocturnas = valorOrdinarias - 11
+    
+    
+    
+    
+            }  
+    
+            if(valorOrdinarias >8){
+                diurnasOrdinariasSlider.value = 8
+                diurnasOrdinariasValue.value = 8
+            }else{
+                diurnasOrdinariasSlider.value = valorOrdinarias ? valorOrdinarias:0
+                diurnasOrdinariasValue.value = valorOrdinarias ? valorOrdinarias:0
+    
+            }
+    
+    
+    
+            if (extrasDiurnas < 0) {
+                diurnasExtrasSlider.value = 0
+                diurnasExtrasValue.value =  0
+                
+            }else{
+                diurnasExtrasSlider.value = extrasDiurnas ? extrasDiurnas : 0
+                diurnasExtrasValue.value = extrasDiurnas ? extrasDiurnas : 0
+    
+            }
+    
+    
+    
+    
+    
+            nocturnasExtrasSlider.value= extrasNocturnas ? extrasNocturnas : 0
+            nocturnasExtrasValue.value= extrasNocturnas ? extrasNocturnas : 0
+            
+        })
+        
+        diurnasOrdinariasSlider.value = valorOrdinarias ? valorOrdinarias:0
+        diurnasOrdinariasValue.value = valorOrdinarias ? valorOrdinarias:0
+        diurnasExtrasSlider.value = extrasDiurnas ? extrasDiurnas : 0
+        diurnasExtrasValue.value = extrasDiurnas ? extrasDiurnas : 0
+        nocturnasExtrasSlider.value= extrasNocturnas ? extrasNocturnas : 0
+        nocturnasExtrasValue.value= extrasNocturnas ? extrasNocturnas : 0
+    
+    
+    }
+    
+    
+
+
+
+
+}
+
+function confirmForm(){
+
+
+
+    const modal = document.querySelector(".modal-confirmacion")
+
+    const confirm = document.querySelector(".confirm-button")
+    const deny = document.querySelector(".deny-button")
+
+    const form = document.querySelector("form")
+    const buttonCharge  = document.querySelector("#button-charge")
+
+
+    if(buttonCharge){
+
+
+        buttonCharge.addEventListener("click",e=>{
+            modal.style.display = "flex"
+        })
+
+    }
+
+
+
+    if(modal){
+        
+        confirm.addEventListener("click",e=>{
+
+            form.submit()
+
+        })
+        
+        deny.addEventListener("click",e=>{
+            modal.style.display="none"
+        })
+    }
+
+}
+function autoManual(){
+
+}
 
 document.addEventListener("DOMContentLoaded",e=>{
     EventListenters()
