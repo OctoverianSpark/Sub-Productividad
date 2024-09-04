@@ -24,16 +24,12 @@
         <div class="container-input-search">
             <label for="searchBy">FILTRAR</label>
             <select id="searchBy" name="column">
-                <?php if($_GET["table"] != "clientes"){ ?>
-                    <option value="fecha">RANGO DE FECHAS</option>
-                <?php }?>
+                <option value="fecha">RANGO DE FECHAS</option>
                 <option value="<?php echo ($_GET["table"] == "empleados" || !$_GET["table"])? "empleado" : "cliente"?>">NOMBRE</option>
             </select>
         </div>
     </div>
 
-        
-    <?php if($_GET["table"] != "clientes"){ ?>
         <div class="container-inputs-search" id="date-search">
             <div class="container-input-search">
                 <label for="date-search">DESDE</label>
@@ -45,11 +41,10 @@
             </div>
 
         </div>
-    
-    <?php }?>
-        <div class="container-input-search" id="text-search" <?php echo ($_GET["table"] ==="clientes") ? "": "style=display:none" ?> >
+
+        <div class="container-input-search" id="text-search" style="display:none">
             <label for="param">VALOR</label>
-            <input type="text" name="param" id="param" <?php echo ($_GET["table"] ==="clientes") ? "": "style=display:none disabled" ?>>
+            <input type="text" name="param" id="param" disabled>
         </div>
         <button type="submit" class="boton-morado-inline">BUSCAR <i class='bx bx-search bx-tada' ></i></button>
 
