@@ -30,7 +30,7 @@
                         $_SESSION["login"]=true;
                         $_SESSION["log_type"] = "user";
                         $_SESSION["username"] = $_POST["login"]["user"];
-                        $_SESSION["name"] = $adData["displayname"] ;
+                        $_SESSION["name"] = strtoupper($adData["displayname"]) ;
                         header("Location: /");
                     }else{
                         header("Location: /login?error=2");

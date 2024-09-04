@@ -25,7 +25,7 @@ class ActiveDirectory{
 
             'domain_controllers' => array("AV-SRV-DC1.asistentevirtualsas.com"),
 
-            'base_dn' => 'dc=AV-SRV-DC1 dc=AsistenteVirtualSAS,dc=com',
+            'base_dn' => 'dc=AsistenteVirtualSAS,dc=com',
 
             'admin_username' => 'Administrador',
 
@@ -50,10 +50,9 @@ class ActiveDirectory{
 
 
     public function consultData(){
-
         $data = self::$ad->search()->where("cn","=",$this->user)->get();
         if(!$data){
-            return;
+            return $data;
         }else{
             return array_shift($data);
         }
