@@ -25,13 +25,12 @@
                 else{
     
                     $adData = $ad->consultData();
-    
+                    
                     if($auth){
                         $_SESSION["login"]=true;
                         $_SESSION["log_type"] = "user";
                         $_SESSION["username"] = $_POST["login"]["user"];
                         $_SESSION["name"] = $adData["displayname"] ;
-    
                         header("Location: /");
                     }else{
                         header("Location: /login?error=2");

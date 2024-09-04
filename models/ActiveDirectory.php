@@ -19,16 +19,17 @@ class ActiveDirectory{
     public function __construct($args = []){
         $config = [
             
-                    
+            
+
             'account_suffix' => "@asistentevirtualsas.com",
 
-            'domain_controllers' => array("asistentevirtualsas.com"),
+            'domain_controllers' => array("AV-SRV-DC1.asistentevirtualsas.com"),
 
-            'base_dn' => 'dc=asistentevirtualsas,dc=com',
+            'base_dn' => 'dc=AV-SRV-DC1 dc=AsistenteVirtualSAS,dc=com',
 
-            'admin_username' => "Administrador",
+            'admin_username' => 'Administrador',
 
-            'admin_password' => "Venezu22366@",
+            'admin_password' => 'Venezu22366@',
         ];
 
         self::$ad = new Adldap($config);
