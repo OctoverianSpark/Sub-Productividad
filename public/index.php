@@ -24,6 +24,7 @@ $router->get("/horas/ver",[Times::class,"ver"]);
 
 
 $router->get("/horas/ver/hora",[Times::class,"hora"]);
+$router->post("/horas/ver/hora",[Times::class,"hora"]);
 $router->get("/horas/ver/cliente",[Times::class,"cliente"]);
 
 $router->get("/horas/registrar",[Times::class,"crear"]);

@@ -85,7 +85,18 @@ class Times{
         $empleados = Empleados::all();
         $clientes = Clientes::all();
 
+        if($_SERVER["REQUEST_METHOD"] === "POST"){
+            
+            $_POST["horas"]["id"] = $id;
 
+            $horas = new Time($_POST["horas"]);
+
+
+
+            $horas->actualizar();
+
+
+        }
 
         $router->render("pages/horas/hora",[
             "hora"=>$hora,
