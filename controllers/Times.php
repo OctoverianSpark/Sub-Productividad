@@ -95,6 +95,8 @@ class Times{
 
             $horas->actualizar();
 
+            sleep(2);
+            header("Location : /horas/ver/hora?id=$id");
 
         }
 

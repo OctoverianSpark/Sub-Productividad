@@ -281,6 +281,7 @@ class Time{
         if($from && $to){
             $query .= "AND (inicio BETWEEN '$from' AND '$to') OR";
             $query .= "(final BETWEEN '$from' AND '$to')";
+            $query .= "AND NOT cliente = 'administrativo'";
         }
 
 
@@ -410,7 +411,7 @@ class Time{
             $resultado[$i]["nocturnas_monto"] = 0;
 
             
-            $query = "SELECT * FROM ".static::$tabla . " WHERE cliente = " . "'$cliente->nombre $cliente->apellido'";
+            $query = "SELECT * FROM ".static::$tabla . " WHERE cliente = " . "'$cliente->nombre $cliente->apellido' AND NOT cliente = 'administrativo'";
             
 
 
