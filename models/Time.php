@@ -411,20 +411,19 @@ class Time{
             $resultado[$i]["nocturnas_monto"] = 0;
 
             
-            $query = "SELECT * FROM ".static::$tabla . " WHERE cliente = " . "'$cliente->nombre $cliente->apellido' AND NOT cliente = 'administrativo'";
+            $query = "SELECT * FROM ".static::$tabla . " WHERE cliente = '" .$resultado[$i]["cliente"]. "' AND NOT cliente = 'administrativo'";
             
 
 
             if(!is_null($from) && !is_null($to)){
-                $query.= " AND (inicio between '$from' and '$to') OR";
-                $query.= " (final between '$from' and '$to')";
+                $query.= " AND ((inicio between '$from' and '$to') OR";
+                $query.= " (final between '$from' and '$to'))";
             }
             
             $times = self::consultarSQL($query);
             
 
             if(count($times)<=0) continue;
-
             foreach($times as $time){
 
                 
