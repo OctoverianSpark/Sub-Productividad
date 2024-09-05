@@ -10,6 +10,8 @@ function EventListenters(){
     calculate()
     changeForm()
     confirmForm()
+    dragNdrop()
+    pages()
 }
 
 
@@ -433,6 +435,94 @@ function confirmForm(){
 function autoManual(){
 
 }
+
+function pages(){
+
+    const indexContainer= document.querySelector("#index-page")
+
+    if (indexContainer) {
+        
+        const addRemove = indexContainer.querySelector(".add-remove")
+        const addButton = addRemove.querySelector(".page-add")
+        const removeButton = addRemove.querySelector(".page-remove")
+
+
+        const pagesIndex = indexContainer.querySelector(".pages")
+        const pages = pagesIndex.querySelectorAll(".pages-number")
+
+
+        addButton.addEventListener("click",e=>{
+            let pageCount = pages.length
+
+
+            const newPage = document.createElement("A")
+            newPage.href= `#entrada-${pageCount+1}`
+            newPage.textContent=pageCount+1
+            console.log(newPage)
+            pagesIndex.appendChild(newPage)
+
+        })
+
+
+
+
+
+    }
+
+
+
+}
+
+
+function dragNdrop(){
+
+    const dragable = document.querySelector(".dragable")
+
+    let startX = 0
+    let startY = 0
+    let newX = 0
+    let newY = 0
+
+    if(dragable){
+        dragable.addEventListener("mousedown",mouseDown)
+
+    }
+
+
+    function mouseDown(e){
+        startX = e.clientX
+        startY = e.clientY
+    
+        
+        document.addEventListener("mousemove",mouseMove)
+        document.addEventListener("mouseup",mouseUp)
+    
+    }
+    
+    
+    function mouseMove(e){
+        
+        newX = startX - e.clientX
+        newY = startY - e.clientY
+    
+    
+        startX = e.clientX
+        startY = e.clientY
+    
+        dragable.style.top = (dragable.offsetTop - newY) + "px"
+        dragable.style.left = (dragable.offsetLeft - newX) + "px"
+    
+    }
+
+
+    function mouseUp(e){
+        document.removeEventListener("mousemove",mouseMove)
+    }
+
+}
+
+
+
 
 document.addEventListener("DOMContentLoaded",e=>{
     EventListenters()

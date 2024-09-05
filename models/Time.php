@@ -312,8 +312,10 @@ class Time{
             
             $empleado = Empleados::getByFullName(strtolower($time->empleado));
 
+            $salarioHora = $empleado->salario / (8 * 30)  ;
 
-            if($empleado->modalidad == "OFICINA" && $empleado->sede == "COLOMBIA"){
+            if($empleado->modalidad == "oficina" && $empleado->sede == "colombia"){
+                
 
                 $diurnasExtra = round($salarioHora + ($salarioHora * .25));
                 $nocturnasExtra = round($salarioHora + ($salarioHora * .75));
@@ -326,7 +328,7 @@ class Time{
 
     
 
-            }else if($empleado->modalidad =="HOGAR"){
+            }else if($empleado->modalidad =="hogar"){
                 $extras = 2;
                 $moneda = "Dolares";
                 
@@ -426,8 +428,8 @@ class Time{
 
                 
                 $inicio = date_timestamp_get(new DateTime($time->inicio));
-                $resultado[$i]["diurnas"] += intval($time->diurnas_extras);
-                $resultado[$i]["nocturnas"] += intval($time->nocturnas_extras);
+                $resultado[$i]["diurnas"] += floatval($time->diurnas_extras);
+                $resultado[$i]["nocturnas"] += floatval($time->nocturnas_extras);
 
                 $resultado[$i]["diurnas_monto"] += (getdate($inicio)["weekday"] == "Sunday")? $time->diurnas_extras * $diurnasExtraDominicales:$time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] += (getdate($inicio)["weekday"] == "Sunday")? $time->nocturnas_extras * $nocturnasExtraDominicales:$time->nocturnas_extras * $nocturnasExtra;

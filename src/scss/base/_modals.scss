@@ -108,3 +108,29 @@
         letter-spacing: 2px;
     }
 }
+
+
+.index-page{
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    top: 40%;
+    left: 1%;
+    width: 20rem;
+    background-color: $blanco;
+    border-radius: 2rem;
+    opacity: .5;
+    
+    
+    &:hover{
+        opacity: 1;
+    }
+}
+
+
+.dragable{
+    position: fixed;
+}
