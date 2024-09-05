@@ -27,7 +27,7 @@
                     <label for="empleado">EMPLEADO</label>
                     <select name="horas[empleado]" id="empleado">
                         <?php foreach($empleados as $empleado){ ?>
-                            <option value="<?php echo $empleado->nombre . " " . $empleado->apellido ?>"<?php echo ($empleado->nombre . " " . $empleado->apellido === strtolower($hora->empleado)) ? "selected" : "" ?> ><?php echo strtoupper($empleado->nombre . " " . $empleado->apellido) ?></option>    
+                            <option value="<?php echo $empleado->nombre . " " . $empleado->apellido ?>"<?php echo ($empleado->nombre . " " . $empleado->apellido === $hora->empleado) ? "selected" : "" ?> ><?php echo strtoupper($empleado->nombre . " " . $empleado->apellido) ?></option>    
                         <?php }?>
                     </select>
                 </div>
@@ -36,7 +36,6 @@
                     <select name="horas[cliente]" id="cliente">
                         <option value="administrativo" <?php echo ($hora->cliente == "administrativo") ? "selected" : "" ?> >HORAS ADMINISTRATIVAS</option>
                         <?php foreach($clientes as $cliente){ ?>
-                            <option value=""></option>
                             <option value="<?php echo $cliente->nombre . " " . $cliente->apellido ?>" <?php echo ($cliente->nombre . " " . $cliente->apellido == $hora->cliente) ? "selected" : "" ?> ><?php echo strtoupper($cliente->nombre . " " . $cliente->apellido) ?> </option>    
                         <?php }?>
                     </select>

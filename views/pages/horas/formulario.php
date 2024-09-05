@@ -48,10 +48,13 @@
     </div>
 
 </fieldset>
+
+
 <div class="container-multifields">
 
     <fieldset class="container-inputs">
         <legend>INFORMACION DE JORNADA</legend>
+        
         <div class="container-input input-horas">
             <label for="inicio">INICIO DE JORNADA</label>
             <input type="datetime-local" name="horas[inicio]" id="inicio" class="inicio" value="<?php echo $time->inicio?? date("Y-m-d") . "T08:00:00" ?>">
@@ -91,7 +94,7 @@
         <legend>REGISTRO DE HORAS</legend>
         <div class="container-input input-horas">
             <label for="diurnas_ordinarias">DIURNAS ORDINARIAS</label>
-            <input type="range" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias" value="0" max="8" step="0.1">
+            <input type="range" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias" value="0" max="8" step="0.2">
             <input type="number" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias_value" value="0" class="calcTime">
         </div>
 
