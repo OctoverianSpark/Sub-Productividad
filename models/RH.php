@@ -84,7 +84,7 @@ class RH{
 
         foreach ($registro as $key => $value) {
             if(property_exists( $objeto, $key ) ){
-                $objeto->$key = strtoupper($value);
+                $objeto->$key = $value;
             }
         }
 

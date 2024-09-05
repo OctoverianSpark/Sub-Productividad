@@ -311,24 +311,22 @@ class Time{
             $inicio = date_timestamp_get(new DateTime($time->inicio));
             
             $empleado = Empleados::getByFullName(strtolower($time->empleado));
-            $salarioHora = round($empleado->salario / (30*8));
 
 
-            
-            if($empleado->modalidad == "oficina" && $empleado->sede == "colombia"){
+            if($empleado->modalidad == "OFICINA" && $empleado->sede == "COLOMBIA"){
 
                 $diurnasExtra = round($salarioHora + ($salarioHora * .25));
                 $nocturnasExtra = round($salarioHora + ($salarioHora * .75));
                 $diurnasExtraDominicales = round($salarioHora + $salarioHora);
                 $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5));
                 $moneda = "COP";
-
                 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? $time->diurnas_extras * $diurnasExtraDominicales:$time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? $time->nocturnas_extras *$nocturnasExtraDominicales:$time->nocturnas_extras * $nocturnasExtra;
+
     
 
-            }else if($empleado->modalidad =="hogar"){
+            }else if($empleado->modalidad =="HOGAR"){
                 $extras = 2;
                 $moneda = "Dolares";
                 
