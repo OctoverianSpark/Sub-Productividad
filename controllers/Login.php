@@ -63,8 +63,7 @@
             // init configuration 
             $clientID = '955799568045-esgpav3v7gqvhu57os14at72g11na401.apps.googleusercontent.com';
             $clientSecret = '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';
-            $redirectUri = 'http://localhost:3000/redirect';
-            
+            $redirectUri = 'http://'. $_SERVER["HTTP_HOST"] .'/redirect';
             // create Client Request to access Google API 
             $client = new Google_Client();
             $client->setClientId($clientID);
