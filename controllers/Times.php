@@ -93,10 +93,10 @@ class Times{
 
 
 
-            $horas->actualizar();
+            $horas->guardar();
 
-            sleep(2);
-            header("Location : /horas/ver/hora?id=$id");
+
+            header("Location:/horas/ver?resultado=2");
 
         }
 

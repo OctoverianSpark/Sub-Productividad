@@ -30,10 +30,10 @@ class Time{
         $this->inicio = strtoupper($args["inicio"]) ?? "";
         $this->almuerzo = strtoupper($args["almuerzo"]) ?? "";
         $this->final = strtoupper($args["final"]) ?? "";
-        $this->diurnas_ordinarias = strtoupper($args["diurnas_ordinarias"]) ?? "";
-        $this->nocturnas_ordinarias = strtoupper($args["nocturnas_ordinarias"]) ?? "";
-        $this->diurnas_extras = strtoupper($args["diurnas_extras"]) ?? "";
-        $this->nocturnas_extras = strtoupper($args["nocturnas_extras"]) ?? "";
+        $this->diurnas_ordinarias = strtoupper($args["diurnas_ordinarias"]) ?? 0;
+        $this->nocturnas_ordinarias = strtoupper($args["nocturnas_ordinarias"]) ?? 0;
+        $this->diurnas_extras = strtoupper($args["diurnas_extras"]) ?? 0;
+        $this->nocturnas_extras = strtoupper($args["nocturnas_extras"]) ?? 0;
         $this->cena = strtoupper($args["cena"]) ?? "no";
         $this->taxi = strtoupper($args["taxi"]) ?? "no";
         $this->comentarios = strtoupper($args["comentarios"]) ?? "";
@@ -120,7 +120,7 @@ class Time{
 
         foreach ($registro as $key => $value) {
             if(property_exists( $objeto, $key ) ){
-                $objeto->$key = $value;
+                $objeto->$key = strtoupper($value);
             }
         }
 
@@ -161,7 +161,7 @@ class Time{
         $query = "INSERT INTO ". static::$tabla ." ("  ;
         $query .= join(", ",array_keys($atributos));
         $query .= ")VALUES ('";
-        $query .= join("' , '",array_values($atributos));
+        $query .= strtolower(join("' , '",array_values($atributos)));
         $query.= "')";
 
         $resultado = self::$db->query($query);
@@ -181,7 +181,7 @@ class Time{
         }
 
         $query = "UPDATE ". static::$tabla." SET "  ;
-        $query.= join(",",$valores);
+        $query.= strtolower(join(",",$valores));
         $query.= " WHERE id = '". self::$db->escape_string($this->id) . "'";
 
         $resultado = self::$db->query($query);
@@ -214,7 +214,7 @@ class Time{
         }
         return $sanitizado;
     }
-
+ 
 
 
 

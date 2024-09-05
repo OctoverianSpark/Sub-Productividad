@@ -84,7 +84,7 @@ class RH{
 
         foreach ($registro as $key => $value) {
             if(property_exists( $objeto, $key ) ){
-                $objeto->$key = $value;
+                $objeto->$key = strtoupper($value);
             }
         }
 
@@ -125,7 +125,7 @@ class RH{
         $query = "INSERT INTO ". static::$tabla ." ("  ;
         $query .= join(", ",array_keys($atributos));
         $query .= ")VALUES ('";
-        $query .= join("' , '",array_values($atributos));
+        $query .= strtolower(join("' , '",array_values($atributos)));
         $query.= "')";
 
         $resultado = self::$db->query($query);
@@ -145,7 +145,7 @@ class RH{
         }
 
         $query = "UPDATE ". static::$tabla." SET "  ;
-        $query.= join(",",$valores);
+        $query.= strtolower(join(",",$valores));
         $query.= " WHERE id = '". self::$db->escape_string($this->id) . "'";
         $query.= " LIMIT 1";
 

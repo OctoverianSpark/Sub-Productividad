@@ -67,11 +67,11 @@
 
                     <div class="container-input">
                         <label for="cena">CENA</label>
-                        <input type="checkbox" name="horas[cena]" id="cena" value="si">
+                        <input type="checkbox" name="horas[cena]" id="cena" value="si" <?php echo (strtolower($hora->cena) == "si") ? "checked" : "" ?>>
                     </div>
                     <div class="container-input">
                         <label for="taxi">TAXI</label>
-                        <input type="checkbox" name="horas[taxi]" id="taxi" value="si">
+                        <input type="checkbox" name="horas[taxi]" id="taxi" value="si" <?php echo (strtolower($hora->taxi) == "si") ? "checked" : "" ?>>
                     </div>
 
 
