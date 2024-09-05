@@ -433,8 +433,8 @@ class Time{
                 $resultado[$i]["nocturnas_monto"] += (getdate($inicio)["weekday"] == "Sunday")? $time->nocturnas_extras * $nocturnasExtraDominicales:$time->nocturnas_extras * $nocturnasExtra;
                 
 
-                $resultado[$i]["logistica"] += ($time->cena==="si")?5 :0;
-                $resultado[$i]["logistica"] += ($time->taxi==="si")?5 :0;
+                $resultado[$i]["logistica"] += ($time->cena==="SI")?5 :0;
+                $resultado[$i]["logistica"] += ($time->taxi==="SI")?5 :0;
                 
 
             }

@@ -17,3 +17,7 @@
 .boton-fucsia-inline{
     @include boton(darken($fucsia,20),inline-block)
 }
+
+.boton-flecha-inline{
+    @include boton(darken($fucsia,20),inline-block);
+}
