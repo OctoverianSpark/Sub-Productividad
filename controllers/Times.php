@@ -45,7 +45,7 @@ class Times{
 
 
 
-                header("Location: /horas/ver");
+                header("Location: /horas/ver?resultado=1");
                 
 
             }
@@ -116,6 +116,19 @@ class Times{
         ]);
     }
 
+
+    public static function eliminar(){
+        $id = validarID();
+
+
+
+        $hora = new Time($args = ["id" => $id]);
+
+        $hora->eliminar();
+
+        header("Location: /horas/ver?resultado=3");
+
+    }
 
 
 

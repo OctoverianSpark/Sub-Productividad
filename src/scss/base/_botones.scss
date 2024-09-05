@@ -9,7 +9,7 @@
     @include boton($rojo,block)
 }
 .boton-rojo-inline{
-    @include boton($rojo,inline-block)
+    @include boton($rojo,inline-block);
 }
 .boton-fucsia-block{
     @include boton(darken($fucsia,20),block)

@@ -220,7 +220,6 @@ class Time{
 
     public function eliminar(){
         $query = "DELETE FROM " . static::$tabla . " WHERE id = $this->id";
-
         self::$db->query($query);
     }
 
@@ -421,6 +420,7 @@ class Time{
             }
             
             $times = self::consultarSQL($query);
+            
             
 
             if(count($times)<=0) continue;

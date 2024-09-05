@@ -10,6 +10,7 @@
         <h2 class="subtitle">INICIO DE JORNADA <span><?php echo $hora->inicio?></span></h2>
         <h2 class="subtitle">HORAS DE ALMUERZO <span><?php echo $hora->almuerzo ?></span></h2>
         <h2 class="subtitle">INICIO DE JORNADA <span><?php echo $hora->final ?></span></h2>
+        <a href="/horas/ver/hora/eliminar?id=<?php echo $hora->id ?>" class="boton-rojo-inline">Eliminar</a>
     </div>
 
     <div class="container-updates">
@@ -18,7 +19,7 @@
             <label for="actualizar">ACTUALIZAR?</label>
             <input type="checkbox" id="actualizar">
         </div>
-        <form method="post" class="form-actualizaciones" >
+        <form method="post" class="form-actualizaciones" novalidate="novalidate">
 
             <fieldset class="container-inputs input-horas-ordinarias-extras" disabled>
             <legend>ACTUALIZAR DATOS</legend>
@@ -62,6 +63,22 @@
                     <input type="range" name="horas[nocturnas_extras]" id="nocturnas_extras" value="<?php echo $hora->nocturnas_extras ?>" max="10" step="0.2">
                     <input type="number" name="horas[nocturnas_extras]" id="nocturnas_extras_value" value="<?php echo $hora->nocturnas_extras ?>" class="calcTime">
                 </div>
+                <div class="container-input">
+
+                    <div class="container-input">
+                        <label for="cena">CENA</label>
+                        <input type="checkbox" name="horas[cena]" id="cena" value="si">
+                    </div>
+                    <div class="container-input">
+                        <label for="taxi">TAXI</label>
+                        <input type="checkbox" name="horas[taxi]" id="taxi" value="si">
+                    </div>
+
+
+
+
+                </div>
+
 
                 <div class="container-input">
                     <label for="comentarios">COMENTARIOS DE LA ACTUALIZACION</label>

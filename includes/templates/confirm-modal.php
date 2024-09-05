@@ -1,7 +1,7 @@
 
 
 <div class="modal modal-confirmacion" style="display: none;">
-+
+
     <h3 class="title">Confirmar Registro?</h3>
 
     <div class="container-confirm">
