@@ -7,6 +7,7 @@ namespace Controllers;
 use DateTime;
 use Models\Clientes;
 use Models\Empleados;
+use Models\Logs;
 use Models\Time;
 use MVC\Router;
 
@@ -26,29 +27,40 @@ class Times{
 
         if($_SERVER["REQUEST_METHOD"] === "POST"){
 
-            
-            $_POST["horas"]["inicio"]=str_replace("T"," ",$_POST["horas"]["inicio"]);
-            $_POST["horas"]["final"]=str_replace("T"," ",$_POST["horas"]["final"]);
+            $errores = [];
 
-            
-            $times = new Time($_POST["horas"]);
-
-
-            $errores = $times->validar();
-
-            if(empty($errores)){
-
-
-
-
-                $times->guardar();
-
-
-
-                header("Location: /horas/ver?resultado=1");
+            foreach($_POST["horas"] as $hora){
+                $hora["inicio"] = str_replace("T"," ",$hora["inicio"]);
+                $hora["final"] = str_replace("T"," ",$hora["inicio"]);
+    
                 
+                $times = new Time($hora);
+
+                $logData = [
+                    "titulo"=>"Hora Cargada",
+                    "contenido"=>"El usuario " . $_SESSION["name"] . " cargo las horas de " . $times->empleado . " en la fecha " . $times->inicio
+                ];
+
+                $log = new Logs($logData);
+
+                $errores = $times->validar();
+    
+                if(empty($errores)){
+    
+    
+    
+    
+                    $times->guardar();
+                    
+                    $log->guardar();
+    
+                    header("Location: /horas/ver?resultado=1");
+                    
+    
+                }
 
             }
+
         }
 
         $router->render("pages/horas/crear",[
@@ -91,11 +103,18 @@ class Times{
 
             $horas = new Time($_POST["horas"]);
 
+            
+            $logData = [
+                "titulo"=>"Hora Actualizada",
+                "contenido"=>"El usuario " . $_SESSION["name"] . " hizo una actualizacion de las horas de " . $horas->empleado . " en la fecha " . $horas->inicio
+            ];
+
+            $log = new Logs($logData);
 
 
             $horas->guardar();
 
-
+            $log->guardar();
             header("Location:/horas/ver?resultado=2");
 
         }

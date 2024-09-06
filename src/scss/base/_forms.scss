@@ -252,6 +252,7 @@ input{
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    position: relative;
     fieldset{
         width: 100%;
     }
@@ -267,7 +268,8 @@ input{
 .logo-1,.logo-2,.logo-3,.logo-4,.logo-5,.logo-6{
     width: 20rem;
     opacity: .5;
-    position: absolute;
+    position: fixed;
+    z-index: -1;
 }
 
 
@@ -275,66 +277,42 @@ input{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     gap: 2rem;
 }
 
+.container-page{
+    padding: 1rem;
+    margin-bottom: 5rem;
+} 
 
 .logo-1{
     transform: rotate(35deg);
-    top: 100%;
+    top: 5%;
+    left: 0;
 }
 
 
 .logo-2{
-    right: 0;
-    top: 120%;
+    right: 0%;
+    top: 5%;
 }
 .logo-3{
-    top: 140%;
+    top: 12%;
 }
 
 
 .logo-4{
-    top: 180%;
-    right: 0;
+    top: 12%;
+    right: 10%;
 }
 
 .logo-5{
     inset: 0;
     width: 100%;
+    height: 100%;
     opacity: .2;
-    z-index: -1;
 }
 
-.logo-6{
-    left: 40%;
-}
-
-
-.container-pages{
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-
-
-    .page{
-        border-radius: 50%;
-        height: 2rem;
-        width: 2rem;
-        background-color: transparent;
-        border: 1px solid $negro;
-    }
-
-    .selected{
-        background-color: darken($fucsia,20);
-        width: .5rem;
-        height: .5rem;
-        border-radius: 50%;
-        height: 2rem;
-        width: 2rem;
-
-
-    }
-}
 
 

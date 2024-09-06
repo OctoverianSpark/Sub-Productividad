@@ -111,7 +111,6 @@
 
 
 .index-page{
-    position: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -119,15 +118,66 @@
 
     top: 40%;
     left: 1%;
-    width: 20rem;
+    width: 30rem;
+    padding: 1rem;
     background-color: $blanco;
     border-radius: 2rem;
     opacity: .5;
+    transition: .5s opacity;
     
     
     &:hover{
         opacity: 1;
     }
+
+
+    .pages{
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+
+
+        a{
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: darken($fucsia, 40);
+
+
+            &.actual{
+                font-weight: 800;
+            }
+        }
+    }
+
+
+    .add-remove{
+
+        display: flex;
+        gap: 2rem;
+        margin: 1rem;
+
+        button{
+            background-color: transparent;
+            border: none;
+            
+            i{
+                
+                font-size: 2rem; 
+
+                color: lighten($morado, 40 );
+                transition: .5s color;
+
+                &:hover{
+                    color: $morado;
+                }
+            }
+        }
+
+
+    }
+
+
+
 }
 
 

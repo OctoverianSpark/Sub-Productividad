@@ -5,6 +5,7 @@ require "config/databases.php";
 require __DIR__ . "/../vendor/autoload.php";
 
 use Models\DESC;
+use Models\Logs;
 use Models\RH;
 use Models\Time;
 
@@ -19,7 +20,7 @@ $subpDB = conectarDB("subp");
 RH::setDb($subpDB);
 DESC::setDb($subpDB);
 Time::setDb($subpDB);
-
+Logs::setDb($subpDB);
 
 
 

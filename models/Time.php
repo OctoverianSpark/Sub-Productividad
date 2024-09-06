@@ -25,18 +25,18 @@ class Time{
 
     public function __construct($args=[]){
         $this->id = $args["id"] ?? null;
-        $this->empleado = strtoupper($args["empleado"]) ?? "";
-        $this->cliente = strtoupper($args["cliente"]) ?? "";
-        $this->inicio = strtoupper($args["inicio"]) ?? "";
-        $this->almuerzo = strtoupper($args["almuerzo"]) ?? "";
-        $this->final = strtoupper($args["final"]) ?? "";
-        $this->diurnas_ordinarias = strtoupper($args["diurnas_ordinarias"]) ?? 0;
-        $this->nocturnas_ordinarias = strtoupper($args["nocturnas_ordinarias"]) ?? 0;
-        $this->diurnas_extras = strtoupper($args["diurnas_extras"]) ?? 0;
-        $this->nocturnas_extras = strtoupper($args["nocturnas_extras"]) ?? 0;
-        $this->cena = strtoupper($args["cena"]) ?? "no";
-        $this->taxi = strtoupper($args["taxi"]) ?? "no";
-        $this->comentarios = strtoupper($args["comentarios"]) ?? "";
+        $this->empleado = strtolower($args["empleado"]) ?? "";
+        $this->cliente = strtolower($args["cliente"]) ?? "";
+        $this->inicio = $args["inicio"] ?? "";
+        $this->almuerzo = $args["almuerzo"] ?? "";
+        $this->final = $args["final"] ?? "";
+        $this->diurnas_ordinarias = $args["diurnas_ordinarias"] ?? 0;
+        $this->nocturnas_ordinarias = $args["nocturnas_ordinarias"] ?? 0;
+        $this->diurnas_extras = $args["diurnas_extras"] ?? 0;
+        $this->nocturnas_extras = $args["nocturnas_extras"] ?? 0;
+        $this->cena = $args["cena"] ?? "no";
+        $this->taxi = $args["taxi"] ?? "no";
+        $this->comentarios = strtolower($args["comentarios"]) ?? "";
     }
 
 
