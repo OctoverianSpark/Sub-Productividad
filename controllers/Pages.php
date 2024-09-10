@@ -71,7 +71,7 @@ class Pages{
                                                                 strtoupper($hora["taxi"]),
                                                                 strtoupper($hora["diurnas_monto"]),
                                                                 strtoupper($hora["nocturnas_monto"]),
-                                                                intval(s($hora["diurnas_monto"])) + intval(s($hora["nocturnas_monto"]))
+                                                                floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"]))
                 ],null,"A$i" );
                 $i++;
 
@@ -92,7 +92,7 @@ class Pages{
                                                                 strtoupper($hora["taxi"]),
                                                                 strtoupper($hora["diurnas_monto"]),
                                                                 strtoupper($hora["nocturnas_monto"]),
-                                                                intval(s($hora["diurnas_monto"])) + intval(s($hora["nocturnas_monto"]))
+                                                                floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"]))
                 ],null,"A$j" );
                 
                 $j++;
