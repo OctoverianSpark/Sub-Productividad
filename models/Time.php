@@ -319,12 +319,13 @@ class Time{
 
                 $diurnasExtra = round($salarioHora + ($salarioHora * .25));
                 $nocturnasExtra = round($salarioHora + ($salarioHora * .75));
+                $horaDominical = round($salarioHora + ($salarioHora * 1.75));
                 $diurnasExtraDominicales = round($salarioHora + $salarioHora);
                 $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5));
                 $moneda = "COP";
                 
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? $time->diurnas_extras * $diurnasExtraDominicales:$time->diurnas_extras * $diurnasExtra;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? $time->nocturnas_extras *$nocturnasExtraDominicales:$time->nocturnas_extras * $nocturnasExtra;
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales):$time->diurnas_extras * $diurnasExtra;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $horaDominical) + ($time->nocturnas_extras *$nocturnasExtraDominicales):$time->nocturnas_extras * $nocturnasExtra;
 
     
 
@@ -332,9 +333,10 @@ class Time{
                 $extras = 2;
                 $moneda = "Dolares";
                 
-                $resultado[$i]["diurnas_monto"] = $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = $time->nocturnas_extras * $extras;
-    
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras):$time->diurnas_extras * $extras;
+
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras): $time->nocturnas_extras * $extras;
+
             }else if($empleado->modalidad == "oficina" && $empleado->sede ="venezuela"){
 
                 
@@ -342,8 +344,9 @@ class Time{
                 $moneda = "Dolares";
 
                 
-                $resultado[$i]["diurnas_monto"] = $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = $time->nocturnas_extras * $extras;
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras):$time->diurnas_extras * $extras;
+
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras): $time->nocturnas_extras * $extras;
     
 
 
