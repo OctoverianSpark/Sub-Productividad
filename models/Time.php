@@ -401,10 +401,10 @@ class Time{
             
 
 
-            $diurnasExtra = 5;
-            $nocturnasExtra =5.5;
-            $diurnasExtraDominicales = 6;
-            $nocturnasExtraDominicales = 6.5;
+            $diurnasExtra = 5.5;
+            $nocturnasExtra =6;
+            $diurnasExtraDominicales = 6.5;
+            $nocturnasExtraDominicales = 7;
 
             $resultado[$i]["cliente"] = $cliente->nombre ." " . $cliente->apellido;
             $resultado[$i]["diurnas"] = 0;
