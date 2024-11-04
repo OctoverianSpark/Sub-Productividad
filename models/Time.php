@@ -319,13 +319,13 @@ class Time{
 
                 $diurnasExtra = round($salarioHora + ($salarioHora * .25));
                 $nocturnasExtra = round($salarioHora + ($salarioHora * .75));
-                $horaDominical = round($salarioHora + ($salarioHora * 1.75));
+                $horaDominical = round($salarioHora + ($salarioHora * .75));
                 $diurnasExtraDominicales = round($salarioHora + $salarioHora);
                 $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5));
                 $moneda = "COP";
                 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales):$time->diurnas_extras * $diurnasExtra;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $horaDominical) + ($time->nocturnas_extras *$nocturnasExtraDominicales):$time->nocturnas_extras * $nocturnasExtra;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras *$nocturnasExtraDominicales):$time->nocturnas_extras * $nocturnasExtra;
 
     
 
