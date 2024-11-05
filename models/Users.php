@@ -1,47 +1,44 @@
 <?php 
 
 
+
 namespace Models;
 
 
 
 
-class Logs{
+class Users{
+
+
+    
+
 
     protected static $db;
 
-    protected static $tabla= "logs";
+    protected static $tabla= "users";
 
-    protected static $columnasDB = ["id","titulo","contenido","fecha"];
+    protected static $columnasDB = ["id","user","email","mode"];
 
+    public $id,$user,$email,$mode;
     public static $errores = [];
 
-    public $id;
-    public $titulo;
-    public $contenido;
-    public $fecha;
 
     public function __construct($args = []){
 
-
-
-        $this->id = null;
-        $this->fecha = date("Y/m/d H:i:s");
-        $this->titulo = $args["titulo"] ?? "";
-        $this->contenido = $args["contenido"]??"";
-
-
+        $this->id = $args["id"]??null;
+        $this->user = $args["user"]?? null;
+        $this->email = $args["email"]??null;
+        $this->mode = $args["mode"]?? null;
+        
 
     }
+
+
+
 
     public static function setDb($db){
         self::$db = $db;
     }
-
-
-
-
-
     public static function getColumns(){
 
         $columnas = [];
@@ -106,7 +103,6 @@ class Logs{
         foreach ($registro as $key => $value) {
             if(property_exists( $objeto, $key ) ){
                 $objeto->$key = $value;
-
             }
         }
 
@@ -127,9 +123,10 @@ class Logs{
 
 
     }
-    public static function all(){
-        $query = "SELECT * FROM " . static::$tabla . " ORDER BY fecha DESC"  ;
 
+
+    public static function all(){
+        $query = "SELECT * FROM " . static::$tabla . " ORDER BY user ASC";
         $resultado = self::consultarSQL($query);
 
         return $resultado;
@@ -154,6 +151,8 @@ class Logs{
 
         return $resultado;
     }
+
+
     public function actualizar(){
         
         $atributos = $this->sanitizarAtributos();
@@ -177,7 +176,21 @@ class Logs{
 
     }
 
+    public static function  findUser($mail=null,$user=null){
 
+        $query = "SELECT * FROM " . self::$tabla . " WHERE ";
+
+        if($mail){
+            $query .= "email = '$mail'";
+        }
+        if($user){
+            $query .= "user = '$user'";
+        }
+        $resultado = self::consultarSQL(query: $query);
+
+
+        return array_shift($resultado);
+    }
 
 
     public function eliminar(){
@@ -191,7 +204,7 @@ class Logs{
 
 
         if($column && $param){
-            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%'";
+            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%' ORDER BY nombre ASC";
             $resultado = self::consultarSQL($query);
 
         }else{
@@ -203,6 +216,7 @@ class Logs{
 
 
     }
+
     public function atributos(){
         $atributos = [];
         foreach (static::$columnasDB as $columna) {
@@ -218,8 +232,11 @@ class Logs{
 
 
         $sanitizado= [];
+
         foreach($atributos as $key => $value){
+            
             $sanitizado[$key] = self::$db->escape_string($value);
+          
 
         }
         return $sanitizado;
@@ -228,6 +245,16 @@ class Logs{
     
 
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -95,11 +95,9 @@ class Time{
     public static function findByDate($range1,$range2){
         
         $query = "SELECT * FROM " . static::$tabla . " WHERE ";
-        $query.= "(inicio BETWEEN '$range1' AND '$range2') OR";
-        $query.= "(final BETWEEN '$range1' AND '$range2')";
-
+        $query.= "(DATE(inicio) BETWEEN '$range1' AND '$range2') OR";
+        $query.= "(DATE(final) BETWEEN '$range1' AND '$range2')";
         $resultado = self::consultarSQL($query);
-
         return $resultado;
 
 
@@ -282,7 +280,6 @@ class Time{
             $query .= "(final BETWEEN '$from' AND '$to')";
             $query .= "AND NOT cliente = 'administrativo'";
         }
-
 
         $resultado = self::consultarSQL($query);
 

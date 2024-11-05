@@ -8,3 +8,14 @@
 .tabla-clientes{
     @include tabla(90%)
 }
+
+.tabla-logs{
+    @include tabla(70%)
+}
+
+
+.tabla-usuarios{
+    display: grid;
+    place-items: center;
+    @include tabla(100rem);
+}

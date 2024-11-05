@@ -86,23 +86,31 @@ function changeForm(){
 
 function rangeValue(){
 
-    const ranges = document.querySelectorAll("input[type='range']")
-    const numbers = document.querySelectorAll("input[type='number']")
+    const containers = document.querySelectorAll(".range-number-container")
 
-    if(ranges.length >0 && numbers.length>0){
-        ranges.forEach(range=>{
+    if(containers){
+        containers.forEach(container=>{
+
+
+            const range = container.querySelector("input[type='range']")
+            const number = container.querySelector("input[type='number']")
+            
             range.addEventListener("input",e=>{
-                const number = document.querySelector(`#${range.id}_value`)
+
+
                 number.value = e.target.value
+
             })
+            number.addEventListener("input",e=>{
+
+
+                range.value = e.target.value
+
+            })
+
+
         })
 
-        numbers.forEach(number=>{
-            number.addEventListener("input",e=>{
-                const range = document.querySelector(`#${number.id.replace("_value","")}`)
-                range.value = e.target.value
-            })
-        })
 
     }
 
@@ -467,7 +475,7 @@ function pages(){
 
 
             createPage(pageCount)
-
+            rangeValue()
 
             
             if(pageCount === 7){
@@ -548,6 +556,7 @@ function createPage(pageNumber){
 
 
     infoPersonas.querySelector("#empleado").setAttribute("name",`horas[${pageNumber-1}][empleado]`)
+    
     infoPersonas.querySelector("#cliente").setAttribute("name",`horas[${pageNumber-1}][cliente]`)
 
 

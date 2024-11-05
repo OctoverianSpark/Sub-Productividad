@@ -106,8 +106,7 @@ class RH{
 
     }
     public static function all(){
-        $query = "SELECT * FROM " . static::$tabla ;
-
+        $query = "SELECT * FROM " . static::$tabla . " ORDER BY nombre ASC";
         $resultado = self::consultarSQL($query);
 
         return $resultado;
@@ -169,7 +168,7 @@ class RH{
 
 
         if($column && $param){
-            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%'";
+            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%' ORDER BY nombre ASC";
             $resultado = self::consultarSQL($query);
 
         }else{

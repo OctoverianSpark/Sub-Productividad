@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Models\Empleados;
 use Models\Clientes;
+use Models\Users;
 use MVC\Router;
 
 
@@ -13,11 +14,13 @@ class Settings{
 
         $clientes = count(Clientes::all());
         $empleados = count(Empleados::all());
+        $usuarios = count(Users::all());
         $total=$empleados + $clientes;
 
         $router->render("settings/index",[
             "clientes"=>$clientes,
             "empleados"=>$empleados,
+            "usuarios"=>$usuarios,
             "total"=>$total
 
         ]

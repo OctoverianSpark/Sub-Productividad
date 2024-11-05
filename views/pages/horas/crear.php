@@ -66,7 +66,7 @@
                         <label for="empleado">EMPLEADO</label>
                         <select name="horas[0][empleado]" id="empleado">
                             <?php foreach($empleados as $empleado){ ?>
-                                <option value="<?php echo $empleado->nombre . " " . $empleado->apellido ?>"><?php echo strtoupper($empleado->nombre . " " . $empleado->apellido) ?></option>    
+                                <option value="<?php echo $empleado->nombre . " " . $empleado->apellido ?>" ><?php echo strtoupper($empleado->nombre . " " . $empleado->apellido) ?></option>    
                             <?php }?>
                         </select>
                     </div>
@@ -123,24 +123,24 @@
 
                 <fieldset class="container-inputs input-horas-ordinarias-extras" id="registro-horas">
                     <legend>REGISTRO DE HORAS</legend>
-                    <div class="container-input input-horas">
+                    <div class="container-input input-horas range-number-container">
                         <label for="diurnas_ordinarias">DIURNAS ORDINARIAS</label>
                         <input type="range" name="horas[0][diurnas_ordinarias]" id="diurnas_ordinarias" value="8" max="8" step="0.2">
                         <input type="number" name="horas[0][diurnas_ordinarias]" id="diurnas_ordinarias_value" value="8" class="calcTime">
                     </div>
 
-                    <div class="container-input input-horas">
+                    <div class="container-input input-horas range-number-container">
                         <label for="nocturnas_ordinarias">NOCTURNAS ORDINARIAS</label>
                         <input type="range" name="horas[0][nocturnas_ordinarias]" id="nocturnas_ordinarias" value="0" max="8" step="0.2">
                         <input type="number"name="horas[0][nocturnas_ordinarias]"  id="nocturnas_ordinarias_value" value="0" class="calcTime">
                     </div>
-                    <div class="container-input input-horas">
+                    <div class="container-input input-horas range-number-container">
                         <label for="diurnas_extras">DIURNAS EXTRAS</label>
                         <input type="range" name="horas[0][diurnas_extras]" id="diurnas_extras" value="0" max="10" step="0.2">
                         <input type="number" name="horas[0][diurnas_extras]" id="diurnas_extras_value" value="0" class="calcTime">
                     </div>
 
-                    <div class="container-input input-horas">
+                    <div class="container-input input-horas range-number-container">
                         <label for="nocturnas_extras">NOCTURNAS EXTRAS</label>
                         <input type="range" name="horas[0][nocturnas_extras]" id="nocturnas_extras" value="0" max="10" step="0.2">
                         <input type="number" name="horas[0][nocturnas_extras]" id="nocturnas_extras_value" value="0" class="calcTime">

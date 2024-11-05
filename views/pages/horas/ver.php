@@ -33,11 +33,11 @@
         <div class="container-inputs-search" id="date-search">
             <div class="container-input-search">
                 <label for="date-search">DESDE</label>
-                <input type="datetime-local" name="from" id="date-search-input" value="<?php echo $_GET["from"] ?>">
+                <input type="date" name="from" id="date-search-input" value="<?php echo $_GET["from"] ?>">
             </div>
             <div class="container-input-search">
                 <label for="date-search">HASTA</label>
-                <input type="datetime-local" name="to" id="date-search-input" value="<?php echo $_GET["to"] ?>">
+                <input type="date" name="to" id="date-search-input" value="<?php echo $_GET["to"] ?>">
             </div>
 
         </div>

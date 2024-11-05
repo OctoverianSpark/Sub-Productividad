@@ -2,9 +2,10 @@
 
 namespace Controllers;
 
-use Models\Empleados;
-use Models\Time;
 use MVC\Router;
+use Models\Empleados;
+use Models\Logs;
+use Models\Time;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -12,7 +13,10 @@ class Pages{
 
     public static function index( Router $router ){
 
-        $router->render("pages/index");
+        $logs = Logs::all();
+        $router->render("pages/index",[
+            "logs" => $logs
+        ]);
 
 
     }
@@ -21,7 +25,7 @@ class Pages{
     public static function export(){
 
         $tabla = $_GET["table"];
-
+        
 
         $spreadsheet = new Spreadsheet();
         $writer = new Xlsx($spreadsheet);

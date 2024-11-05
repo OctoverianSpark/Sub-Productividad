@@ -47,7 +47,11 @@
     
     border: 1px solid $negro;
     margin: 5rem;
+    display: grid;
+    place-items: center;
+
     max-width: $width;
+    width: 100%;
     border-spacing: 0;
     display: block;
     min-height: 10vh;
@@ -57,7 +61,7 @@
     overflow-y: scroll;
     scrollbar-color: rgba($morado, .5) rgba($morado, 0);
     scrollbar-width: thin;
-    
+    border: none;
     
     thead{
         position: sticky;
@@ -71,9 +75,8 @@
         }
     }
     tbody{
-        
         td{
-            width: 15rem;
+            width: auto;
             padding: 1rem;
             border: 1px solid $negro;
         }

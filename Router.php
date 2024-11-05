@@ -23,7 +23,7 @@ class Router{
         $auth = $_SESSION["login"] ?? null;
 
         $rutasProtegidas = ["/","/horas/ver","/horas/registrar","/export","/settings","/settings/empleados","settings/clientes","/eliminar"];
-
+        $rutasGOD = ["/settings/usuarios","/settings/usuarios/crear","/settings/usuarios/actualizar", "/settings/usuarios/eliminar"];
         $urlActual = $_SERVER["PATH_INFO"] ?? "/";
         $metodo = $_SERVER["REQUEST_METHOD"];
 
@@ -46,6 +46,9 @@ class Router{
 
         if(in_array($urlActual,$rutasProtegidas) && !$auth){
             header("Location: /login");
+        }
+        if(in_array($urlActual, $rutasGOD) && $_SESSION["mode"] !== "GOD"){
+            header("Location : / ");
         }
 
     }   

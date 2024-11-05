@@ -22,3 +22,11 @@
     @include boton(darken($fucsia,20),inline-block);
 }
 
+
+.container-buttons{
+
+    display: flex;
+    gap: 2rem;
+
+
+}

@@ -9,6 +9,7 @@
     
     use Google_Client;
     use Google_Service_Oauth2;
+    use Models\Users;
 
     class Login{
         public static function login(Router $router){
@@ -19,21 +20,26 @@
     
                 $auth = $ad->auth();
     
+                $user= Users::findUser(null,$_POST["login"]["user"]);
+
                 if (!$_POST["login"]["user"] || !$_POST["login"]["password"]) {
                     header("Location: /login?error=1");
                 }
                 else{
+                    if($user){
     
-                    $adData = $ad->consultData();
-                    
-                    if($auth){
-                        $_SESSION["login"]=true;
-                        $_SESSION["log_type"] = "user";
-                        $_SESSION["username"] = $_POST["login"]["user"];
-                        $_SESSION["name"] = strtoupper($adData["displayname"]) ;
-                        header("Location: /");
-                    }else{
-                        header("Location: /login?error=2");
+                        $adData = $ad->consultData();
+                        if($auth){
+                            $_SESSION["login"]=true;
+                            $_SESSION["log_type"] = "user";
+                            $_SESSION["username"] = $_POST["login"]["user"];
+                            $_SESSION["name"] = strtoupper($adData["displayname"]) ;
+                            $_SESSION["mode"] = $user->mode;
+                            header("Location: /");
+                        }else{
+                            header("Location: /login?error=2");
+                            
+                        }
                         
                     }
     
@@ -89,15 +95,23 @@
             }
             session_start();
     
+            $user= Users::findUser($email);
+
+            if($user){
+
     
-            $_SESSION["name"] = $name;
-            $_SESSION["email"] = $email;
-            $_SESSION["picture"] = $picture;
-            $_SESSION["log_type"] = "email";
-            $_SESSION["login"] = true;
-            
+                $_SESSION["name"] = $name;
+                $_SESSION["email"] = $email;
+                $_SESSION["picture"] = $picture;
+                $_SESSION["log_type"] = "email";
+                $_SESSION["login"] = true;
+                $_SESSION["mode"] = $user->mode;
     
-            header("Location: /");
+                
+        
+                header("Location: /");
+
+            }
     
             // now you can use this profile info to create account in your website and make user logged in. 
             } else {

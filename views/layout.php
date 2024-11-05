@@ -2,7 +2,6 @@
 <?php
     $auth = estalogueado();
 
-
 ?>
 
 
@@ -41,8 +40,11 @@
                         <ul>
                                 <li><a href="/horas/registrar" class="navegacion_enlace">Ingresar Horas</a></li>
                                 <li><a href="/horas/ver" class="navegacion_enlace">Ver Horas</a></li>
-                                <li><a href="/settings" class="navegacion_enlace">Configuracion</a></li>
+                                <?php if($_SESSION["mode"] == "ADMIN"){ ?>
+                                    <li><a href="/settings" class="navegacion_enlace">Configuracion</a></li>
+                                <?php } ?>
                                 <li><a href="/logout" class="navegacion_enlace">Cerrar Sesion</a></li>
+
                         </ul>
                     </nav>
             </div>
