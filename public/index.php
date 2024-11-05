@@ -9,6 +9,7 @@ use Controllers\Login;
 use Controllers\Pages;
 use Controllers\Settings;
 use Controllers\Times;
+use Controllers\Users;
 
 $router = new Router;
 
@@ -61,6 +62,18 @@ $router->post("/settings/clientes/actualizar",[Clients::class,"actualizar"]);
 
 $router->get("/settings/clientes/eliminar",[Clients::class,"eliminar"]);
 $router->post("/settings/clientes/eliminar",[Clients::class,"eliminar"]);
+
+/* Usuarios */
+$router->get("/settings/usuarios",[Users::class,"index"]);
+$router->post("/settings/usuarios",[Users::class,"index"]);
+
+$router->get("/settings/usuarios/crear",[Users::class,"crear"]);
+$router->post("/settings/usuarios/crear",[Users::class,"crear"]);
+
+$router->get("/settings/usuarios/actualizar",[Users::class,"actualizar"]);
+$router->post("/settings/usuarios/actualizar",[Users::class,"actualizar"]);
+
+$router->get("/settings/usuarios/eliminar",[Users::class,"eliminar"]);
 
 
 
