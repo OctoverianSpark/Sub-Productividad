@@ -23,7 +23,7 @@
                     <span>Clientes Registrados: <?php echo $clientes ?></span>
                     <a href="settings/clientes" class="boton-morado-block">Clientes</a>
                 </div>
-                <?php if($_SESSION["mode"] === "ADMIN"){ ?>
+                <?php if($_SESSION["mode"] == "ADMIN" || $_SESSION["mode"] == "GOD"){ ?>
                     <div class="container-count-action">
                         <span>Usuarios con Acceso: <?php echo $usuarios ?></span>
                         <a href="settings/usuarios" class="boton-morado-block">Usuarios</a>
