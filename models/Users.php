@@ -126,7 +126,7 @@ class Users{
 
 
     public static function all(){
-        $query = "SELECT * FROM " . static::$tabla . " ORDER BY user ASC";
+        $query = "SELECT * FROM " . static::$tabla . " ORDER BY mode ASC";
         $resultado = self::consultarSQL($query);
 
         return $resultado;
@@ -186,6 +186,8 @@ class Users{
         if($user){
             $query .= "user = '$user'";
         }
+
+        
         $resultado = self::consultarSQL(query: $query);
 
 
