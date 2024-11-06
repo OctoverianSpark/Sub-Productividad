@@ -105,8 +105,10 @@
         <thead>
             <th>CLIENTE</th>
             <th>HORAS DIURNAS</th>
+            <th>HORAS DIURNAS DOMINICALES</th>
             <th>MONTO DIURNAS</th>
             <th>HORAS NOCTURNAS</th>
+            <th>HORAS NOCTURNAS DOMINICALES</th>
             <th>MONTO NOCTURNAS</th>
             <th>MONTO LOGISTICA</th>
             <th>TOTAL</th>
@@ -118,8 +120,10 @@
                 <tr>
                     <td><?php echo strtoupper(s($hora["cliente"])) ?></td>
                     <td><?php echo s($hora["diurnas"]) ?></td>
+                    <td><?php echo s($hora["diurnas_domingo"]) ?></td>
                     <td><?php echo s($hora["diurnas_monto"]) ?> DOLARES</td>
                     <td><?php echo s($hora["nocturnas"]) ?></td>
+                    <td><?php echo s($hora["nocturnas_domingo"]) ?></td>
                     <td><?php echo s($hora["nocturnas_monto"]) ?> DOLARES</td>
                     <td><?php echo s($hora["logistica"]) ?> DOLARES</td>
                     <td><?php echo intval(s($hora["diurnas_monto"])) + intval(s($hora["nocturnas_monto"])) + intval(s($hora["logistica"])) ?> DOLARES</td>

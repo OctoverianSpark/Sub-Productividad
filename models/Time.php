@@ -327,7 +327,7 @@ class Time{
     
 
             }else if($empleado->modalidad =="hogar"){
-                $extras = 2;
+                $extras = 2.5;
                 $moneda = "Dolares";
                 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras):$time->diurnas_extras * $extras;
@@ -337,7 +337,7 @@ class Time{
             }else if($empleado->modalidad == "oficina" && $empleado->sede ="venezuela"){
 
                 
-                $extras = 1.88;
+                $extras = 2;
                 $moneda = "Dolares";
 
                 
@@ -405,7 +405,9 @@ class Time{
 
             $resultado[$i]["cliente"] = $cliente->nombre ." " . $cliente->apellido;
             $resultado[$i]["diurnas"] = 0;
+            $resultado[$i]["diurnas_domingo"] = 0;
             $resultado[$i]["nocturnas"] = 0;
+            $resultado[$i]["nocturnas_domingo"] = 0;
             $resultado[$i]["diurnas_monto"] = 0;
             $resultado[$i]["nocturnas_monto"] = 0;
 
@@ -428,19 +430,18 @@ class Time{
 
                 
                 $inicio = date_timestamp_get(new DateTime($time->inicio));
-                $resultado[$i]["diurnas"] += floatval($time->diurnas_extras);
-                $resultado[$i]["nocturnas"] += floatval($time->nocturnas_extras);
-
+                $resultado[$i]["diurnas"] +=  (getdate($inicio)["weekday"] != "Sunday")? $time->diurnas_extras : 0;
+                $resultado[$i]["nocturnas"] +=  (getdate($inicio)["weekday"] != "Sunday")? $time->nocturnas_extras : 0;
+                $resultado[$i]["diurnas_domingo"] +=  (getdate($inicio)["weekday"] == "Sunday")? $time->diurnas_extras : 0;
+                $resultado[$i]["nocturnas_domingo"] +=  (getdate($inicio)["weekday"] == "Sunday")? $time->nocturnas_extras : 0;
                 $resultado[$i]["diurnas_monto"] += (getdate($inicio)["weekday"] == "Sunday")? $time->diurnas_extras * $diurnasExtraDominicales:$time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] += (getdate($inicio)["weekday"] == "Sunday")? $time->nocturnas_extras * $nocturnasExtraDominicales:$time->nocturnas_extras * $nocturnasExtra;
-                
 
                 $resultado[$i]["logistica"] += ($time->cena==="SI")?5 :0;
                 $resultado[$i]["logistica"] += ($time->taxi==="SI")?5 :0;
                 
 
             }
-
 
 
 
