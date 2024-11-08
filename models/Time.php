@@ -327,7 +327,7 @@ class Time{
     
 
             }else if($empleado->modalidad =="hogar"){
-                $extras = 2.5;
+                $extras = 2;
                 $moneda = "Dolares";
                 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras):$time->diurnas_extras * $extras;
@@ -337,7 +337,7 @@ class Time{
             }else if($empleado->modalidad == "oficina" && $empleado->sede ="venezuela"){
 
                 
-                $extras = 2;
+                $extras = 1.88;
                 $moneda = "Dolares";
 
                 
@@ -450,7 +450,6 @@ class Time{
 
         }
         
-       
         
 
         return $resultado;

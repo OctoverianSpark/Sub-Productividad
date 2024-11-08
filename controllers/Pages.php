@@ -135,7 +135,9 @@ class Pages{
             $spreadsheet->getActiveSheet()->fromArray([ 
                                                         "CLIENTE",
                                                         "HORAS EXTRAS DIURNAS",
+                                                        "HORAS EXTRAS DIURNAS DOMINICALES",
                                                         "HORAS EXTRAS NOCTURNAS",
+                                                        "HORAS EXTRAS NOCTURNAS DOMINICALES",
                                                         "MONTO EXTRAS DIURNAS",
                                                         "MONTO EXTRAS NOCTURNAS",
                                                         "MONTO LOGISTICA",
@@ -150,7 +152,9 @@ class Pages{
                     $spreadsheet->getActiveSheet()->fromArray([ 
                     $hora["cliente"],
                     $hora["diurnas"],
+                    $hora["diurnas_domingo"],
                     $hora["nocturnas"],
+                    $hora["nocturnas_domingo"],
                     $hora["diurnas_monto"],
                     $hora["nocturnas_monto"],
                     $hora["logistica"],

@@ -142,13 +142,14 @@ class Times{
 
         $hora = new Time($args = ["id" => $id]);
 
-        
-        $hora->eliminar();
+        $time = Time::find($id);
         
         $logData = [
             "titulo"=>"Hora Eliminada",
-            "contenido"=>"El usuario " . $_SESSION["name"] . " ha eliminado las horas de " . $times->empleado . " en la fecha " . $times->inicio
+            "contenido"=>"El usuario " . $_SESSION["name"] . " ha eliminado las horas de " . $time->empleado . " en la fecha " . $time->inicio
         ];
+    
+        $hora->eliminar();
 
         $log = new Logs($logData);
 
