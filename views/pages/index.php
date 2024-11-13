@@ -6,7 +6,7 @@
 
     
     
-    <?php if($_SESSION["mode"] == "ADMIN" || $_SESSION["mode"] == "GOD"){ ?>
+    <?php if(in_array($_SESSION["mode"],["GOD","ADMIN","AUDITER"])){ ?>
         <h2>Registros de Eventos</h2>
         <table class="tabla-logs">
             <thead>

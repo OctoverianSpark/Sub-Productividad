@@ -45,9 +45,8 @@ class Times{
                 $errores = $times->validar();
     
                 if(empty($errores)){
-    
-    
-    
+                    
+                    $times->auditar = ($_SESSION["mode"] == "AUDITED") ? "si" : "no";
     
                     $times->guardar();
                     
@@ -71,12 +70,15 @@ class Times{
 
 
     public static function ver(Router $router){
-
         if($_GET["table"] == "empleados" || !$_GET["table"]){
             $horas = Time::getPayments($_GET["column"],$_GET["param"],$_GET["from"],$_GET["to"]);
 
         }else if($_GET["table"] == "clientes"){
             $horas = Time::getAgentPayments(($_GET["from"])?str_replace("T"," ",$_GET["from"]): null,str_replace("T"," ",$_GET["to"]),$_GET["param"]);
+        }else if($_GET["table"] == "auditar" && in_array($_SESSION["mode"],["GOD","AUDITER"])){
+
+            $horas = Time::all("si");
+            
         }else{
             header("Location:/");
         }

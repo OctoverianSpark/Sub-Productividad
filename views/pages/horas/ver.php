@@ -16,6 +16,13 @@
                 <label for="clientes">CLIENTES</label>
                 <input type="radio" name="table"  id="radio-selector" value="clientes" <?php echo ($_GET["table"] === "clientes")?"checked" : "" ?>>
             </div>
+            <?php if(in_array($_SESSION["mode"] , ["GOD","AUDITER"])){ ?>
+                <div class="container-input-search">
+                    <label for="auditar">AUDITAR</label>
+                    <input type="radio" name="table"  id="radio-selector" value="auditar" <?php echo ($_GET["table"] === "auditar")?"checked" : "" ?>>
+                    
+                </div>
+            <?php } ?>
         </div>
     </div>
 
@@ -132,4 +139,37 @@
             <?php } ?>
         </tbody>
     </table>
+<?php } else if($_GET["table"] === "auditar") {?>
+
+    <table class="tabla-empleados">
+        <thead>
+            <th>FECHA</th>
+            <th>EMPLEADO</th>
+            <th>CLIENTE</th>
+            <th>DIURNAS ORDINARIAS</th>
+            <th>NOCTURNAS ORDINARIAS</th>
+            <th>DIURNAS EXTRAS</th>
+            <th>NOCTURNAS EXTRAS</th>
+            <th>ACCIONES</th>
+        </thead>
+
+        <tbody>
+            <?php foreach($horas as $hora){ ?>
+                <tr>
+                    <td><?php echo strtoupper(s($hora->inicio))?></td>
+                    <td><?php echo strtoupper(s($hora->empleado))?></td>
+                    <td><?php echo strtoupper(s($hora->cliente)) ?></td>
+                    <td><?php echo strtoupper(s($hora->diurnas_ordinarias)) ?></td>
+                    <td><?php echo strtoupper(s($hora->nocturnas_ordinarias)) ?></td>
+                    <td><?php echo strtoupper(s($hora->diurnas_extras)) ?></td>
+                    <td><?php echo strtoupper(s($hora->nocturnas_extras)) ?></td>
+                    <td>
+                        <a href="/horas/ver/hora?id=<?php echo s($hora->id) ?>" class="boton-morado-inline">Gestionar</a>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+
+
 <?php } ?>

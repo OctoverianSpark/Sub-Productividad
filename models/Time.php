@@ -15,11 +15,11 @@ class Time{
 
     protected static $tabla= "horas_extras";
 
-    protected static $columnasDB = ["id","empleado","cliente","inicio","almuerzo","final","diurnas_ordinarias","nocturnas_ordinarias","diurnas_extras","nocturnas_extras","cena","taxi", "comentarios"];
+    protected static $columnasDB = ["id","empleado","cliente","inicio","almuerzo","final","diurnas_ordinarias","nocturnas_ordinarias","diurnas_extras","nocturnas_extras","cena","taxi", "comentarios","auditar"];
 
     public static $errores = [];
 
-    public $id,$empleado,$cliente,$inicio,$almuerzo,$final,$diurnas_ordinarias,$nocturnas_ordinarias,$diurnas_extras,$nocturnas_extras,$cena,$taxi,$comentarios;
+    public $id,$empleado,$cliente,$inicio,$almuerzo,$final,$diurnas_ordinarias,$nocturnas_ordinarias,$diurnas_extras,$nocturnas_extras,$cena,$taxi,$comentarios,$auditar;
 
 
 
@@ -37,6 +37,7 @@ class Time{
         $this->cena = $args["cena"] ?? "no";
         $this->taxi = $args["taxi"] ?? "no";
         $this->comentarios = strtolower($args["comentarios"]) ?? "";
+        $this->auditar = strtolower($args["auditar"]) ?? "no";
     }
 
 
@@ -92,11 +93,12 @@ class Time{
 
     }
 
-    public static function findByDate($range1,$range2){
+    public static function findByDate($range1,$range2,$audit){
         
         $query = "SELECT * FROM " . static::$tabla . " WHERE ";
-        $query.= "(DATE(inicio) BETWEEN '$range1' AND '$range2') OR";
-        $query.= "(DATE(final) BETWEEN '$range1' AND '$range2')";
+        $query.= "((DATE(inicio) BETWEEN '$range1' AND '$range2') OR";
+        $query.= "(DATE(final) BETWEEN '$range1' AND '$range2'))";
+        $query .= "AND auditar = '$audit'";
         $resultado = self::consultarSQL($query);
         return $resultado;
 
@@ -139,9 +141,9 @@ class Time{
 
 
     }
-    public static function all(){
-        $query = "SELECT * FROM " . static::$tabla ;
-
+    public static function all($audit = "no"){
+        $query = "SELECT * FROM " . static::$tabla . " WHERE auditar = '$audit' " ;
+        
         $resultado = self::consultarSQL($query);
 
         return $resultado;
@@ -222,15 +224,15 @@ class Time{
     }
 
 
-    public static function filter($column,$param){
+    public static function filter($column,$param,$audit = "no"){
 
 
         if($column && $param){
-            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%'";
+            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param' AND auditar = '$audit'";
             $resultado = self::consultarSQL($query);
 
         }else{
-            $resultado = static::all();
+            $resultado = static::all($audit);
         }
 
         return $resultado;
@@ -292,7 +294,7 @@ class Time{
     public static function getPayments($column = null,$param = null,$from=null,$to=null){
 
         if($from && $to){
-            $times = static::findByDate($from,$to);
+            $times = static::findByDate($from,$to,"no");
         }else{
 
             $times = static::filter($column,$param);

@@ -201,18 +201,18 @@ function calculate(page){
                     
                     valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
             
-            
                     if(dateTimeFinal.getHours()<=21 && dateTimeFinal.getHours() >6){
                         extrasDiurnas = valorOrdinarias - 8
                     }
             
             
                     if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
-                        
+
+                        valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000))
             
                         extrasDiurnas = 5 - alm
             
-                        extrasNocturnas = valorOrdinarias - 11
+                        extrasNocturnas = valorOrdinarias - 13
             
             
             
@@ -270,7 +270,6 @@ function calculate(page){
         
             inicio.addEventListener("input",e=>{
                 
-                console.log(inicio)
         
                 dateTimeInicio = new Date(inicio.value)
                 dateTimeFinal = new Date(final.value)
@@ -286,6 +285,7 @@ function calculate(page){
                 if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
                     
         
+                    valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000))
                     extrasDiurnas = 5 - alm
         
                     extrasNocturnas = valorOrdinarias - 11
@@ -346,6 +346,7 @@ function calculate(page){
         
                 if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
                     
+                    valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000))
         
                     extrasDiurnas = 5 - alm
         
