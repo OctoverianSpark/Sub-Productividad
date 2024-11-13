@@ -135,7 +135,10 @@ class Pages{
             $spreadsheet->getActiveSheet()->fromArray([ 
                                                         "CLIENTE",
                                                         "HORAS EXTRAS DIURNAS",
+                                                        "HORAS EXTRAS DIURNAS DOMINICALES",
+                                                        "HORAS ORDINARIAS DIURNAS DOMINICALES",
                                                         "HORAS EXTRAS NOCTURNAS",
+                                                        "HORAS EXTRAS NOCTURNAS DOMINICALES",
                                                         "MONTO EXTRAS DIURNAS",
                                                         "MONTO EXTRAS NOCTURNAS",
                                                         "MONTO LOGISTICA",
@@ -150,11 +153,14 @@ class Pages{
                     $spreadsheet->getActiveSheet()->fromArray([ 
                     $hora["cliente"],
                     $hora["diurnas"],
+                    $hora["diurnas_domingo"],
+                    $hora["diurnas_ordinarias_domingo"],
                     $hora["nocturnas"],
+                    $hora["nocturnas_domingo"],
                     $hora["diurnas_monto"],
                     $hora["nocturnas_monto"],
                     $hora["logistica"],
-                    intval(s($hora["diurnas_monto"])) + intval(s($hora["nocturnas_monto"])) + intval(s($hora["logistica"]))
+                    floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"])) + floatval(s($hora["logistica"]))
                    
                 ], null,"A$i");
                 $i++;
