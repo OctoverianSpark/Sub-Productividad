@@ -93,11 +93,21 @@ class Time{
 
     }
 
+    public static function aprooveAudition($id){
+
+
+        $query = "UPDATE " . self::$tabla ." SET auditar = 'no' WHERE id = " . $id;
+        
+        self::$db->query($query);
+
+
+    }
+
     public static function findByDate($range1,$range2,$audit){
         
         $query = "SELECT * FROM " . static::$tabla . " WHERE ";
-        $query.= "((DATE(inicio) BETWEEN '$range1' AND '$range2') OR";
-        $query.= "(DATE(final) BETWEEN '$range1' AND '$range2'))";
+        $query.= "((DATE(inicio) BETWEEN '$range1 00:00:00' AND '$range2 23:59:00') OR";
+        $query.= "(DATE(final) BETWEEN '$range1 00:00:00' AND '$range2 23:59:00'))";
         $query .= "AND auditar = '$audit'";
         $resultado = self::consultarSQL($query);
         return $resultado;
@@ -228,7 +238,7 @@ class Time{
 
 
         if($column && $param){
-            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param' AND auditar = '$audit'";
+            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%' AND auditar = '$audit'";
             $resultado = self::consultarSQL($query);
 
         }else{
@@ -278,8 +288,8 @@ class Time{
         $query = "SELECT * FROM " . self::$tabla . " WHERE cliente = '$name'";
 
         if($from && $to){
-            $query .= "AND (inicio BETWEEN '$from' AND '$to') OR";
-            $query .= "(final BETWEEN '$from' AND '$to')";
+            $query .= "AND (inicio BETWEEN '$from 00:00:00' AND '$to 23:59:00') OR";
+            $query .= "(final BETWEEN '$from 00:00:00' AND '$to 23:59:00')";
             $query .= "AND NOT cliente = 'administrativo'";
         }
 
@@ -329,7 +339,7 @@ class Time{
     
 
             }else if($empleado->modalidad =="hogar"){
-                $extras = 2;
+                $extras = 2.5;
                 $moneda = "Dolares";
                 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday")? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras):$time->diurnas_extras * $extras;
@@ -339,7 +349,7 @@ class Time{
             }else if($empleado->modalidad == "oficina" && $empleado->sede ="venezuela"){
 
                 
-                $extras = 1.88;
+                $extras = 2;
                 $moneda = "Dolares";
 
                 

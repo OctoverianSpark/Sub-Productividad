@@ -74,7 +74,7 @@ class Times{
             $horas = Time::getPayments($_GET["column"],$_GET["param"],$_GET["from"],$_GET["to"]);
 
         }else if($_GET["table"] == "clientes"){
-            $horas = Time::getAgentPayments(($_GET["from"])?str_replace("T"," ",$_GET["from"]): null,str_replace("T"," ",$_GET["to"]),$_GET["param"]);
+            $horas = Time::getAgentPayments($_GET["from"] . " 08:00:00",str_replace("T"," ",$_GET["to"]),$_GET["param"]);
         }else if($_GET["table"] == "auditar" && in_array($_SESSION["mode"],["GOD","AUDITER"])){
 
             $horas = Time::all("si");
@@ -136,6 +136,15 @@ class Times{
         ]);
     }
 
+    public static function aproove(){
+
+        $id = validarID();
+
+        Time::aprooveAudition($id);
+
+        header("Location: /horas/ver?table=auditar");
+
+    }
 
     public static function eliminar(){
         $id = validarID();

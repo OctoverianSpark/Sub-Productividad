@@ -158,7 +158,7 @@
         <tbody>
             <?php foreach($horas as $hora){ ?>
                 <tr>
-                    <td><?php echo strtoupper(s($hora->inicio))?></td>
+                    <td><?php echo strtoupper(s($hora->inicio))?> <a title="Aprobar Auditoria" href="/aproove?id=<?php echo $hora->id ?>"><i style="font-size:18px" class="bi bi-check2-all"></i></a></td>
                     <td><?php echo strtoupper(s($hora->empleado))?></td>
                     <td><?php echo strtoupper(s($hora->cliente)) ?></td>
                     <td><?php echo strtoupper(s($hora->diurnas_ordinarias)) ?></td>

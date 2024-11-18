@@ -35,7 +35,7 @@
                             $_SESSION["username"] = $_POST["login"]["user"];
                             $_SESSION["name"] = strtoupper($adData["displayname"]) ;
                             $_SESSION["mode"] = $user->mode;
-                            $_SESSION["department"] = $user->department;
+
                             header("Location: /");
                         }else{
                             header("Location: /login?error=2");

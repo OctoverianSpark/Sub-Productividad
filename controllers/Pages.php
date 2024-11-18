@@ -49,8 +49,8 @@ class Pages{
 
             
 
-            $spreadsheet->getSheetByName("AVSAS")->fromArray(["EMPLEADO","CLIENTE","MODALIDAD","INICIO DE JORNADA","ALMUERZO","FINAL DE JORNADA","DIURNAS ORDINARIAS","DIURNAS EXTRAS","NOCTURNAS ORDINARIAS","NOCTURNAS EXTRAS","CENA","TAXI","MONTO EXTRAS DIURNAS","MONTO EXTRAS NOCTURNAS","TOTAL A PAGAR"]);
-            $spreadsheet->getSheetByName("AVCA")->fromArray(["EMPLEADO","CLIENTE","MODALIDAD","INICIO DE JORNADA","ALMUERZO","FINAL DE JORNADA","DIURNAS ORDINARIAS","DIURNAS EXTRAS","NOCTURNAS ORDINARIAS","NOCTURNAS EXTRAS","CENA","TAXI","MONTO EXTRAS DIURNAS","MONTO EXTRAS NOCTURNAS","TOTAL A PAGAR"]);
+            $spreadsheet->getSheetByName("AVSAS")->fromArray(["EMPLEADO","CLIENTE","MODALIDAD","INICIO DE JORNADA","ALMUERZO","FINAL DE JORNADA","DIURNAS ORDINARIAS","DIURNAS EXTRAS","NOCTURNAS ORDINARIAS","NOCTURNAS EXTRAS","CENA","TAXI","MONTO EXTRAS DIURNAS","MONTO EXTRAS NOCTURNAS","TOTAL A PAGAR","COMENTARIOS"]);
+            $spreadsheet->getSheetByName("AVCA")->fromArray(["EMPLEADO","CLIENTE","MODALIDAD","INICIO DE JORNADA","ALMUERZO","FINAL DE JORNADA","DIURNAS ORDINARIAS","DIURNAS EXTRAS","NOCTURNAS ORDINARIAS","NOCTURNAS EXTRAS","CENA","TAXI","MONTO EXTRAS DIURNAS","MONTO EXTRAS NOCTURNAS","TOTAL A PAGAR","COMENTARIOS"]);
 
             $spreadsheet->setActiveSheetIndexByName("AVSAS");
             foreach ($horas as $hora) {
@@ -75,7 +75,8 @@ class Pages{
                                                                 strtoupper($hora["taxi"]),
                                                                 strtoupper($hora["diurnas_monto"]),
                                                                 strtoupper($hora["nocturnas_monto"]),
-                                                                floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"]))
+                                                                floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"])),
+                                                                $hora["comentarios"]
                 ],null,"A$i" );
                 $i++;
 
@@ -96,7 +97,8 @@ class Pages{
                                                                 strtoupper($hora["taxi"]),
                                                                 strtoupper($hora["diurnas_monto"]),
                                                                 strtoupper($hora["nocturnas_monto"]),
-                                                                floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"]))
+                                                                floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"])),
+                                                                $hora["comentarios"]
                 ],null,"A$j" );
                 
                 $j++;

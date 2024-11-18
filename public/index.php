@@ -17,6 +17,7 @@ $router = new Router;
 /* Paginas */
 $router->get("/",[Pages::class,"index"]);
 $router->get("/export",[Pages::class,"export"]);
+$router->get("/aproove",[Times::class,"aproove"]);
 
 
 
@@ -35,6 +36,7 @@ $router->post("/horas/registrar",[Times::class,"crear"]);
 
 /* Settings */
 $router->get("/settings",[Settings::class,"index"]);
+
 
 /* Empleados */
 $router->get("/settings/empleados",[Employees::class,"index"]);
