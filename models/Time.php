@@ -288,11 +288,11 @@ class Time{
         $query = "SELECT * FROM " . self::$tabla . " WHERE cliente = '$name'";
 
         if($from && $to){
-            $query .= "AND (inicio BETWEEN '$from 00:00:00' AND '$to 23:59:00') OR";
-            $query .= "(final BETWEEN '$from 00:00:00' AND '$to 23:59:00')";
+            $query .= "AND ((inicio BETWEEN '$from 00:00:00' AND '$to 23:59:00') OR";
+            $query .= "(final BETWEEN '$from 00:00:00' AND '$to 23:59:00'))";
             $query .= "AND NOT cliente = 'administrativo'";
         }
-
+        debuguear($query);
         $resultado = self::consultarSQL($query);
 
         return $resultado;
@@ -429,8 +429,8 @@ class Time{
 
 
             if(!is_null($from) && !is_null($to)){
-                $query.= " AND ((inicio between '$from' and '$to') OR";
-                $query.= " (final between '$from' and '$to'))";
+                $query.= " AND ((inicio between '$from 00:00:00' and '$to 23:59:59') OR";
+                $query.= " (final between '$from 00:00:00' and '$to 23:59:59'))";
             }
             
             $times = self::consultarSQL($query);
