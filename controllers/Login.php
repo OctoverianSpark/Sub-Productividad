@@ -92,7 +92,7 @@
                     $picture = $google_account_info->picture;
                     
                     // Validar el dominio del correo electrónico
-                    if (!isset($_GET["hd"]) || $_GET["hd"] != "asistentevirtualsas.com") {
+                    if (!isset($_GET["hd"])) {
                         header("Location: /login?error");
                         exit();
                     }
