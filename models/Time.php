@@ -152,7 +152,7 @@ class Time{
 
     }
     public static function all($audit = "no"){
-        $query = "SELECT * FROM " . static::$tabla . " WHERE auditar = '$audit' " ;
+        $query = "SELECT * FROM " . static::$tabla . " WHERE auditar = '$audit' order by id DESC" ;
         
         $resultado = self::consultarSQL($query);
 
@@ -292,7 +292,6 @@ class Time{
             $query .= "(final BETWEEN '$from 00:00:00' AND '$to 23:59:00'))";
             $query .= "AND NOT cliente = 'administrativo'";
         }
-        debuguear($query);
         $resultado = self::consultarSQL($query);
 
         return $resultado;

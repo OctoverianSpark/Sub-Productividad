@@ -106,7 +106,7 @@ class RH{
 
     }
     public static function all(){
-        $query = "SELECT * FROM " . static::$tabla . " ORDER BY nombre ASC";
+        $query = "SELECT * FROM " . static::$tabla . " ORDER BY id DESC";
         $resultado = self::consultarSQL($query);
 
         return $resultado;
