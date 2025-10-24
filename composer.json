@@ -18,7 +18,12 @@
         "phpmailer/phpmailer": "^6.9",
         "dompdf/dompdf": "^3.0",
         "phpoffice/phpspreadsheet": "^2.2",
-        "google/apiclient": "^2.16",
-        "adldap/adldap": "5.0.0.x-dev"
-    }
+        "google/apiclient": "^2.18",
+        "adldap/adldap": "5.0.0.x-dev",
+        "google/apiclient-services": "^0.412.0",
+        "vlucas/phpdotenv": "^5.6"
+    },
+      "config": {
+    "process-timeout": 1200
+  }
 }

@@ -1,40 +1,59 @@
-footer{
+main {
+    flex: 10;
+}
+
+footer {
     background-color: $fucsia;
     margin: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-direction: column;
-
     padding: 1rem;
+    margin-top: auto;
 
-
-    
+   p {
+        margin: 0;
+        font-size: 1.5rem;
+    }
 }
 
 
-.mainLogoFooter{
+.mainLogoFooter {
     text-align: center;
-    h1{
+    display: inline-block;
+    h1 {
         text-transform: uppercase;
         color: $morado;
+        margin: 5px;
         font-size: 3rem;
 
 
-        span:first-child{
-            color: darken($celeste,70);
+        span:first-child {
+            color: darken($celeste, 70);
         }
 
-        span:last-child{
-            color: darken($fucsia,50);
+        span:last-child {
+            color: darken($fucsia, 50);
             font-weight: 700;
         }
 
     }
 }
 
+@media (max-width: 768px) {
+    .mainLogoFooter {
+        h1{
+            font-size: 2.5rem;
+        }
+    }
+    footer p{
+        font-size: 1.5rem;
+    }
+    
+}
 
 
-a{
+a {
     color: $negro;
 }

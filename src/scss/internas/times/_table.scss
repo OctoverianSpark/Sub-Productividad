@@ -1,21 +1,18 @@
 .tabla-empleados{
-    @include tabla(100%);
-
-
-
+    @include tabla();
 }
 
 .tabla-clientes{
-    @include tabla(90%)
+    @include tabla()
 }
 
 .tabla-logs{
-    @include tabla(70%)
+    @include tabla()
 }
 
 
 .tabla-usuarios{
     display: grid;
     place-items: center;
-    @include tabla(100rem);
+    @include tabla();
 }

@@ -1,5 +1,4 @@
-
-.main-settings-empleados{
+.main-settings-empleados {
 
     display: flex;
     justify-content: center;
@@ -10,15 +9,78 @@
 }
 
 
+.main-settings-ver {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
-
-.tabla-empleados{
-    @include tabla()
 }
 
-.container-tabla-empleados{
+
+.container-tabla-empleados {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+
+.form-empleados {
+    background-color: white;
+    border-radius: 40px;
+    width: 50%;
+    padding: 2%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    .container-input {
+        gap: 5px;
+        align-items: flex-start;
+
+    }
+}
+
+
+
+
+.form-empleados .container-input {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        width: 100%;
+        display: block;
+    }
+
+
+
+  select,  input {
+        width: 100%;
+        padding: 8px;
+        font-size: 20px;
+        margin: 0 !important;
+        background-color: rgba(245, 245, 245, 1);
+        border: 1px solid rgba(128, 128, 128, 1);
+        display: block;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background-color: white;
+            border: 1.5px solid rgba(50, 50, 50, 1);
+        }
+
+        &:focus {
+            transform: translateY(-2px);
+            border: 1px solid rgba(0, 123, 255, 0.9);
+            box-shadow: 0 0 4px rgba(128, 128, 128, 1);
+        }
+    }
+}
+
+
+@media (max-width: 768px){
+
+.form-empleados {
+min-width: 90%;
+}
 }

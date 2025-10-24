@@ -1,711 +1,345 @@
 
+document.addEventListener("DOMContentLoaded", EventListenters)
 
-
-function EventListenters(){
-
-    modals()
-    rangeValue()
-    requestHours()
-    activateUpdates()
-    changeForm()
-    confirmForm()
-    dragNdrop()
-    pages()
-    detectandExec()
-    scrollToPage()
+function EventListenters() {
+    modals();
+    rangeValue();
+    requestHours();
+    activateUpdates();
+    changeForm();
+    confirmForm();
+    dragNdrop();
+    pages();
+    detectandExec();
+    scrollToPage();
+    selector();
 }
 
+function modals() {
+    const modal = document.querySelector(".modal");
+    if (!modal) return;
 
-function modals(){
-
-
-    
-    const modal = document.querySelector(".modal")
-
-    if(modal){
-        const button = document.querySelector(".modal button")
-        button.addEventListener("click",e=>{
-            console.log(modal)
-            modal.remove()
-        })
-
-
-    }
-
-
-
+    const button = modal.querySelector("button");
+    button.addEventListener("click", () => modal.remove());
 }
 
-function changeForm(){
+function confirmForm() {
+    const modal = document.querySelector(".modal-confirmacion");
+    const buttonCharge = document.querySelector("#button-charge");
 
-    const dateSearch = document.querySelector("#date-search")
-    const dateSearchInput = document.querySelectorAll("#date-search-input")
-    const textSearch = document.querySelector("#text-search")
+    if (!modal || !buttonCharge) return;
 
-    const filterSelector = document.querySelector("#searchBy")
+    const confirm = document.querySelector(".confirm-button");
+    const deny = document.querySelector(".deny-button");
+    const form = document.querySelector("form");
 
-    if (filterSelector) {
-        filterSelector.addEventListener("input",e=>{
+    buttonCharge.addEventListener("click", (e) => {
+        modal.style.display = "flex";
+    });
 
-
-            if(e.target.value === "fecha"){
-                textSearch.style.display = "none"
-                textSearch.children[1].disabled = true
-                dateSearch.style.display = "block"
-
-                dateSearchInput.forEach(date =>{
-                    date.disabled = false
-                })
-
-
-            }else if(e.target.value !== "fecha"){
-                textSearch.style.display = "block"
-                textSearch.children[1].disabled = false
-
-                dateSearch.style.display = "none"
-                dateSearchInput.forEach(date =>{
-                    date.disabled = true
-                })
-
-                
-
-
-
-
-            }
-
-
-        })
-    }
-
-
-
+    confirm.addEventListener("click", () => form.submit());
+    deny.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
 }
 
+function changeForm() {
+    const filterSelector = document.querySelector("#searchBy");
+    if (!filterSelector) return;
 
+    const dateSearch = document.querySelector("#date-search");
+    const dateSearchInput = document.querySelectorAll("#date-search-input");
+    const textSearch = document.querySelector("#text-search");
 
-function rangeValue(){
+    filterSelector.addEventListener("input", (e) => {
+        const isFecha = e.target.value === "fecha";
 
-    const containers = document.querySelectorAll(".range-number-container")
+        dateSearch.style.display = isFecha ? "flex" : "none";
+        textSearch.style.display = isFecha ? "none" : "flex";
 
-    if(containers){
-        containers.forEach(container=>{
-
-
-            const range = container.querySelector("input[type='range']")
-            const number = container.querySelector("input[type='number']")
-            
-            range.addEventListener("input",e=>{
-
-
-                number.value = e.target.value
-
-            })
-            number.addEventListener("input",e=>{
-
-
-                range.value = e.target.value
-
-            })
-
-
-        })
-
-
-    }
-
+        textSearch.children[1].disabled = isFecha;
+        dateSearchInput.forEach((input) => (input.disabled = !isFecha));
+    });
 }
 
-function requestHours(){
+function rangeValue() {
+    const containers = document.querySelectorAll(".range-number-container");
 
-    const radios = document.querySelectorAll("#radio-selector")
+    containers.forEach((container) => {
+        const range = container.querySelector("input[type='range']");
+        const number = container.querySelector("input[type='number']");
 
+        if (!range || !number) return;
 
+        const syncValue = (source, target) => {
+            target.value = source.value;
+        };
 
-    if(radios){
-        radios.forEach(radio =>{
-            
-
-            radio.addEventListener("input",e=>{
-
-                location.href = `/horas/ver?table=${e.target.value}`
-
-
-            })
-
-        })
-    }
-
+        range.addEventListener("input", () => {
+            syncValue(range, number);
+        });
+        number.addEventListener("input", () => {
+            syncValue(number, range);
+        });
+    });
 }
 
-function activateUpdates(){
-    const checkBox = document.querySelector("#actualizar")
+function requestHours() {
+    const radios = document.querySelectorAll("#radio-selector");
 
-
-
-
-    if(checkBox){
-        checkBox.addEventListener("input",e=>{
-
-            console.log(e.target.value)
-            const updateForm =document.querySelector(".container-inputs")
-            if (e.target.checked) {
-                updateForm.disabled = false
-            } 
-            if (!e.target.checked) {
-                updateForm.disabled = true
-            }
-
-        })
-    }
+    radios.forEach((radio) => {
+        radio.addEventListener("input", (e) => {
+            location.href = `/horas/ver?table=${e.target.value}`;
+        });
+    });
 }
 
+function activateUpdates() {
+    const checkBox = document.querySelector("#actualizar");
+    if (!checkBox) return;
 
+    const updateForm = document.querySelector(".container-inputs");
 
-
-function calculate(page){
-        const inicio = page.querySelector("#inicio")
-        const final = page.querySelector("#final")
-        const radioAlm = page.querySelectorAll(".radio-input")
-        const diurnasOrdinariasSlider = page.querySelector("#diurnas_ordinarias")
-        const diurnasOrdinariasValue = page.querySelector("#diurnas_ordinarias_value")
-        const nocturnasOrdinariasSlider = page.querySelector("#nocturnas_ordinarias")
-        const nocturnasOrdinariasValue = page.querySelector("#nocturnas_ordinarias_value")
-        const diurnasExtrasSlider = page.querySelector("#diurnas_extras")
-        const diurnasExtrasValue = page.querySelector("#diurnas_extras_value")
-        const nocturnasExtrasSlider = page.querySelector("#nocturnas_extras")
-        const nocturnasExtrasValue = page.querySelector("#nocturnas_extras_value")
-
-        if(inicio){
-            let dateTimeInicio = new Date(inicio.value)
-            let dateTimeFinal = new Date(final.value)
-        
-            let alm = 2
-        
-            let valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
-            let extrasDiurnas
-            let extrasNocturnas
-                
-            const rangoNocturnas = [21,22,23,0,1,2,3,4,5,6]
-        
-        
-            radioAlm.forEach(radio => {
-                radio.addEventListener("input",e=>{
-                        
-                    alm = e.target.value
-        
-        
-        
-                    dateTimeInicio = new Date(inicio.value)
-                    dateTimeFinal = new Date(final.value)
-                    
-                    valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
-            
-                    if(dateTimeFinal.getHours()<=21 && dateTimeFinal.getHours() >6){
-                        extrasDiurnas = valorOrdinarias - 8
-                    }
-            
-            
-                    if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
-
-                        valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000))
-            
-                        extrasDiurnas = 5 - alm
-            
-                        extrasNocturnas = valorOrdinarias - 13
-            
-            
-            
-            
-                    }  
-            
-                    if(valorOrdinarias >8){
-                        diurnasOrdinariasSlider.value = 8
-                        diurnasOrdinariasValue.value = 8
-                    }else{
-                        diurnasOrdinariasSlider.value = valorOrdinarias ? valorOrdinarias:0
-                        diurnasOrdinariasValue.value = valorOrdinarias ? valorOrdinarias:0
-        
-                    }
-        
-        
-        
-                    if (extrasDiurnas < 0) {
-                        diurnasExtrasSlider.value = 0
-                        diurnasExtrasValue.value =  0
-                        
-                    }else{
-                        diurnasExtrasSlider.value = extrasDiurnas ? extrasDiurnas : 0
-                        diurnasExtrasValue.value = extrasDiurnas ? extrasDiurnas : 0
-        
-                    }
-            
-            
-            
-            
-            
-                    nocturnasExtrasSlider.value= extrasNocturnas ? extrasNocturnas : 0
-                    nocturnasExtrasValue.value= extrasNocturnas ? extrasNocturnas : 0
-                    
-            
-            
-            
-            
-            
-            
-            
-            
-            
-        
-        
-        
-        
-        
-        
-        
-        
-                })
-            })
-        
-        
-            inicio.addEventListener("input",e=>{
-                
-        
-                dateTimeInicio = new Date(inicio.value)
-                dateTimeFinal = new Date(final.value)
-                
-                valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
-        
-        
-                if(dateTimeFinal.getHours()<=21 && dateTimeFinal.getHours() >6){
-                    extrasDiurnas = valorOrdinarias - 8
-                }
-        
-        
-                if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
-                    
-        
-                    valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000))
-                    extrasDiurnas = 5 - alm
-        
-                    extrasNocturnas = valorOrdinarias - 11
-        
-        
-        
-        
-                }  
-        
-                if(valorOrdinarias >8){
-                    diurnasOrdinariasSlider.value = 8
-                    diurnasOrdinariasValue.value = 8
-                }else{
-                    diurnasOrdinariasSlider.value = valorOrdinarias ? valorOrdinarias:0
-                    diurnasOrdinariasValue.value = valorOrdinarias ? valorOrdinarias:0
-        
-                }
-        
-        
-        
-                if (extrasDiurnas < 0) {
-                    diurnasExtrasSlider.value = 0
-                    diurnasExtrasValue.value =  0
-                    
-                }else{
-                    diurnasExtrasSlider.value = extrasDiurnas ? extrasDiurnas : 0
-                    diurnasExtrasValue.value = extrasDiurnas ? extrasDiurnas : 0
-        
-                }
-        
-        
-        
-        
-        
-                nocturnasExtrasSlider.value= extrasNocturnas ? extrasNocturnas : 0
-                nocturnasExtrasValue.value= extrasNocturnas ? extrasNocturnas : 0
-                
-        
-            })
-        
-        
-            
-        
-            final.addEventListener("input",e=>{
-                
-        
-        
-                dateTimeInicio = new Date(inicio.value)
-                dateTimeFinal = new Date(final.value)
-                
-                valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000)) - alm
-        
-        
-                if(dateTimeFinal.getHours()<=21 && dateTimeFinal.getHours() >6){
-                    extrasDiurnas = valorOrdinarias - 8
-                }
-        
-        
-                if(dateTimeFinal.getHours()>21 || (dateTimeFinal.getHours() <= 6 && dateTimeFinal.getDay() === dateTimeInicio.getDay() + 1)){
-                    
-                    valorOrdinarias = ((dateTimeFinal.getTime() - dateTimeInicio.getTime())/(3600000))
-        
-                    extrasDiurnas = 5 - alm
-        
-                    extrasNocturnas = valorOrdinarias - 11
-        
-        
-        
-        
-                }  
-        
-                if(valorOrdinarias >8){
-                    diurnasOrdinariasSlider.value = 8
-                    diurnasOrdinariasValue.value = 8
-                }else{
-                    diurnasOrdinariasSlider.value = valorOrdinarias ? valorOrdinarias:0
-                    diurnasOrdinariasValue.value = valorOrdinarias ? valorOrdinarias:0
-        
-                }
-        
-        
-        
-                if (extrasDiurnas < 0) {
-                    diurnasExtrasSlider.value = 0
-                    diurnasExtrasValue.value =  0
-                    
-                }else{
-                    diurnasExtrasSlider.value = extrasDiurnas ? extrasDiurnas : 0
-                    diurnasExtrasValue.value = extrasDiurnas ? extrasDiurnas : 0
-        
-                }
-        
-        
-        
-        
-        
-                nocturnasExtrasSlider.value= extrasNocturnas ? extrasNocturnas : 0
-                nocturnasExtrasValue.value= extrasNocturnas ? extrasNocturnas : 0
-                
-            })
-            
-        
-        
+    checkBox.addEventListener("input", (e) => {
+        if (updateForm) {
+            updateForm.disabled = !e.target.checked;
         }
+    });
+}
+
+function calculate(page) {
+    const elements = {
+        inicio: page.querySelector("#inicio"),
+        final: page.querySelector("#final"),
+        radioAlm: page.querySelectorAll(".radio-input"),
+        diurnasOrd: {
+            slider: page.querySelector("#diurnas_ordinarias"),
+            value: page.querySelector("#diurnas_ordinarias_value"),
+        },
+        nocturnasOrd: {
+            slider: page.querySelector("#nocturnas_ordinarias"),
+            value: page.querySelector("#nocturnas_ordinarias_value"),
+        },
+        diurnasExt: {
+            slider: page.querySelector("#diurnas_extras"),
+            value: page.querySelector("#diurnas_extras_value"),
+        },
+        nocturnasExt: {
+            slider: page.querySelector("#nocturnas_extras"),
+            value: page.querySelector("#nocturnas_extras_value"),
+        },
+    };
+
+    if (!elements.inicio || !elements.final) return;
+
+    let almuerzo = 2;
+
+    const calcularHoras = (esDesdeRadio = false) => {
+        let inicio = new Date(elements.inicio.value);
+        let final = new Date(elements.final.value);
+
+        if (!inicio.getDate() || !final.getDate()) return;
+
+        const totalHoras = (final - inicio) / 3600000;
+        let ordinarias = totalHoras - almuerzo;
+        let extrasDiurnas = 0;
+        let extrasNocturnas = 0;
         
+        const horasFinal = final.getHours();
+        const esNocturno =
+            horasFinal > 21 ||
+            (horasFinal <= 6 && final.getDay() === inicio.getDay() + 1);
 
-    
- 
-    
+        if (esNocturno) {
+            ordinarias = totalHoras;
+            extrasDiurnas = 5 - almuerzo;
+            extrasNocturnas = totalHoras - (esDesdeRadio ? 13 : 11);
+        } else if (horasFinal <= 21 && horasFinal > 6) {
+            extrasDiurnas = ordinarias - 8;
+        }
 
+        actualizarCampo(elements.diurnasOrd, Math.min(ordinarias, 8));
+        actualizarCampo(elements.diurnasExt, Math.max(extrasDiurnas, 0));
+        actualizarCampo(elements.nocturnasExt, Math.max(extrasNocturnas, 0));
+    };
+
+    const actualizarCampo = (campo, valor) => {
+        const valorFinal = valor ?? 0;
+        if (campo.slider) campo.slider.value = valorFinal;
+        if (campo.value) campo.value.value = valorFinal;
+    };
+
+    elements.radioAlm.forEach((radio) => {
+        radio.addEventListener("input", (e) => {
+            almuerzo = parseFloat(e.target.value);
+            calcularHoras(true);
+        });
+    });
+
+    elements.inicio.addEventListener("input", () => {calcularHoras(false);});
+    elements.final.addEventListener("input", () => {calcularHoras(false)});
+} 
+
+
+function pages() {
+    const indexContainer = document.querySelector(".index-page");
+    if (!indexContainer) return;
+
+    const addButton = indexContainer.querySelector(".page-add");
+    const removeButton = indexContainer.querySelector(".page-remove");
+    const pagesIndex = indexContainer.querySelector(".pages");
+
+    let pageCount = pagesIndex.querySelectorAll(".page-number").length;
+
+    const updateButtons = () => {
+        addButton.disabled = pageCount >= 7;
+        removeButton.disabled = pageCount <= 1;
+    };
+
+    addButton.addEventListener("click", () => {
+        if (pageCount >= 8) return;
+
+        pageCount++;
+
+        const newIndex = document.createElement("A");
+        newIndex.href = `#entrada-${pageCount}`;
+        newIndex.textContent = pageCount;
+        newIndex.classList.add("page-number");
+        newIndex.id = `pagina-${pageCount}`;
+        pagesIndex.appendChild(newIndex);
+
+        createPage(pageCount);
+        rangeValue();
+        updateButtons();
+
+        removeButton.addEventListener("click", () => {
+            if (pageCount <= 1) return;
+            document.querySelector(`#pagina-${pageCount}`).remove();
+            pageCount;
+            updateButtons();
+        });
+    });
+
+    removeButton.addEventListener("click", () => {
+        if (pageCount <= 1) return;
+
+        document.querySelector("#pagina-" + pageCount).remove(),
+            deletePage(pageCount);
+        pageCount--;
+        updateButtons();
+    });
 }
 
-function confirmForm(){
+function createPage(pageNumber) {
+    const multiPage = document.querySelector(".container-times");
+    const registerPage = multiPage.querySelector(".container-page");
+    const newPage = registerPage.cloneNode(true);
 
+    newPage.id = `entrada-${pageNumber}`;
+    newPage.querySelector(".subtitle").textContent = "Entrada " + pageNumber;
 
+    const index = pageNumber - 1;
 
-    const modal = document.querySelector(".modal-confirmacion")
+    const setName = (selector, field) => {
+        const el = newPage.querySelector(selector);
+        if (el) el.setAttribute("name", `horas[${index}][${field}]`);
+    };
 
-    const confirm = document.querySelector(".confirm-button")
-    const deny = document.querySelector(".deny-button")
+    setName("#empleado", "empleado");
+    setName("#cliente", "cliente");
+    setName("#inicio", "inicio");
+    setName("#almuerzo-0", "almuerzo");
+    setName("#almuerzo-1", "almuerzo");
+    setName("almuerzo-2", "almuerezo");
+    setName("#final", "final");
 
-    const form = document.querySelector("form")
-    const buttonCharge  = document.querySelector("#button-charge")
+    const horasfield = [
+        "diurnas_ordinarias",
+        "nocturnas_ordinarias",
+        "diurnas_extras",
+        "nocturnas_extras",
+    ];
+    horasfield.forEach((field) => {
+        setName(`#${field}`, field);
+        setName(`#${field}_value`, field);
+    });
 
+    setName("#cena", "cena");
+    setName("#taxi", "taxi");
+    setName("#comantarios", "comentarios");
 
-    if(buttonCharge){
-
-
-        buttonCharge.addEventListener("click",e=>{
-            modal.style.display = "flex"
-        })
-
-    }
-
-
-
-    if(modal){
-        
-        confirm.addEventListener("click",e=>{
-
-            form.submit()
-
-        })
-        
-        deny.addEventListener("click",e=>{
-            modal.style.display="none"
-        })
-    }
-
-}
-function autoManual(){
-
-}
-
-function pages(){
-
-    const indexContainer= document.querySelector(".index-page")
-    
-    if (indexContainer) {
-        
-
-
-
-        const addRemove = indexContainer.querySelector(".add-remove")
-        const addButton = addRemove.querySelector(".page-add")
-        const removeButton = addRemove.querySelector(".page-remove")
-
-
-        const pagesIndex = indexContainer.querySelector(".pages")
-        const pages = pagesIndex.querySelectorAll(".page-number")
-
-
-        let pageCount = pages.length
-
-
-        addButton.addEventListener("click",e=>{
-
-
-
-            pageCount ++
-
-            const newIndex = document.createElement("A")
-            newIndex.href= `#entrada-${pageCount}`
-            newIndex.textContent=pageCount
-            newIndex.classList.add("page-number")
-            newIndex.id = `pagina-${pageCount}`
-            pagesIndex.appendChild(newIndex)
-
-
-            createPage(pageCount)
-            rangeValue()
-
-            
-            if(pageCount === 7){
-                addButton.disabled = true
-            }
-
-            if (pageCount >1) {
-                removeButton.disabled = false
-            }
-
-
-
-
-
-
-        })
-
-        removeButton.addEventListener("click",e=>{
-
-
-
-            const pageIndex = document.querySelector("#pagina-"+pageCount)
-
-            pageIndex.remove()
-            deletePage(pageCount)
-
-            pageCount--
-
-            if(pageCount < 7){
-                addButton.disabled = false
-            }
-
-            if (pageCount <2) {
-                removeButton.disabled = true
-            }
-
-
-
-        })
-
-
-
-
-
-    }
-
-
-
+    multiPage.appendChild(newPage);
+    detectandExec();
+    scrollToPage();
 }
 
 
+function deletePage(pageNumber) {
+    document.querySelector(`#entrada-${pageNumber}`).remove();
+}
 
-function createPage(pageNumber){
+function scrollToPage() {
+    const indexes = document.querySelectorAll(".page-number");
 
+    indexes.forEach((index) => {
+        index.addEventListener("click", (e) => {
+            e.preventDefault();
+            const pageScroll = e.target.getAttribute("href");
+            const page = document.querySelector(pageScroll);
+            page.scrollIntoView({ behavior: "smooth" });
+        });
+    });
+}
 
+function dragNdrop() {
+    const dragable = document.querySelector(".dragable");
+    if (!dragable) return;
 
-    const multiPage = document.querySelector(".container-times")
+    let startX = 0,
+        startY = 0;
 
-    const registerPage = multiPage.querySelector(".container-page")
+    const mouseMove = (e) => {
+        const deltax = startX - e.clientX;
+        const deltaY = startY - e.clientY;
 
+        startX = e.clientX;
+        startY = e.clientY;
 
-    const newPage = registerPage.cloneNode(true)
+        dragable.style.top = `${dragable.offsetTop - deltaY}px`;
+        dragable.style.left = `${dragable.offsetLeft - deltax}px`;
+    };
 
-    newPage.id = "entrada-" + pageNumber
+    const mouseUp = () => {
+        document.removeEventListener("mousemove", mouseMove);
+        document.removeEventListener("mouseup", mouseUp);
+    };
 
+    const mouseDown = (e) => {
+        startX = e.clientX;
+        startY = e.clientY;
 
-    const infoPersonas = newPage.querySelector("#info-personas")
-    const infoJornada = newPage.querySelector("#info-jornada")
-    const registroHoras = newPage.querySelector("#registro-horas")
-    const logistica = newPage.querySelector("#logistica")
-    const comentarios = newPage.querySelector("#registro-comentarios")
+        document.addEventListener("mousemove", mouseMove);
+        document.addEventListener("mouseup", mouseUp);
+    };
 
-
-
-
-
-    newPage.querySelector(".subtitle").textContent = "Entrada " + (pageNumber)
-
-
-    infoPersonas.querySelector("#empleado").setAttribute("name",`horas[${pageNumber-1}][empleado]`)
-    
-    infoPersonas.querySelector("#cliente").setAttribute("name",`horas[${pageNumber-1}][cliente]`)
-
-
-
-
-    infoJornada.querySelector("#inicio").setAttribute("name",`horas[${pageNumber-1}][inicio]`)
-    infoJornada.querySelector("#almuerzo-0").setAttribute("name",`horas[${pageNumber-1}][almuerzo]`)
-    infoJornada.querySelector("#almuerzo-1").setAttribute("name",`horas[${pageNumber-1}][almuerzo]`)
-    infoJornada.querySelector("#almuerzo-2").setAttribute("name",`horas[${pageNumber-1}][almuerzo]`)
-    infoJornada.querySelector("#final").setAttribute("name",`horas[${pageNumber-1}][final]`)
-
-
-    registroHoras.querySelector("#diurnas_ordinarias").setAttribute("name",`horas[${pageNumber-1}][diurnas_ordinarias]`)
-    registroHoras.querySelector("#diurnas_ordinarias_value").setAttribute("name",`horas[${pageNumber-1}][diurnas_ordinarias]`)
-    registroHoras.querySelector("#nocturnas_ordinarias").setAttribute("name",`horas[${pageNumber-1}][nocturnas_ordinarias]`)
-    registroHoras.querySelector("#nocturnas_ordinarias_value").setAttribute("name",`horas[${pageNumber-1}][nocturnas_ordinarias]`)
-    registroHoras.querySelector("#diurnas_extras").setAttribute("name",`horas[${pageNumber-1}][diurnas_extras]`)
-    registroHoras.querySelector("#diurnas_extras_value").setAttribute("name",`horas[${pageNumber-1}][diurnas_extras]`)
-    registroHoras.querySelector("#nocturnas_extras").setAttribute("name",`horas[${pageNumber-1}][nocturnas_extras]`)
-    registroHoras.querySelector("#nocturnas_extras_value").setAttribute("name",`horas[${pageNumber-1}][nocturnas_extras]`)
-
-    logistica.querySelector("#cena").setAttribute("name",`horas[${pageNumber-1}][cena]`)
-    logistica.querySelector("#taxi").setAttribute("name",`horas[${pageNumber-1}][taxi]`)
-    comentarios.querySelector("#comentarios").setAttribute("name",`horas[${pageNumber-1}][comentarios]`)
-
-
-
-    multiPage.appendChild(newPage)
-    
-
-    detectandExec()
-    scrollToPage()
+    dragable.addEventListener("mousedown", mouseDown);
 }
 
 
-
-function deletePage(pageNumber){
-    
-    const multiPage = document.querySelector(".container-times")
-
-    const registerPage = multiPage.querySelector("#entrada-"+pageNumber)
-
-
-    registerPage.remove()
-}
-
-
-
-function scrollToPage(){
-
-    const indexes = document.querySelectorAll(".page-number")
-
-
-
-    indexes.forEach(index=>{
-        index.addEventListener("click",e=>{
-            e.preventDefault()
-
-
-            const pageScroll = e.target.getAttribute("href")
-
-
-
-            const page = document.querySelector(pageScroll)
-
-            page.scrollIntoView({behavior: "smooth"})
-
-            
-        })
-    })
-
-
-}
-
-function dragNdrop(){
-
-    const dragable = document.querySelector(".dragable")
-
-    let startX = 0
-    let startY = 0
-    let newX = 0
-    let newY = 0
-
-    if(dragable){
-        dragable.addEventListener("mousedown",mouseDown)
-
-    }
-
-
-    function mouseDown(e){
-        startX = e.clientX
-        startY = e.clientY
-    
-        
-        document.addEventListener("mousemove",mouseMove)
-        document.addEventListener("mouseup",mouseUp)
-    
-    }
-    
-    
-    function mouseMove(e){
-        
-        newX = startX - e.clientX
-        newY = startY - e.clientY
-    
-    
-        startX = e.clientX
-        startY = e.clientY
-    
-        dragable.style.top = (dragable.offsetTop - newY) + "px"
-        dragable.style.left = (dragable.offsetLeft - newX) + "px"
-    
-    }
-
-
-    function mouseUp(e){
-        document.removeEventListener("mousemove",mouseMove)
-    }
-
-}
 function detectandExec() {
-    
-    const pages = []
-    let i =1
-    let actualPage
-
-    while(true){
-        actualPage = document.querySelector("#entrada-" + i)
-
-        if(actualPage == null){
-            break
-        }
-
-        calculate(actualPage)
-
-
-        i++
-
-    }
-
-
-
-
+  let i = 1;
+  let page;
+  while ((page = document.querySelector(`#entrada-${i}`))) {
+    calculate(page);
+    i++;
+  }
 }
 
 
+function selector() {
+  $(document).ready(function () {
+    $("#empleado").select2();
+    $("#cliente").select2();
+  });
+}
 
-
-document.addEventListener("DOMContentLoaded",e=>{
-    EventListenters()
-})

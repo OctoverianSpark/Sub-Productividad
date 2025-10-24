@@ -1,7 +1,6 @@
 
 <?php
     $auth = estalogueado();
-
 ?>
 
 
@@ -19,11 +18,11 @@
 </head>
 <body>
     
+
 <?php $mensaje=mostrarNotificacion($_GET["resultado"])?>
 <?php if($mensaje){ ?>
     <div class="modal modal-exito">
-        <p><?php echo $mensaje ?></p>
-        
+        <p><?php echo $mensaje ?></p>        
         <button class="close-button"><i class='bx bxs-x-circle' ></i></button>
     </div>
 <?php } ?>
@@ -35,16 +34,14 @@
                     <a href="/" class="mainLogoHeader">
                         <h1>Sub<span>-</span><span>Productividad</span></h1>
                     </a>
-
                     <nav class="navegacion">
                         <ul>
-                                <li><a href="/horas/registrar" class="navegacion_enlace">Ingresar Horas</a></li>
-                                <li><a href="/horas/ver" class="navegacion_enlace">Ver Horas</a></li>
+                                <li><a href="/horas/registrar">Ingresar Horas</a></li>
+                                <li><a href="/horas/ver" >Ver Horas</a></li>
                                 <?php if(in_array($_SESSION["mode"],["GOD","ADMIN"])){ ?>
-                                    <li><a href="/settings" class="navegacion_enlace">Configuracion</a></li>
+                                    <li><a href="/settings" >Configuracion</a></li>
                                 <?php } ?>
-                                <li><a href="/logout" class="navegacion_enlace">Cerrar Sesion</a></li>
-
+                                <li><a href="/logout" >Cerrar Sesion</a></li>
                         </ul>
                     </nav>
             </div>
@@ -59,8 +56,15 @@
     </header>
     <?php echo $contenido ?>
 
-    <script src="/build/js/bundle.min.js"></script>
-    <footer>
+
+<!-- jQuery para Select2 -->    
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="/build/js/bundle.min.js"></script>
+
+<footer>
             <a href="/" class="mainLogoFooter">
                 <h1>Sub <span>-</span> <span>Productividad</span></h1>
             </a>

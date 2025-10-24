@@ -16,19 +16,22 @@
 
                 <legend>DATOS DE INICIO DE SESION</legend>
                 <div class="container-input">
-                            <label for="user">USUARIO</label>
-                            <input type="text" id="user" name="login[user]">
+                    <label for="user">USUARIO</label>
+                    <input type="text" id="user" name="login[user]">
 
                 </div>
                 <div class="container-input">
                     <label for="password">CONTRASEÑA</label>
                     <input type="password" name="login[password]" id="password">
-                    
+
                 </div>
                 <input type="submit" value="Iniciar Sesion" class="boton-morado-block">
+                <?php if (!empty($errorMessage)): ?>
+                    <div class="error-message">
+                        <?= htmlspecialchars($errorMessage) ?>
+                    </div>
+                <?php endif; ?>
             </fieldset>
-             
-
         </form>
     </div>
 
