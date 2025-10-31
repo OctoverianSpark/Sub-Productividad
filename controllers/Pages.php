@@ -15,29 +15,29 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Pages
 {
-   public static function index(Router $router)
-{
-    $page = $_GET['page'] ?? 1;
-    $perPage = $_GET['per_page'] ?? 20;
+    public static function index(Router $router)
+    {
+        $page = $_GET['page'] ?? 1;
+        $perPage = $_GET['per_page'] ?? 20;
 
-    $filtros = [
-        'column' => $_GET['column'] ?? '',
-        'param' => $_GET['param'] ?? ''
-    ];
+        $filtros = [
+            'column' => $_GET['column'] ?? '',
+            'param' => $_GET['param'] ?? ''
+        ];
 
 
-    $paginacion = Logs::paginarConFiltros($page, $perPage, $filtros);
+        $paginacion = Logs::paginarConFiltros($page, $perPage, $filtros);
 
-    $baseUrl = "/";
-    $pagination_links = Paginacion::buildPaginationLinks($baseUrl, $paginacion, $filtros);
-    
-    $router->render("pages/index", [
-        'logs' => $paginacion['data'],
-        'paginacion' => $paginacion,
-        'pagination_links' => $pagination_links,
-        'filtros' => $filtros
-    ]);
-}
+        $baseUrl = "/";
+        $pagination_links = Paginacion::buildPaginationLinks($baseUrl, $paginacion, $filtros);
+
+        $router->render("pages/index", [
+            'logs' => $paginacion['data'],
+            'paginacion' => $paginacion,
+            'pagination_links' => $pagination_links,
+            'filtros' => $filtros
+        ]);
+    }
     public static function export()
     {
         try {
@@ -108,7 +108,7 @@ class ExportHandler
 
 
 
-    private function ExportEmpleados($from, $to)
+    private function exportEmpleados($from, $to)
     {
         $filename = "reporte_" . strtotime($from) . "-" . strtotime($to) . ".xlsx";
         $horas = Time::getPayments(null, null, $from, $to);
@@ -132,7 +132,7 @@ class ExportHandler
     private function exportClientes($from, $to)
     {
         $filename = "reporte_clientes_" . strtotime($from) . "-" . strtotime($to) . ".xlsx";
-        $horas = time::getAgentPayments($from, $to);
+        $horas = Time::getAgentPayments($from, $to);
 
         $this->hojaClientes();
         foreach ($horas as $index => $hora) {
@@ -244,6 +244,8 @@ class ExportHandler
 
     private function outputFile()
     {
+        if (ob_get_length()) ob_end_clean();
+
         if (!headers_sent()) {
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

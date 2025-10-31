@@ -12,7 +12,6 @@
 
 
 .tabla-usuarios{
-    display: grid;
-    place-items: center;
-    @include tabla();
+    @include tabla(70%);
+
 }

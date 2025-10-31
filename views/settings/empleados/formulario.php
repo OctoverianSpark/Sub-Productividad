@@ -6,11 +6,11 @@
 
     <div class="container-input input-empleados">
         <label for="name">NOMBRES</label>
-        <input type="text" name="empleados[nombre]" id="name" value="<?php echo strtoupper($empleados->nombre) ?>" placeholder="Nombres">
+        <input type="text" name="empleados[nombre]" id="name" value="<?php echo strtoupper($empleados->nombre) ?>" placeholder="Nombres" required>
     </div>
     <div class="container-input input-empleados">
         <label for="lastName">APELLIDOS</label>
-        <input type="text" name="empleados[apellido]" id="lastName" value="<?php echo strtoupper($empleados->apellido) ?>" placeholder="Apellidos">
+        <input type="text" name="empleados[apellido]" id="lastName" value="<?php echo strtoupper($empleados->apellido) ?>" placeholder="Apellidos" required>
     </div>
     <div class="container-input input-empleados">
         <label for="docType">TIPO DE DOCUMENTO</label>
@@ -24,7 +24,7 @@
     </div>
     <div class="container-input input-empleados">
         <label for="document">DOCUMENTO</label>
-        <input type="text" name="empleados[documento]" id="document" value="<?php echo $empleados->documento ?>" placeholder="Número de documento">
+        <input type="text" name="empleados[documento]" id="document" value="<?php echo $empleados->documento ?>" placeholder="Número de documento" required>
     </div>
     <div class="container-input input-empleados">
         <label for="sede">SEDE</label>

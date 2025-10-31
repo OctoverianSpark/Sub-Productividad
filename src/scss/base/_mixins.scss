@@ -35,6 +35,8 @@
     border-radius: 2rem;
     display: $display;
     border: none;
+    transition: all 0.2s ease;
+
 
     &:hover {
         transform: translateY(-2px);
@@ -47,20 +49,20 @@
     }
 }
 
-@mixin tabla($width: 95vw) {
-    width: auto;
-    max-width: $width;
+@mixin tabla($width: auto) {
+    width: $width;
+    max-width: 95vw;
     margin: 2rem auto;
     text-align: center;
     border-spacing: 0;
     border-collapse: separate;
     min-height: 10vh;
     max-height: 59vh;
-    display: block;
+    display: table;
     position: relative;
     overflow: scroll;
     scrollbar-width: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
 
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;

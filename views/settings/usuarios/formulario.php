@@ -2,12 +2,12 @@
 
     <div class="container-input input-usuarios">
         <label for="domain-user">Usuario de Dominio</label>
-        <input type="text" id="domain-user" name="user" value="<?php echo $user->user ?>">
+        <input type="text" id="domain-user" name="user" value="<?php echo $user->user ?>" required>
     </div>
 
     <div class="container-input input-usuarios">
         <label for="mail-user">Usuario de Correo</label>
-        <input type="mail" id="mail-user" name="email" value="<?php echo $user->email ?>">
+        <input type="mail" id="mail-user" name="email" value="<?php echo $user->email ?>" required>
     </div>
 
     <div class="container-input input-usuarios">

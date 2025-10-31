@@ -162,7 +162,7 @@ abstract class BaseModel
         if (!empty($filtros["column"]) && !empty($filtros["param"])) {
             $column = self::$db->escape_string($filtros["column"]);
             $param = self::$db->escape_string($filtros["param"]);
-            $whereClause = "WHERE $column LIKE '%$param%'";
+            $whereClause = " WHERE $column LIKE '%$param%'";
         }
 
         $countQuery = "SELECT COUNT(*) as total FROM " . static::$tabla . " $whereClause";

@@ -115,14 +115,12 @@ class Time extends BaseModel
 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
-           
             } else if ($empleado->modalidad == "hogar") {
                 $extras = 2.5;
                 $moneda = "Dolares";
 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
-           
             } else if ($empleado->modalidad == "oficina" && $empleado->sede == "venezuela") {
                 $extras = 2;
                 $moneda = "Dolares";
@@ -172,7 +170,7 @@ class Time extends BaseModel
         $data = self::consultarSQL($dataQuery);
 
         $totalPages = ceil($totalRecords / $perPage);
-        
+
         return [
             "data" => $data,
             "current_page" => $page,
@@ -357,10 +355,21 @@ class Time extends BaseModel
         $i = 0;
 
         foreach ($clientes as $cliente) {
-            $diurnasExtra = 5.5;
-            $nocturnasExtra = 6;
-            $diurnasExtraDominicales = 6.5;
-            $nocturnasExtraDominicales = 7;
+
+            $tipo = strtolower($cliente->tipo);
+            if ($tipo === "nuevo") {
+
+                $diurnasExtra = 6.5;
+                $nocturnasExtra = 7;
+                $diurnasExtraDominicales = 7.5;
+                $nocturnasExtraDominicales = 8;
+            } else if ($tipo === "viejo") {
+
+                $diurnasExtra = 6;
+                $nocturnasExtra = 6.5;
+                $diurnasExtraDominicales = 7;
+                $nocturnasExtraDominicales = 7.5;
+            }
 
             $resultado[$i]["cliente"] = $cliente->nombre . " " . $cliente->apellido;
             $resultado[$i]["diurnas"] = 0;
@@ -393,8 +402,8 @@ class Time extends BaseModel
                 $resultado[$i]["nocturnas_monto"] += (getdate($inicio)["weekday"] == "Sunday") ? $time->nocturnas_extras * $nocturnasExtraDominicales : $time->nocturnas_extras * $nocturnasExtra;
                 $resultado[$i]["diurnas_monto"] += (getdate($inicio)["weekday"] == "Sunday") ? $time->diurnas_ordinarias * $diurnasExtraDominicales : 0;
 
-                $resultado[$i]["logistica"] += ($time->cena === "SI") ? 5 : 0;
-                $resultado[$i]["logistica"] += ($time->taxi === "SI") ? 5 : 0;
+                $resultado[$i]["logistica"] += ($time->cena === "si") ? 5 : 0;
+                $resultado[$i]["logistica"] += ($time->taxi === "si") ? 5 : 0;
             }
 
             $i++;

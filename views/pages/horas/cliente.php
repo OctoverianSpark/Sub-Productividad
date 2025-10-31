@@ -25,7 +25,7 @@
         <div class="container-buttons">
             <button type="submit" class="boton-morado-inline">BUSCAR <i class='bx bx-search bx-tada'></i></button>
 
-            <a href="/horas/ver?table=<?php echo $_GET["table"] ?>" class="boton-fucsia-inline">Borrar Filtro <i class='bx bxs-trash bx-tada'></i></a>
+            <a href="/horas/ver/cliente?name=<?php echo urlencode($_GET['name']) ?>" class="boton-fucsia-inline">Borrar Filtro <i class='bx bxs-trash bx-tada'></i></a>
 
         </div>
 
@@ -51,7 +51,8 @@
                     <th>TAXI</th>
                 </thead>
                 <tbody>
-                    <?php foreach ($horas as $hora) { ?>
+                    <?php foreach ($horas as $hora) {
+                         ?>
 
 
                         <tr>
