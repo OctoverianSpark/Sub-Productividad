@@ -1,25 +1,17 @@
 <?php
 
-
-
 namespace Models;
 
-
-
-class Empleados extends RH{
-
-
-    protected static $columnasDB = ["id","nombre","apellido","tipo_documento","documento","sede","modalidad","cargo","salario"];
+class Empleados extends BaseModel
+{
 
     protected static $tabla = "empleados";
+    protected static $columnasDB = ["id", "nombre", "apellido", "tipo_documento", "documento", "sede", "modalidad", "cargo", "salario"];
+    public $id, $nombre, $apellido, $tipo_documento, $documento, $sede, $modalidad, $cargo, $salario;
 
-
-    public $id,$nombre,$apellido,$tipo_documento,$documento,$sede,$modalidad,$cargo,$salario;
-
-    public function __construct($args=[]){
-
-
-        $this->id = $args["id"]?? null;
+    public function __construct($args = [])
+    {
+        $this->id = $args["id"] ?? null;
 
         $this->nombre = $args["nombre"] ?? "";
         $this->apellido = $args["apellido"] ?? "";
@@ -29,55 +21,56 @@ class Empleados extends RH{
         $this->modalidad = $args["modalidad"] ?? "";
         $this->cargo = $args["cargo"] ?? "";
         $this->salario = $args["salario"] ?? null;
+    }
+
+     public static function getColumns()
+    {
+
+        $columnas = [];
+
+        foreach (static::$columnasDB as $columna) {
+            if ($columna === "id") continue;
+            $columnas[] = $columna;
+        }
 
 
+        return $columnas;
+    }
+
+    public function validar()
+    {
+
+        if (!$this->nombre) {
+            self::$errores[] = "El nombre es obligatorio";
+        }
+        if (!$this->apellido) {
+            self::$errores[] = "El apellido es obligatorio";
+        }
+        if (!$this->documento) {
+            self::$errores[] = "El documento es obligatorio";
+        }
+        if (!$this->tipo_documento) {
+            self::$errores[] = "El tipo de documento es obligatorio";
+        }
+        if (!$this->cargo) {
+            self::$errores[] = "El cargo es obligatorio";
+        }
+        if ($this->salario <= 0) {
+            self::$errores[] = "El salario es obligatorio";
+        }
+        return self::$errores;
     }
 
 
-    public function validar(){
+    public static function getByFullName($name)
+    {
 
+        $query = "SELECT * FROM " . static::$tabla . " WHERE CONCAT(nombre,' ',apellido) = '$name'";
+        $resultado = self::consultarSQL($query);
 
-        if(!$this->nombre){
-            self::$errores[] = "El nombre es obligatorio";
-        }
-        if(!$this->apellido){
-            self::$errores[] = "El apellido es obligatorio";
-        }
-        if(!$this->documento){
-            self::$errores[] = "El documento es obligatorio";
-        }
-        if(!$this->tipo_documento){
-            self::$errores[] = "El tipo de documento es obligatorio";
-        }
-        if(!$this->cargo){
-            self::$errores[] = "El cargo es obligatorio";
-        }
-        if($this->salario<=0){
-            self::$errores[] = "El salario es obligatorio";
-        }
-
-
-        return self::$errores;
-        
-        
-
-
+        return array_shift($resultado);
     }
 
     
-    public static function getByFullName($name){
-
-        $query = "SELECT * FROM " . static::$tabla . " WHERE CONCAT(nombre,' ',apellido) = '$name'";
-
-
-        $resultado = self::consultarSQL($query);
-        return array_shift ( $resultado );
-
-
-
-
-    }
-
+ 
 }
-
-?>

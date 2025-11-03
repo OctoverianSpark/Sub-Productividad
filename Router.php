@@ -1,73 +1,84 @@
 <?php
 
-
 namespace MVC;
 
 
+class Router
+{
 
-class Router{
+    private $rutas = [
+        "GET" => [],
+        "POST" => [],
+    ];
 
-    public $rutasGET = [];
-    public $rutasPOST = [];
-
-    public function get($url,$fn){
-        $this->rutasGET[$url] = $fn;
+    public function get($url, $fn)
+    {
+        $this->rutas["GET"][$url] = $fn;
     }
-    public function post($url,$fn){
-        $this->rutasPOST[$url] = $fn;
+    public function post($url, $fn)
+    {
+        $this->rutas["POST"][$url] = $fn;
     }
 
-    public function comprobarRutas(){
 
+    public function comprobarRutas()
+    {
         session_start();
         $auth = $_SESSION["login"] ?? null;
+        $modo = $_SESSION["mode"] ?? null;
 
-        $rutasProtegidas = ["/","/horas/ver","/horas/registrar","/export","/settings","/settings/empleados","settings/clientes","/eliminar"];
-        $rutasGOD = ["/settings/usuarios","/settings/usuarios/crear","/settings/usuarios/actualizar", "/settings/usuarios/eliminar"];
+        $rutasPublicas = [
+            "/login",
+            "/logout",
+            "/redirect",
+        ];
+
+        $rutasGOD = [
+            "/settings/usuarios",
+            "/settings/usuarios/crear",
+            "/settings/usuarios/actualizar",
+            "/settings/usuarios/eliminar"
+        ];
+
         $urlActual = $_SERVER["PATH_INFO"] ?? "/";
         $metodo = $_SERVER["REQUEST_METHOD"];
 
-
-        if ($metodo === "GET") {
-            $fn = $this->rutasGET[$urlActual] ?? null;
-        }else{
-            
-            $fn = $this->rutasPOST[$urlActual] ?? null;
+        // RUTAS PUBLICAS
+        if (!in_array($urlActual, $rutasPublicas) && !$auth) {
+            header("Location: /login");
+            exit;
         }
 
+        // RUTAS GOD
+        if (in_array($urlActual, $rutasGOD) && $modo !== "GOD") {
+            header("Location: /");
+            exit;
+        }
 
+        $fn = $this->rutas[$metodo][$urlActual] ?? null;
 
         if ($fn) {
-            call_user_func($fn,$this);
-        }else{
+            call_user_func($fn, $this);
+        } else {
             echo "Pagina no Encontrada";
         }
+    }
 
-
-        if(in_array($urlActual,$rutasProtegidas) && !$auth){
-            header("Location: /login");
-        }
-        if(in_array($urlActual, $rutasGOD) && $_SESSION["mode"] !== "GOD"){
-            header("Location : / ");
-        }
-
-    }   
-
-
-
-
-    public function render($view,$datos =[]){
-
-
-
+    public function render($view, $datos = [])
+    {
         foreach ($datos as $key => $value) {
             $$key = $value;
         }
-        ob_start();
-        include __DIR__ ."/views/$view.php";
-        $contenido = ob_get_clean();
-        include __DIR__ ."/views/layout.php";
 
+        $viewPath = __DIR__ . "/views/$view.php";
+        if (!file_exists($viewPath)) {
+            echo "La vista $view no existe.";
+            return;
+        }
+
+        ob_start();
+        include $viewPath;
+        $contenido = ob_get_clean();
+        include __DIR__ . "/views/layout.php";
     }
 }
-

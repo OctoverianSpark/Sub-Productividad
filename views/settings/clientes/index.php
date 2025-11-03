@@ -6,11 +6,11 @@
 
 <?php }?>
 
-<a href="clientes/crear" class="boton-fucsia-inline">Ingresar Cliente</a>
 
 
 <main class="main-settings-clientes">
 
+  <a href="clientes/crear" class="boton-fucsia-inline">Ingresar Cliente</a>
 
 <?php include "../includes/templates/searchForm.php" ?>
 
@@ -24,7 +24,6 @@
             <div class="actions">
             <a href="clientes/actualizar?id=<?php echo $cliente->id ?>" class="boton-fucsia-inline">Actualizar</a>
             <a href="clientes/eliminar?id=<?php echo $cliente->id ?>" class="boton-rojo-inline">Eliminar</a>
-
             </div>
         </div>
         

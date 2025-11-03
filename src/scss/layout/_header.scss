@@ -1,35 +1,35 @@
-.barra{
+.barra {
     background-color: $fucsia;
     margin: 0;
-    padding: 4rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-direction: column;
 
-
-    
-    ul{
+    ul {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 5rem;
         padding: 3rem;
         flex-direction: column;
+        margin: 0;
 
-        a{
+        a {
             font-size: 2.5rem;
             color: $morado;
             font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
 
-
-
+            &:hover {
+                opacity: 0.8;
+            }
         }
     }
-
 }
 
-.center{
+.center {
     flex-direction: column !important;
     height: auto;
     display: flex;
@@ -37,73 +37,64 @@
 }
 
 
-@include desktop{
-    .barra{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+@include desktop {
+    .barra {
         flex-direction: row;
 
+        ul {
+            flex-direction: row;
 
-    
-    ul{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 5rem;
-        padding: 3rem;
-        flex-direction: row;
-
-        a{
-            font-size: 2.5rem;
-            color: $morado;
-            font-weight: 600;
-
-
-
+            li {
+                a {
+                    font-size: 2.5rem;
+                    color: $morado;
+                    font-weight: 600;
+                }
+            }
         }
-    }
     }
 }
 
 
 
-.mainLogoHeader{
+.mainLogoHeader {
     text-align: center;
     padding: 1rem;
-    margin-top: -5.5rem;
-    h1{
-        
+
+    h1 {
+
         text-transform: uppercase;
         color: $morado;
+        position: relative;
 
-        &::after{
+        &::after {
             content: "";
-            display:block;
+            display: block;
             width: 0;
-            height: .5rem;
+            height: 0.5rem;
             background-color: $morado;
             animation: extend 1s infinite alternate ease-in-out;
-            animation-delay: .4s;
+            animation-delay: 0.4s;
             margin-top: -1.5rem;
         }
-        &::before{
+
+        &::before {
             content: "";
-            display:block;
+            display: block;
             width: 0;
-            height: .5rem;
+            height: 0.5rem;
             background-color: $morado;
             animation: extend 1s infinite alternate ease-in-out;
-            animation-delay:  .2s;
+            animation-delay: 0.2s;
             margin-bottom: -1.5rem;
         }
 
-        span:first-child{
-            color: darken($celeste,70);
+        span:first-child {
+            color: darken($celeste, 70);
         }
 
-        span:last-child{
-            color: darken($fucsia,50);
+        span:last-child {
+            color: darken($fucsia, 50);
             font-size: 3rem;
             font-weight: 700;
         }
@@ -111,10 +102,7 @@
     }
 }
 
-
-
-a{
+a {
     color: $negro;
+    text-decoration: none;
 }
-
-

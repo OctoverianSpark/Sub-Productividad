@@ -60,7 +60,9 @@ input[type="range"]{
         width: 10%;
     }
 
-
+  .container-logistica {
+    justify-content: start;
+}
 
 }
 input[type="radio"]{
@@ -186,7 +188,6 @@ form{
 }
 
 .form-settings{
-    
     display: flex;
     justify-content: center;
     align-items: center;

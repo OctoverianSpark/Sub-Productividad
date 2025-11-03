@@ -1,63 +1,101 @@
-.main-settings-clientes{
-    
-    display: flex;
-    justify-content: center;
-    align-self: center;
-    flex-direction: column;
-
-}
-
-
-
-.container-clientes{
-    @include grid(2,5rem);
-
-    max-height: 70vh;
-    overflow-y: scroll;
-
-}
-
-.actions{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.settings-clientes-from {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
     gap: 2rem;
 }
-.container-datos-cliente{
-    padding: 1rem;
+
+
+
+
+
+.settings-clientes-from .inputs-clientes {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    gap: 0;
 
-    h2{
-        font-weight: 700;
-        color: $morado;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        
-    
-
-
-        &::after{
-            content: "";
-            display: block;
-            height: .5rem;
-            background-color: $morado;
-            width: 40rem;
-            text-align: center;
-
-        }
-    
-
-
+    label {
+        width: 100%;
     }
 
-    p{
-        font-weight: 700;
-        color: $morado;
+    select,
+    input {
+        width: 100%;
+        padding: 8px;
+        font-size: 20px;
+        margin: 0 !important;
+        background-color: rgba(245, 245, 245, 1);
+        border: 1px solid rgba(128, 128, 128, 1);
+        display: block;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background-color: white;
+            border: 1.5px solid rgba(50, 50, 50, 1);
+        }
+
+        &:focus {
+            transform: translateY(-2px);
+            border: 1px solid rgba(0, 123, 255, 0.9);
+            box-shadow: 0 0 4px rgba(128, 128, 128, 1);
+        }
+    }
+}
+
+.main-settings-clientes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+.main-settings-clientes .container-clientes {
+    display: grid;
+    width: 100%;
+    gap: 2rem;
+    padding: 2rem;
+    grid-template-columns: repeat(3, minmax(150px, 1fr));
+    
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(1, minmax(260px, 1fr));
+    }
+
+    .container-datos-cliente {
+        background-color: rgba(245, 245, 245, 1);
+        border-radius: 20px;
+        padding: 1rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+
+        h2 {
+            align-items: center;
+            margin: 1rem;
+
+            &::after {
+                content: "";
+                display: block;
+                height: .5rem;
+                background-color: #9b59b6;
+                width: 100%;
+                text-align: center;
+
+            }
+        }
+        p{
+            text-align: center;
+            margin:1rem;
+        }
+    }
+
+    .actions {
+        margin: 1rem;
+        gap: 1rem;
+        display: flex;
+        justify-content: flex-end;
     }
 
 }

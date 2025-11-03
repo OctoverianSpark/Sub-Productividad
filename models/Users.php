@@ -1,270 +1,72 @@
-<?php 
-
-
+<?php
 
 namespace Models;
 
+class Users extends BaseModel
+{
+    protected static $tabla = "users";
+    protected static $columnasDB = ["id", "user", "email", "mode"];
+    public $id, $user, $email, $mode;
 
-
-
-class Users{
-
-
-    
-
-
-    protected static $db;
-
-    protected static $tabla= "users";
-
-    protected static $columnasDB = ["id","user","email","mode"];
-
-    public $id,$user,$email,$mode;
-    public static $errores = [];
-
-
-    public function __construct($args = []){
-
-        $this->id = $args["id"]??null;
-        $this->user = $args["user"]?? null;
-        $this->email = $args["email"]??null;
-        $this->mode = $args["mode"]?? null;
-        
-
+    public function __construct($args = [])
+    {
+        $this->id = $args["id"] ?? null;
+        $this->user = $args["user"] ?? null;
+        $this->email = $args["email"] ?? null;
+        $this->mode = $args["mode"] ?? null;
     }
 
-
-
-
-    public static function setDb($db){
-        self::$db = $db;
-    }
-    public static function getColumns(){
-
-        $columnas = [];
-
-        foreach(static::$columnasDB as $columna){
-            if($columna === "id") continue;
-            $columnas[]=$columna;
-        }
-        
-
-        return $columnas;
-
-
-    }
-
-
-    public static function get($limit){
-        $query = "SELECT * FROM " . static::$tabla . " LIMIT ". $limit;
-
-        $resultado = self::consultarSQL($query);
-
-        return $resultado;
-    }
-
-    public static function consultarSQL($query){
-
-        //Consultar
-        $resultado = self::$db->query($query);
-
-
-        //Iterar
-        $array = [];
-        while ($registro = $resultado->fetch_assoc()) {
-
-            $array[] = static::crearObjeto($registro);
-
-        }
-
-        //Liberar
-        $resultado->free();
-
-        //Retornar
-        return $array;
-
-
-
-    }
-
-    
-    public static function find($id){
-        $query = "SELECT * FROM " . static::$tabla ." WHERE id = $id";
-
-        $resultado = self::consultarSQL($query);
-
-        return array_shift($resultado);
-    }
-
-    protected static function crearObjeto($registro){
-        $objeto = new static;
-        
-
-        foreach ($registro as $key => $value) {
-            if(property_exists( $objeto, $key ) ){
-                $objeto->$key = $value;
-            }
-        }
-
-        return $objeto;
-    }
-
-
-    public function guardar(){
-
-        if (!$this->id) {
-            $this->crear();
-            
-        }else{
-            $this->actualizar();
-        }
-
-        return true;
-
-
-    }
-
-
-    public static function all(){
+    public static function all()
+    {
         $query = "SELECT * FROM " . static::$tabla . " ORDER BY mode ASC";
-        $resultado = self::consultarSQL($query);
-
-        return $resultado;
+        return self::consultarSQL($query);
     }
 
 
-    public function crear(){
-
-        //Sanitizar
+    public function actualizar()
+    {
         $atributos = $this->sanitizarAtributos();
-        
- 
-
-        //Insercion
-        $query = "INSERT INTO ". static::$tabla ." ("  ;
-        $query .= join(", ",array_keys($atributos));
-        $query .= ")VALUES ('";
-        $query .= strtolower(join("' , '",array_values($atributos)));
-        $query.= "')";
-
-        $resultado = self::$db->query($query);
-
-        return $resultado;
-    }
-
-
-    public function actualizar(){
-        
-        $atributos = $this->sanitizarAtributos();
-
         $valores = [];
 
-        foreach($atributos as $key=>$value){
-            if($atributos[$key] === "" || $atributos[$key] === null) continue;
-            if($key === "creado") continue;
+        foreach ($atributos as $key => $value) {
+            if ($atributos[$key] === "" || $atributos[$key] === null) continue;
+            if ($key === "creado") continue;
             $valores[] = "$key='$value'";
         }
 
-        $query = "UPDATE ". static::$tabla." SET "  ;
-        $query.= strtolower(join(",",$valores));
-        $query.= " WHERE id = '". self::$db->escape_string($this->id) . "'";
-        $query.= " LIMIT 1";
+        $query = "UPDATE " . static::$tabla . " SET ";
+        $query .= strtolower(join(",", $valores));
+        $query .= " WHERE id = '" . self::$db->escape_string($this->id) . "'";
+        $query .= " LIMIT 1";
 
         $resultado = self::$db->query($query);
         return $resultado;
-
-
     }
 
-    public static function  findUser($mail=null,$user=null){
 
+    public static function  findUser($mail = null, $user = null)
+    {
         $query = "SELECT * FROM " . self::$tabla . " WHERE ";
 
-        if($mail){
+        if ($mail) {
             $query .= "email = '$mail'";
         }
-        if($user){
+        if ($user) {
             $query .= "user = '$user'";
         }
-
-        
         $resultado = self::consultarSQL(query: $query);
-
 
         return array_shift($resultado);
     }
 
 
-    public function eliminar(){
-        $query = "DELETE FROM " . static::$tabla . " WHERE id = $this->id";
-
-        self::$db->query($query);
-    }
-
-
-    public static function filter($column,$param){
-
-
-        if($column && $param){
+    public static function filter($column, $param)
+    {
+        if ($column && $param) {
             $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%' ORDER BY nombre ASC";
-            $resultado = self::consultarSQL($query);
-
-        }else{
-            $resultado = static::all();
+            return self::consultarSQL($query);
+        } else {
+            return static::all();
         }
-
-        return $resultado;
-
-
-
     }
-
-    public function atributos(){
-        $atributos = [];
-        foreach (static::$columnasDB as $columna) {
-            if ($columna === "id") continue;
-            $atributos[$columna] = $this->$columna;
-            # code...
-        }
-        return $atributos;
-    }
-
-    public function sanitizarAtributos(){
-        $atributos = $this->atributos();
-
-
-        $sanitizado= [];
-
-        foreach($atributos as $key => $value){
-            
-            $sanitizado[$key] = self::$db->escape_string($value);
-          
-
-        }
-        return $sanitizado;
-    }
-
-    
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-?>

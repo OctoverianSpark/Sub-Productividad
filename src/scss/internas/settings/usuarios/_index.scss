@@ -1,11 +1,60 @@
-.input-usuarios{
-    
-    display: grid ;
-    place-items: center;
+.main-settings .boton-morado-block{
+    margin: 1rem;
+}
 
-    label{
-        text-align: center;
+.main-settings-crear .boton-morado-inline{
+padding: 2rem 4rem;
+font-size: 20px;
+}
+
+
+.user-data-from {
+    margin: 2rem;
+    background-color: white;
+    border-radius: 20px;
+    width: 65%;
+    padding: 3rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    @media (max-width: 768px){
+        width: 90%;
+    }    
+}
+
+.user-data-from .input-usuarios {
+    gap: 0;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+    margin: 0 auto;
+    padding: 0;
+
+    label {
+        display: block;
         width: 100%;
+    }
+
+    select,
+    input {
+        width: 100%;
+        padding: 8px;
+        font-size: 20px;
+        margin: 0 !important;
+        background-color: rgba(245, 245, 245, 1);
+        border: 1px solid rgba(128, 128, 128, 1);
+        display: block;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background-color: white;
+            border: 1.5px solid rgba(50, 50, 50, 1);
+        }
+
+        &:focus {
+            transform: translateY(-2px);
+            border: 1px solid rgba(0, 123, 255, 0.9);
+            box-shadow: 0 0 4px rgba(128, 128, 128, 1);
+        }
     }
 
 }

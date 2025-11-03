@@ -1,56 +1,122 @@
+.form-search {
+    border-radius: 20px;
+    padding: 10px;
+    max-width: 600px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
 
-.form-search{
-    display: flex;
-    align-items: center;
-    justify-content:center ;
-    gap: 3rem;
-    
-    margin: 4rem;
 
+.radio {
+    width: auto;
+    justify-content: center;
+    gap: 30px;
+}
 
-    button{
-        margin-top: 1.2rem;
+.container-input-search input[type="radio"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #7a63f8;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+
+    &:focus {
+        outline: 1px solid $morado;
+        outline-offset: 1px;
     }
 }
 
-.container-inputs-search{
+
+.container-inputs-search {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: row !important;
-    
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 2rem;
+    width: 100%;
 
     
 }
 
-#date-search{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+
+.container-input-search input[type="radio"]:checked {
+    background-color: #7a63f8;
+    box-shadow: 0 0 0 4px rgba(122, 99, 248, 0.25);
 }
 
-.container-input-search{
-    
+
+.container-input-search {
+    position: relative;
+    width: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     text-align: center;
 
-    label{
-        font-weight: 700;
-        width: 100%;
-        font-size: 2rem;
-        color: $morado;
+    label {
+        width: auto;
+        font-weight: 900;
+        font-size: 1.6rem;
+        color: #2b1977;
         text-align: center;
     }
 
-    input,select{
-        border: none;
+    input[type="text"],
+    input[type="date"],
+    select {
+        border: 2px solid $morado;
         outline: none;
-        border-radius: 1rem;
-        padding: .5rem;
+        border-radius: 0.8rem;
+        padding: 1rem 1.5rem;
+        font-size: 1.5rem;
+        width: 100%;
+        max-width: 25rem;
+        background-color: white;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+}
+
+select {
+    cursor: pointer;
+    outline: none;
+}
+
+.container-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+
+
+    a {
+        padding: 1rem 2.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        border-radius: 3rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+
+        i {
+            font-size: 1.7rem;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
     }
 }

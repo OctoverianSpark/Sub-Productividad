@@ -1,18 +1,21 @@
+
 <?php
 
-    function conectarDB($schema){
+
+
+function conectarDB($schema){
         $db = new mysqli(
-            "localhost",
-            "root",
-            "jprz28009301.",
+            $_ENV["DB_HOST"] ,
+            $_ENV["DB_USER"] ,
+            $_ENV["DB_PASS"] ,
             $schema,
-            3306
+            $_ENV["DB_PORT"]
         );
         return $db;
+
     }
 
 
-
-
+   
 
 ?>
