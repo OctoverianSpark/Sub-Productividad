@@ -14,9 +14,7 @@
             "email": "jeanpaul.hero2@gmail.com"
         }
     ],
-    "require": {
-        "phpmailer/phpmailer": "^6.9",
-        "dompdf/dompdf": "^3.0",
+    "require": {    
         "phpoffice/phpspreadsheet": "^2.2",
         "google/apiclient": "^2.18",
         "adldap/adldap": "5.0.0.x-dev",
