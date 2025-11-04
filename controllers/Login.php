@@ -185,10 +185,6 @@ class Login
         $name = $google_account_info->name;
         $picture = $google_account_info->picture;
 
-        if (!self::validateLoginInput($email)) {
-            self::redirectWithError(self::ERROR_INVALID_DOMAIN);
-            return;
-        }
 
         $user = Users::findUser($email);
 

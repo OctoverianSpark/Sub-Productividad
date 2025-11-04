@@ -50,7 +50,7 @@ class Time extends BaseModel
 
     public static function all($audit = "no")
     {
-        $query = "SELECT * FROM " . static::$tabla . " WHERE auditar = '$audit' ORDER BY id DESC";
+        $query = "SELECT * FROM " . static::$tabla . " WHERE auditar = '$audit' ORDER BY id DESC,inicio ASC";
         $resultado = self::consultarSQL($query);
         return $resultado;
     }
@@ -116,7 +116,7 @@ class Time extends BaseModel
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
             } else if ($empleado->modalidad == "hogar") {
-                $extras = 2.5;
+                $extras = 2.8;
                 $moneda = "Dolares";
 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;

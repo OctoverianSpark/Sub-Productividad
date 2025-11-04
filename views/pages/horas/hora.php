@@ -9,7 +9,7 @@
         <h2 class="subtitle">CLIENTE <span><?php echo $hora->cliente ?></span></h2>
         <h2 class="subtitle">INICIO DE JORNADA <span><?php echo $hora->inicio?></span></h2>
         <h2 class="subtitle">HORAS DE ALMUERZO <span><?php echo $hora->almuerzo ?></span></h2>
-        <h2 class="subtitle">INICIO DE JORNADA <span><?php echo $hora->final ?></span></h2>
+        <h2 class="subtitle">FINAL DE JORNADA <span><?php echo $hora->final ?></span></h2>
         <a href="/horas/ver/hora/eliminar?id=<?php echo $hora->id ?>" class="boton-rojo-inline">Eliminar</a>
     </div>
 

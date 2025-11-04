@@ -207,7 +207,7 @@ function pages() {
         newIndex.classList.add("page-number");
         newIndex.id = `pagina-${pageCount}`;
         pagesIndex.appendChild(newIndex);
-
+        console.log(pageCount);
         createPage(pageCount);
         rangeValue();
         updateButtons();
@@ -215,7 +215,7 @@ function pages() {
         removeButton.addEventListener("click", () => {
             if (pageCount <= 1) return;
             document.querySelector(`#pagina-${pageCount}`).remove();
-            pageCount;
+            pageCount--;
             updateButtons();
         });
     });
@@ -234,45 +234,71 @@ function createPage(pageNumber) {
     const multiPage = document.querySelector(".container-times");
     const registerPage = multiPage.querySelector(".container-page");
     const newPage = registerPage.cloneNode(true);
-
+  
+    // 🔹 Asignar ID y título del nuevo bloque
     newPage.id = `entrada-${pageNumber}`;
-    newPage.querySelector(".subtitle").textContent = "Entrada " + pageNumber;
-
-    const index = pageNumber - 1;
-
-    const setName = (selector, field) => {
-        const el = newPage.querySelector(selector);
-        if (el) el.setAttribute("name", `horas[${index}][${field}]`);
-    };
-
-    setName("#empleado", "empleado");
-    setName("#cliente", "cliente");
-    setName("#inicio", "inicio");
-    setName("#almuerzo-0", "almuerzo");
-    setName("#almuerzo-1", "almuerzo");
-    setName("almuerzo-2", "almuerezo");
-    setName("#final", "final");
-
-    const horasfield = [
-        "diurnas_ordinarias",
-        "nocturnas_ordinarias",
-        "diurnas_extras",
-        "nocturnas_extras",
-    ];
-    horasfield.forEach((field) => {
-        setName(`#${field}`, field);
-        setName(`#${field}_value`, field);
+    const subtitle = newPage.querySelector(".subtitle");
+    if (subtitle) subtitle.textContent = "Entrada " + pageNumber;
+  
+    // 🔹 Generar nuevos IDs únicos y actualizar labels
+    const idMap = new Map();
+    newPage.querySelectorAll("[id]").forEach((el) => {
+      const oldId = el.id;
+      const newId = `${oldId}-${crypto.randomUUID()}`;
+      idMap.set(oldId, newId);
+      el.id = newId;
     });
-
-    setName("#cena", "cena");
-    setName("#taxi", "taxi");
-    setName("#comantarios", "comentarios");
-
+  
+    newPage.querySelectorAll("label[for]").forEach((label) => {
+      const oldFor = label.getAttribute("for");
+      if (idMap.has(oldFor)) label.setAttribute("for", idMap.get(oldFor));
+    });
+  
+    // 🔹 Actualizar names y limpiar valores
+    newPage.querySelectorAll("input, select, textarea").forEach((el) => {
+      const baseField = el.getAttribute("data-field") || el.name || el.id;
+  
+      if (baseField) {
+        // Reemplaza el índice en horas[0] → horas[nuevo]
+        el.name = baseField.replace(/horas\[\d+\]/, `horas[${pageNumber - 1}]`);
+      }
+  
+      // 🔹 Limpieza según tipo de elemento
+      if (el.type === "radio") {
+        el.checked = el.value == 2
+      } else if (el.type === "checkbox") {
+        el.checked = false; // checkboxes desmarcados
+      } else if (el.tagName === "SELECT") {
+        el.selectedIndex = 0; // select reseteado
+      }
+    });
+  
+    // 🔹 Agregar el nuevo bloque al contenedor
     multiPage.appendChild(newPage);
-    detectandExec();
-    scrollToPage();
-}
-
+  
+    // 🔹 Reinicializar Select2
+    newPage.querySelectorAll("select").forEach((select) => {
+      const next = select.nextElementSibling;
+      if (next && next.classList.contains("select2")) next.remove();
+  
+      select.classList.remove("select2-hidden-accessible");
+      select.removeAttribute("data-select2-id");
+      select.removeAttribute("aria-hidden");
+  
+      $(select).select2({
+        width: "100%",
+        placeholder: "Seleccione una opción",
+        allowClear: true,
+        dropdownParent: $(newPage) // evita conflictos con otros clones
+      });
+    });
+  
+    // 🔹 Ejecutar funciones adicionales si existen
+    if (typeof detectandExec === "function") detectandExec();
+    if (typeof scrollToPage === "function") scrollToPage(newPage);
+  }
+  
+  
 
 function deletePage(pageNumber) {
     document.querySelector(`#entrada-${pageNumber}`).remove();

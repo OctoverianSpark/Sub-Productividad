@@ -22,8 +22,7 @@ class Times
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $errores = [];
-
-            foreach ($_POST["horas"] as $hora) {
+            foreach ($_POST["horas"] as $key=>$hora) {
                 $hora["inicio"] = str_replace("T", " ", $hora["inicio"]);
                 $hora["final"] = str_replace("T", " ", $hora["inicio"]);
 
@@ -36,14 +35,13 @@ class Times
                 $log = new Logs($logData);
                 $errores = $times->validar();
 
-                if (empty($errores)) {
-                    $times->auditar = ($_SESSION["mode"] == "AUDITED") ? "si" : "no";
-                    $times->guardar();
-                    $log->guardar();
+                $times->guardar();
+                $log->guardar();
 
-                    header("Location: /horas/ver?resultado=1");
-                }
+
             }
+            header("Location: /horas/ver?resultado=1");
+
         }
         $router->render("pages/horas/crear", [
             "empleados" => $empleados,
