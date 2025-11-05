@@ -24,7 +24,11 @@ class Times
             $errores = [];
             foreach ($_POST["horas"] as $key=>$hora) {
                 $hora["inicio"] = str_replace("T", " ", $hora["inicio"]);
+<<<<<<< HEAD
                 $hora["final"] = str_replace("T", " ", $hora["final"]);
+=======
+                $hora["final"] = str_replace("T", " ", $hora["final"]); 
+>>>>>>> 00b66d823903cf83f7850d8abc3ab70208a3dc50
 
                 $times = new Time($hora);
 
