@@ -27,7 +27,7 @@ class Time extends BaseModel
         $this->cena = $args["cena"] ?? "no";
         $this->taxi = $args["taxi"] ?? "no";
         $this->comentarios = $args["comentarios"] ?? "";
-        $this->auditar = $args["auditar"] ?? "no";
+        $this->auditar = $args["auditar"] ?? "si";
     }
 
 

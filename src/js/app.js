@@ -207,17 +207,10 @@ function pages() {
         newIndex.classList.add("page-number");
         newIndex.id = `pagina-${pageCount}`;
         pagesIndex.appendChild(newIndex);
-        console.log(pageCount);
         createPage(pageCount);
         rangeValue();
         updateButtons();
 
-        removeButton.addEventListener("click", () => {
-            if (pageCount <= 1) return;
-            document.querySelector(`#pagina-${pageCount}`).remove();
-            pageCount--;
-            updateButtons();
-        });
     });
 
     removeButton.addEventListener("click", () => {
@@ -283,14 +276,18 @@ function createPage(pageNumber) {
   
       select.classList.remove("select2-hidden-accessible");
       select.removeAttribute("data-select2-id");
-      select.removeAttribute("aria-hidden");
-  
+      select.removeAttribute("aria-hidden");  
+
+        select.querySelectorAll("option").forEach(option => {
+            option.removeAttribute("data-select2-id");
+        })
+
       $(select).select2({
         width: "100%",
         placeholder: "Seleccione una opción",
-        allowClear: true,
-        dropdownParent: $(newPage) // evita conflictos con otros clones
-      });
+        allowClear: false,
+        dropdownParent: $(newPage),
+    });
     });
   
     // 🔹 Ejecutar funciones adicionales si existen
