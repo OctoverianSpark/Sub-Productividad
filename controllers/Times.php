@@ -27,7 +27,6 @@ class Times
                 $hora["final"] = str_replace("T", " ", $hora["final"]); 
 
                 $times = new Time($hora);
-
                 $logData = [
                     "titulo" => "Hora Cargada",
                     "contenido" => "El usuario " . $_SESSION["name"] . " cargo las horas de " . $times->empleado . " en la fecha " . $times->inicio
@@ -139,6 +138,10 @@ class Times
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $_POST["horas"]["id"] = $id;
+
+            if (!isset($_POST["horas"]["auditar"])) {
+                $_POST["horas"]["auditar"] = "no";
+            }
 
             $horas = new Time($_POST["horas"]);
 

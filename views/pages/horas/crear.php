@@ -85,7 +85,10 @@
 
                 <fieldset class="container-inputs" id="info-jornada">
                     <legend>INFORMACION DE JORNADA</legend>
-
+                        <div class="container-input">
+                            <label for="festivo">FESTIVO</label>
+                            <input type="checkbox" name="horas[0][festivo]" id="festivo" value="si">
+                        </div>
                     <div class="container-input input-horas">
                         <label for="inicio">INICIO DE JORNADA</label>
                         <input type="datetime-local" name="horas[0][inicio]" id="inicio" class="inicio" value="<?php echo $time->inicio?? date("Y-m-d") . "T08:00:00" ?>">

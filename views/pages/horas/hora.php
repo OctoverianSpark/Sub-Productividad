@@ -40,6 +40,10 @@
                         <?php }?>
                     </select>
                 </div>
+                  <div class="container-input">
+                        <label for="festivo">FESTIVO</label>
+                        <input type="checkbox" name="horas[festivo]" id="festivo" value="si" <?php echo (strtolower($hora->festivo) == "si") ? "checked" : "" ?>>
+                    </div>
                 <div class="container-input input-horas range-number-container">
                     <label for="diurnas_ordinarias">DIURNAS ORDINARIAS</label>
                     <input type="range" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias" value="<?php echo $hora->diurnas_ordinarias ?>" max="10" step="0.1">
