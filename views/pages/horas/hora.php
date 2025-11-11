@@ -84,7 +84,7 @@
                 </div>
 
 
-                <?php if($hora->auditar === "SI" &&  in_array($_SESSION["mode"], ["GOD","AUDITER"])){ ?>
+                <?php if($hora->auditar === "SI" &&  in_array(strtoupper($_SESSION['mode']), ["GOD","AUDITER"])){ ?>
 
                     <div class="container-input">
                         <label>APROBAR AUDITORIA</label>
