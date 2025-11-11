@@ -8,8 +8,8 @@ use Models\Empleados;
 class Time extends BaseModel
 {
     protected static $tabla = "horas_extras";
-    protected static $columnasDB = ["id", "empleado", "cliente", "inicio", "almuerzo", "final", "diurnas_ordinarias", "nocturnas_ordinarias", "diurnas_extras", "nocturnas_extras", "cena", "taxi", "comentarios", "auditar"];
-    public $id, $empleado, $cliente, $inicio, $almuerzo, $final, $diurnas_ordinarias, $nocturnas_ordinarias, $diurnas_extras, $nocturnas_extras, $cena, $taxi, $comentarios, $auditar;
+    protected static $columnasDB = ["id", "empleado", "cliente", "inicio", "almuerzo", "final", "diurnas_ordinarias", "nocturnas_ordinarias", "diurnas_extras", "nocturnas_extras", "cena", "taxi", "comentarios", "auditar", "festivo"];
+    public $id, $empleado, $cliente, $inicio, $almuerzo, $final, $diurnas_ordinarias, $nocturnas_ordinarias, $diurnas_extras, $nocturnas_extras, $cena, $taxi, $comentarios, $auditar, $festivo;
 
 
     public function __construct($args = [])
@@ -28,6 +28,7 @@ class Time extends BaseModel
         $this->taxi = $args["taxi"] ?? "no";
         $this->comentarios = $args["comentarios"] ?? "";
         $this->auditar = $args["auditar"] ?? "si";
+        $this->festivo = $args["festivo"] ?? "no";
     }
 
 
@@ -113,20 +114,20 @@ class Time extends BaseModel
                 $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5), 2);
                 $moneda = "COP";
 
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
             } else if ($empleado->modalidad == "hogar") {
                 $extras = 2.8;
                 $moneda = "Dolares";
 
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
             } else if ($empleado->modalidad == "oficina" && $empleado->sede == "venezuela") {
                 $extras = 2;
                 $moneda = "Dolares";
 
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) : $time->diurnas_extras * $extras;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
             }
 
             foreach ($time as $key => $value) {
@@ -225,7 +226,7 @@ class Time extends BaseModel
             if ($key === "creado") continue;
             $valores[] = "$key='$value'";
         }
-
+        $atributos["auditar"] = "no";
         $query = "UPDATE " . static::$tabla . " SET ";
         $query .= strtolower(join(",", $valores));
         $query .= " WHERE id = '" . self::$db->escape_string($this->id) . "'";
@@ -313,22 +314,22 @@ class Time extends BaseModel
                 $diurnasExtraDominicales = round($salarioHora + $salarioHora, 2);
                 $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5), 2);
                 $moneda = "COP";
-
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
+                
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday"  || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
             } else if ($empleado->modalidad == "hogar") {
                 $extras = 2.8;
                 $moneda = "Dolares";
 
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
             } else if ($empleado->modalidad == "oficina" && $empleado->sede == "venezuela") {
                 $extras = 2;
                 $moneda = "Dolares";
 
 
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
+                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
+                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
             }
 
 

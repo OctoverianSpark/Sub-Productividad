@@ -40,6 +40,10 @@
                         <?php }?>
                     </select>
                 </div>
+                  <div class="container-input">
+                        <label for="festivo">FESTIVO</label>
+                        <input type="checkbox" name="horas[festivo]" id="festivo" value="si" <?php echo (strtolower($hora->festivo) == "si") ? "checked" : "" ?>>
+                    </div>
                 <div class="container-input input-horas range-number-container">
                     <label for="diurnas_ordinarias">DIURNAS ORDINARIAS</label>
                     <input type="range" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias" value="<?php echo $hora->diurnas_ordinarias ?>" max="10" step="0.1">
@@ -84,24 +88,7 @@
                 </div>
 
 
-                <?php if($hora->auditar === "SI" &&  in_array(strtoupper($_SESSION['mode']), ["GOD","AUDITER"])){ ?>
-
-                    <div class="container-input">
-                        <label>APROBAR AUDITORIA</label>
-                        <div class="container-input">
-
-                            <input type="radio" name="horas[auditar]" id="audit-no" value="no">
-                            <label for="audit-no">SI</label>
-
-                        </div>
-                        <div class="container-input">
-
-                            <input type="radio" name="horas[auditar]" id="audit-yes" value="si">
-                            <label for="audit-yes">NO</label>
-
-                        </div>
-                    </div>
-                <?php } ?>
+             
                 <input type="submit" value="Actualizar" class="boton-morado-inline">
             </fieldset>
 

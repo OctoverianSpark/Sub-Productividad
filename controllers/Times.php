@@ -27,7 +27,6 @@ class Times
                 $hora["final"] = str_replace("T", " ", $hora["final"]);
 
                 $times = new Time($hora);
-
                 $logData = [
                     "titulo" => "Hora Cargada",
                     "contenido" => "El usuario " . $_SESSION["name"] . " cargo las horas de " . $times->empleado . " en la fecha " . $times->inicio
@@ -54,7 +53,7 @@ class Times
     public static function ver(Router $router)
     {
         $page = (int)($_GET["page"] ?? 1);
-        $perPage = (int)($_GET["per_page"] ?? 20);
+        $perPage = (int)($_GET["per_page"] ?? 100);
 
         if ($page < 1) $page = 1;
 
@@ -140,6 +139,10 @@ class Times
 
             $_POST["horas"]["id"] = $id;
 
+            if (!isset($_POST["horas"]["auditar"])) {
+                $_POST["horas"]["auditar"] = "no";
+            }
+
             $horas = new Time($_POST["horas"]);
 
 
@@ -154,7 +157,12 @@ class Times
             $horas->guardar();
 
             $log->guardar();
-            header("Location:/horas/ver?resultado=2");
+             $table = $_GET["table"] ?? null;
+            if ($table) {
+                header("Location:/horas/ver?table=" . $table . "&resultado=2");
+            } else {
+                header("Location:/horas/ver?resultado=2");
+            }
         }
 
         $router->render("pages/horas/hora", [

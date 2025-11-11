@@ -186,7 +186,7 @@
                             <td><?php echo strtoupper(s($hora->diurnas_extras)) ?></td>
                             <td><?php echo strtoupper(s($hora->nocturnas_extras)) ?></td>
                             <td>
-                                <a href="/horas/ver/hora?id=<?php echo s($hora->id) ?>" class="boton-morado-inline">Gestionar</a>
+                                <a href="/horas/ver/hora?id=<?php echo s($hora->id) ?>&table=auditar" class="boton-morado-inline">Gestionar</a>
                             </td>
                         </tr>
                     <?php } ?>
