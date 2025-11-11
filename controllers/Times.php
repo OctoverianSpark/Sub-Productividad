@@ -53,7 +53,7 @@ class Times
     public static function ver(Router $router)
     {
         $page = (int)($_GET["page"] ?? 1);
-        $perPage = (int)($_GET["per_page"] ?? 20);
+        $perPage = (int)($_GET["per_page"] ?? 100);
 
         if ($page < 1) $page = 1;
 
@@ -157,7 +157,12 @@ class Times
             $horas->guardar();
 
             $log->guardar();
-            header("Location:/horas/ver?resultado=2");
+             $table = $_GET["table"] ?? null;
+            if ($table) {
+                header("Location:/horas/ver?table=" . $table . "&resultado=2");
+            } else {
+                header("Location:/horas/ver?resultado=2");
+            }
         }
 
         $router->render("pages/horas/hora", [

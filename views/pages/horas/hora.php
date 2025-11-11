@@ -88,24 +88,7 @@
                 </div>
 
 
-                <?php if($hora->auditar === "SI" &&  in_array($_SESSION["mode"], ["GOD","AUDITER"])){ ?>
-
-                    <div class="container-input">
-                        <label>APROBAR AUDITORIA</label>
-                        <div class="container-input">
-
-                            <input type="radio" name="horas[auditar]" id="audit-no" value="no">
-                            <label for="audit-no">SI</label>
-
-                        </div>
-                        <div class="container-input">
-
-                            <input type="radio" name="horas[auditar]" id="audit-yes" value="si">
-                            <label for="audit-yes">NO</label>
-
-                        </div>
-                    </div>
-                <?php } ?>
+             
                 <input type="submit" value="Actualizar" class="boton-morado-inline">
             </fieldset>
 

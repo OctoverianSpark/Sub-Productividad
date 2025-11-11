@@ -47,47 +47,49 @@ class Paginacion
         $links = [];
         $currentPage = $paginacion['current_page'];
         $totalPages = $paginacion['total_pages'];
-        $perPage = $paginacion["per_page"];
+          $perPage = $paginacion['per_page'];
 
-        $params = http_build_query($filtros);
-        $separator = !empty($params) ? '&' : '';
+        
+        $hasQuery = (strpos($baseUrl, '?') !== false);
+        $glue = $hasQuery ? '&' : '?';
 
-        $whereClause = "";
-        if (!empty($filtros["column"]) && !empty($filtros["param"])){
-            $column = $filtros["column"]; 
-            $param  = $filtros["param"];
-            $whereClause = "column=$column&param=$param";  
-        }
-
+        
+        $buildUrl = function ($page) use ($baseUrl, $glue, $filtros, $perPage) {
+            $queryParams = array_merge($filtros, [
+                'page' => $page,
+                'per_page' => $perPage,
+            ]);
+            return $baseUrl . $glue . http_build_query($queryParams);
+        };
         // Primera página
         if ($currentPage > 1) {
-            $links['first'] = $baseUrl . '?' . $whereClause . $separator . 'page=1' . $separator . "per_page=" . $perPage;
+            $links['first'] = $buildUrl(1);
         }
 
         // Página anterior
-        if ($paginacion['has_prev']) {
-            $links['prev'] = $baseUrl . '?' . $whereClause . $separator . 'page=' . $paginacion['prev_page'] . $separator . "per_page=" . $perPage;
+        if (!empty($paginacion['has_prev']) && !empty($paginacion['prev_page'])) {
+            $links['prev'] = $buildUrl($paginacion['prev_page']);
         }
 
-        // Páginas numéricas 
+        // Páginas numéricas
         $start = max(1, $currentPage - 2);
         $end = min($totalPages, $currentPage + 2);
 
         for ($i = $start; $i <= $end; $i++) {
             $links['pages'][$i] = [
-                'url' => $baseUrl . '?' . $whereClause . $separator . 'page=' . $i . $separator . "per_page=" . $perPage,
-                'is_current' => $i == $currentPage
+                'url' => $buildUrl($i),
+                'is_current' => ($i === $currentPage),
             ];
         }
 
         // Página siguiente
-        if ($paginacion['has_next']) {
-            $links['next'] = $baseUrl . '?' . $whereClause . $separator . 'page=' . $paginacion['next_page'] . $separator . "per_page=" . $perPage;
+        if (!empty($paginacion['has_next']) && !empty($paginacion['next_page'])) {
+            $links['next'] = $buildUrl($paginacion['next_page']);
         }
 
         // Última página
-        if ($currentPage < $totalPages) {
-            $links['last'] = $baseUrl . '?' . $whereClause . $separator . 'page=' . $totalPages . $separator . "per_page=" . $perPage;
+        if ($currentPage < $totalPages && $totalPages > 0) {
+            $links['last'] = $buildUrl($totalPages);
         }
         return $links;
     }

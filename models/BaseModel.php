@@ -154,7 +154,7 @@ abstract class BaseModel
     }
 
 
- public static function paginarConFiltros($page = 1, $perPage = 20, $filtros = [])
+ public static function paginarConFiltros($page = 1, $perPage = 100, $filtros = [])
     {
         $offset = ($page - 1) * $perPage;
 
