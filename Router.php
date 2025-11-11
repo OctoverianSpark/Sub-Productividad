@@ -25,7 +25,7 @@ class Router
     {
         session_start();
         $auth = $_SESSION["login"] ?? null;
-        $modo = $_SESSION["mode"] ?? null;
+        $modo = strtoupper($_SESSION["mode"]) ?? null;
 
         $rutasPublicas = [
             "/login",

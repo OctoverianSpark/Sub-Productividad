@@ -24,7 +24,7 @@ class Times
             $errores = [];
             foreach ($_POST["horas"] as $key=>$hora) {
                 $hora["inicio"] = str_replace("T", " ", $hora["inicio"]);
-                $hora["final"] = str_replace("T", " ", $hora["final"]); 
+                $hora["final"] = str_replace("T", " ", $hora["final"]);
 
                 $times = new Time($hora);
                 $logData = [
@@ -94,7 +94,7 @@ class Times
             $pagination_links = Paginacion::buildPaginationLinks("/horas/ver", $paginacion, $urlFilters);
         } else if ($_GET["table"] == "clientes") {
             $horas = Time::getAgentPayments($_GET["from"] . " 08:00:00", str_replace("T", " ", $_GET["to"]), $_GET["param"]);
-        } else if ($_GET["table"] == "auditar" && in_array($_SESSION["mode"], ["GOD", "AUDITER"])) {
+        } else if ($_GET["table"] == "auditar" && in_array(strtoupper($_SESSION["mode"]), ["GOD", "AUDITER"])) {
             $horas = Time::all("si");
 
             if (!empty($_GET["column"]) && !empty($_GET["param"])) {
