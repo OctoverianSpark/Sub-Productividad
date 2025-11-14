@@ -6,7 +6,6 @@ function EventListenters() {
     rangeValue();
     requestHours();
     activateUpdates();
-    changeForm();
     confirmForm();
     dragNdrop();
     pages();
@@ -43,24 +42,6 @@ function confirmForm() {
     });
 }
 
-function changeForm() {
-    const filterSelector = document.querySelector("#searchBy");
-    if (!filterSelector) return;
-
-    const dateSearch = document.querySelector("#date-search");
-    const dateSearchInput = document.querySelectorAll("#date-search-input");
-    const textSearch = document.querySelector("#text-search");
-
-    filterSelector.addEventListener("input", (e) => {
-        const isFecha = e.target.value === "fecha";
-
-        dateSearch.style.display = isFecha ? "flex" : "none";
-        textSearch.style.display = isFecha ? "none" : "flex";
-
-        textSearch.children[1].disabled = isFecha;
-        dateSearchInput.forEach((input) => (input.disabled = !isFecha));
-    });
-}
 
 function rangeValue() {
     const containers = document.querySelectorAll(".range-number-container");

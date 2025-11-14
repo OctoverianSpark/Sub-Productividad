@@ -25,7 +25,10 @@ class Times
             foreach ($_POST["horas"] as $key=>$hora) {
                 $hora["inicio"] = str_replace("T", " ", $hora["inicio"]);
                 $hora["final"] = str_replace("T", " ", $hora["final"]); 
-
+                
+                if (isset($_SESSION["mode"]) && $_SESSION["mode"] === "audited") {
+                    $hora["auditar"] = "no";
+                }
                 $times = new Time($hora);
                 $logData = [
                     "titulo" => "Hora Cargada",
@@ -79,7 +82,6 @@ class Times
             }
 
             $result = Time::getPaymentsPaginated($page, $perPage, $_GET["column"], $_GET["param"], $_GET["from"], $_GET["to"]);
-
             $horas = $result["data"];
             $paginacion = $result["pagination"];
 
@@ -93,7 +95,11 @@ class Times
 
             $pagination_links = Paginacion::buildPaginationLinks("/horas/ver", $paginacion, $urlFilters);
         } else if ($_GET["table"] == "clientes") {
-            $horas = Time::getAgentPayments($_GET["from"] . " 08:00:00", str_replace("T", " ", $_GET["to"]), $_GET["param"]);
+
+            $from = (!empty($_GET["from"])) ? $_GET["from"] : null;
+            $to = (!empty($_GET["to"])) ? $_GET["to"] : null;
+            $horas = Time::getAgentPayments($from, $to, $_GET["param"]);
+
         } else if ($_GET["table"] == "auditar" && in_array($_SESSION["mode"], ["GOD", "AUDITER"])) {
             $horas = Time::all("si");
 
@@ -139,9 +145,9 @@ class Times
 
             $_POST["horas"]["id"] = $id;
 
-            if (!isset($_POST["horas"]["auditar"])) {
-                $_POST["horas"]["auditar"] = "no";
-            }
+            
+            $_POST["horas"]["auditar"] = "no";
+            
 
             $horas = new Time($_POST["horas"]);
 

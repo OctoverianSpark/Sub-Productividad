@@ -282,8 +282,9 @@ class Time extends BaseModel
         if ($from && $to) {
             $query .= "AND ((inicio BETWEEN '$from 00:00:00' AND '$to 23:59:00') OR";
             $query .= "(final BETWEEN '$from 00:00:00' AND '$to 23:59:00'))";
-            $query .= " AND NOT cliente = 'administrativo'";
         }
+        $query .= " AND NOT cliente = 'administrativo'";
+        $query .= " ORDER BY inicio DESC, id DESC";
         $resultado = self::consultarSQL($query);
 
         return $resultado;
@@ -314,7 +315,7 @@ class Time extends BaseModel
                 $diurnasExtraDominicales = round($salarioHora + $salarioHora, 2);
                 $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5), 2);
                 $moneda = "COP";
-                
+
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday"  || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
             } else if ($empleado->modalidad == "hogar") {

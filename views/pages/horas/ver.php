@@ -22,18 +22,18 @@
                 <?php } ?>
             </div>
         </div>
-
-        <div class="container-inputs-search">
-            <div class="container-input-search">
-                <label for="searchBy">FILTRAR</label>
-                <select id="searchBy" name="column">
-                    <option value="fecha">RANGO DE FECHAS</option>
-                    <option value="<?php echo ($_GET["table"] == "empleados" || !$_GET["table"]) ? "empleado" : "cliente" ?>">NOMBRE</option>
-                </select>
-            </div>
-        </div>
-
+        <?php
+        $defaultColumn = (isset($_GET["table"]) && $_GET["table"] === "clientes") ? "cliente" : "empleado";
+        $currentColumn = isset($_GET["column"]) ? htmlspecialchars($_GET["column"]) : $defaultColumn;
+        ?>
+        <input type="hidden" name="column" value="<?php echo $currentColumn; ?>">
         <div class="container-inputs-search" id="date-search">
+            <div class="container-input-search" id="text-search">
+                <label for="param">Buscar por nombre</label>
+                <input type="text" name="param" id="param" value="<?php echo htmlspecialchars($_GET['param'] ?? '') ?>" <?php echo (isset($_GET["column"]) && $_GET["column"] === "fecha") ? 'disabled' : '' ?>>
+            </div>
+
+            <?php if ($_GET["table"] !== "auditar") { ?>
             <div class="container-input-search">
                 <label for="date-search">DESDE</label>
                 <input type="date" name="from" id="date-search-input" value="<?php echo $_GET["from"] ?>">
@@ -42,12 +42,9 @@
                 <label for="date-search">HASTA</label>
                 <input type="date" name="to" id="date-search-input" value="<?php echo $_GET["to"] ?>">
             </div>
+            <?php } ?> 
         </div>
 
-        <div class="container-input-search" id="text-search" style="display:none">
-            <label for="param">Buscar por nombre</label>
-            <input type="text" name="param" id="param" disabled>
-        </div>
 
         <!-- Mantener parámetros de paginación en el formulario de búsqueda -->
         <?php if (isset($_GET["per_page"])): ?>
