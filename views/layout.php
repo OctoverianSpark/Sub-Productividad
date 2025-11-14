@@ -38,7 +38,7 @@
                         <ul>
                                 <li><a href="/horas/registrar">Ingresar Horas</a></li>
                                 <li><a href="/horas/ver" >Ver Horas</a></li>
-                                <?php if(in_array($_SESSION["mode"],["GOD","ADMIN"])){ ?>
+                                <?php if(in_array(strtoupper($_SESSION["mode"]),["GOD","ADMIN","AUDITER"])){ ?>
                                     <li><a href="/settings" >Configuracion</a></li>
                                 <?php } ?>
                                 <li><a href="/logout" >Cerrar Sesion</a></li>

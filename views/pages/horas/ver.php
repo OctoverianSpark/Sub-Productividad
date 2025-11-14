@@ -14,7 +14,7 @@
                     <label for="clientes">CLIENTES</label>
                     <input type="radio" name="table" id="radio-selector" value="clientes" <?php echo ($_GET["table"] === "clientes") ? "checked" : "" ?>>
                 </div>
-                <?php if (in_array($_SESSION["mode"], ["GOD", "AUDITER"])) { ?>
+                <?php if (in_array(strtoupper($_SESSION["mode"]), ["GOD", "AUDITER"])) { ?>
                     <div class="container-input-search">
                         <label for="au2ditar">AUDITAR</label>
                         <input type="radio" name="table" id="radio-selector" value="auditar" <?php echo ($_GET["table"] === "auditar") ? "checked" : "" ?>>
