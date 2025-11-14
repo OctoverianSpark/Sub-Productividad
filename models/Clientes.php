@@ -41,4 +41,18 @@ class Clientes extends BaseModel
     }
 
 
+     public static function filter($column, $param)
+    {
+        if ($column && $param) {
+            $column = self::$db->escape_string($column);
+            $param = self::$db->escape_string($param);
+            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%' ORDER BY id DESC";
+            return self::consultarSQL($query);
+        } else {
+            $query = "SELECT * FROM " . static::$tabla . " ORDER BY id DESC";
+            return self::consultarSQL($query);
+        }
+    }
+
+
 }

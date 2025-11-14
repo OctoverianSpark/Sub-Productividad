@@ -3,8 +3,11 @@
 namespace Controllers;
 
 use Models\Empleados;
+use Models\Logs;
 use Models\Paginacion;
 use MVC\Router;
+use Models\Users as DB_Users;
+
 
 
 
@@ -38,13 +41,15 @@ class Employees
 
         ]);
     }
-    
+
 
     public static function crear(Router $router)
     {
         $errores = [];
 
+
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
             $empleados = new Empleados($_POST["empleados"]);
             $errores = $empleados->validar();
 
@@ -53,6 +58,14 @@ class Employees
                 header("Location: /settings/empleados?resultado=1");
             }
         }
+
+        $logData = [
+            "titulo" => "Empleado Creado",
+            "contenido" => "El usuario " . $_SESSION["name"] . " ha agregado al empleado " . $empleados->nombre . " " . $empleados->apellido . "",
+        ];
+        $log = new Logs($logData);
+        $log->guardar();
+
 
         $router->render("settings/empleados/crear", [
             "empleados" => $empleados,
@@ -77,6 +90,14 @@ class Employees
             }
         }
 
+        $logData = [
+            "titulo" => "Empleado actualizado",
+            "contenido" => "El usuario " . $_SESSION["name"] . " ha actualizado al empleado " . $empleados->nombre . " " . $empleados->apellido . "",
+        ];
+        $log = new Logs($logData);
+        $log->guardar();
+
+
         $router->render("settings/empleados/actualizar", [
             "empleados" => $empleados,
             "errores" => $errores
@@ -87,10 +108,18 @@ class Employees
     public static function eliminar()
     {
         $id = validarID();
-        $args["id"] = $id;
-        $empleados = new Empleados($args);
+
+        $empleados = Empleados::find($id);
+
+        $logData = [
+            "titulo" => "Empleado eliminado",
+            "contenido" => "El usuario " . $_SESSION["name"] . " ha eliminado al empleado " . $empleados->nombre . " " . $empleados->apellido . "",
+        ];
+        $log = new Logs($logData);
+        $log->guardar();
 
         $empleados->eliminar();
+
         header("Location: /settings/empleados?resultado=3");
     }
 }
