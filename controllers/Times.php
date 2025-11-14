@@ -139,9 +139,7 @@ class Times
 
             $_POST["horas"]["id"] = $id;
 
-            if (!isset($_POST["horas"]["auditar"])) {
-                $_POST["horas"]["auditar"] = "no";
-            }
+            $_POST["horas"]["auditar"] = "no";
 
             $horas = new Time($_POST["horas"]);
 
