@@ -13,6 +13,8 @@
   <a href="clientes/crear" class="boton-fucsia-inline">Ingresar Cliente</a>
 
 <?php include "../includes/templates/searchForm.php" ?>
+<a href="/export?table=clientes_info" class="boton-fucsia-inline">Exportar <i class='bx bxs-save bx-tada' ></i></a>
+
 
 <div class="container-clientes">
     <?php foreach($clientes as $cliente){ ?>
