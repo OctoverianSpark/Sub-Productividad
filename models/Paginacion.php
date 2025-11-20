@@ -45,7 +45,8 @@ class Paginacion
     {
 
         $links = [];
-        $currentPage = $paginacion['current_page'];
+        $currentPage = (int)($paginacion['current_page']);
+        
         $totalPages = $paginacion['total_pages'];
           $perPage = $paginacion['per_page'];
 

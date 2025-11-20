@@ -3,7 +3,9 @@
 namespace Controllers;
 
 use Exception;
+use Google\Client;
 use InvalidArgumentException;
+use Models\Clientes;
 use MVC\Router;
 use Models\Empleados;
 use Models\Logs;
@@ -55,6 +57,7 @@ class ExportHandler
     private const EMPLEADO_HEADERS = ["EMPLEADO", "CLIENTE", "MODALIDAD", "INICIO DE JORNADA", "ALMUERZO", "FINAL DE JORNADA", "DIURNAS ORDINARIAS", "DIURNAS EXTRAS", "NOCTURNAS ORDINARIAS", "NOCTURNAS EXTRAS", "CENA", "TAXI", "MONTO EXTRAS DIURNAS", "MONTO EXTRAS NOCTURNAS", "TOTAL A PAGAR", "COMENTARIOS"];
     private const CLIENTE_HEADERS = ['CLIENTE', 'HORAS EXTRAS DIURNAS', 'HORAS EXTRAS DIURNAS DOMINICALES', 'HORAS ORDINARIAS DIURNAS DOMINICALES', 'HORAS EXTRAS NOCTURNAS', 'HORAS EXTRAS NOCTURNAS DOMINICALES', 'MONTO EXTRAS DIURNAS', 'MONTO EXTRAS NOCTURNAS', 'MONTO LOGISTICA', 'SUBTOTAL'];
     private const EMPLEADO_INFO_HEADERS = ['NOMBRE', 'APELLIDO', 'TIPO DE DOCUMENTO', 'DOCUMENTO', 'SEDE', 'CARGO', 'SALARIO'];
+    private const CLIENTE = ['NOMBRE', 'APELLIDO', 'TIPO'];
 
     private $spreadsheet;
     private $writer;
@@ -82,6 +85,9 @@ class ExportHandler
                 break;
             case "clientes":
                 $this->exportClientes($from, $to);
+                break;
+            case "clientes_info":
+                $this->exportClientesInfo();
                 break;
             default:
                 throw new InvalidArgumentException("Tabla no valida:" . $table);
@@ -155,6 +161,19 @@ class ExportHandler
     }
 
 
+    private function exportClientesInfo() {
+        $filename = "clientesInfo.xlsx";
+        $clientes = Clientes::all();
+
+        $this->createClienteInfoSheet();
+
+        foreach ($clientes as $index => $cliente){
+            $this->addClienteInfoRow($cliente, $index + 2);
+        }
+        $this->setFilename($filename);
+    }
+
+
     private function hojaEmpleados()
     {
         $this->spreadsheet->removeSheetByIndex(0);
@@ -178,6 +197,11 @@ class ExportHandler
         $this->spreadsheet->removeSheetByIndex(0);
         $sheet = $this->spreadsheet->createSheet()->setTitle("empleados");
         $sheet->fromArray(self::EMPLEADO_INFO_HEADERS);
+    }
+    private function createClienteInfoSheet () {
+        $this->spreadsheet->removeSheetByIndex(0);
+        $sheet = $this->spreadsheet->createSheet()->setTitle("Clientes");
+        $sheet->fromArray(self::CLIENTE, null, "A1");
     }
 
 
@@ -239,6 +263,14 @@ class ExportHandler
         $this->spreadsheet->getActiveSheet()->fromArray($rowData, null, "A$row");
     }
 
+    private function addClienteInfoRow($cliente, $row){
+        $rowData = [
+            strtoupper($cliente->nombre),
+            strtoupper($cliente->apellido),
+            strtoupper($cliente->tipo),
+        ];
+        $this->spreadsheet->getActiveSheet()->fromArray($rowData, null, "A$row");
+    }
 
 
 
