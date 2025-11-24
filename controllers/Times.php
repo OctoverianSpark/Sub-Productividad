@@ -26,7 +26,7 @@ class Times
                 $hora["inicio"] = str_replace("T", " ", $hora["inicio"]);
                 $hora["final"] = str_replace("T", " ", $hora["final"]); 
                 
-                if (isset($_SESSION["mode"]) && $_SESSION["mode"] === "audited") {
+                if (isset($_SESSION["mode"]) && strtoupper($_SESSION["mode"]) === "AUDITER") {
                     $hora["auditar"] = "no";
                 }
                 $times = new Time($hora);
