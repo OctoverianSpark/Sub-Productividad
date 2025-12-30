@@ -125,19 +125,23 @@ function calculate(page) {
         let ordinarias = totalHoras - almuerzo;
         let extrasDiurnas = 0;
         let extrasNocturnas = 0;
-        
         const horasFinal = final.getHours();
+        const cruzaDia = final.getDate() !== inicio.getDate();
+
         const esNocturno =
-            horasFinal > 21 ||
-            (horasFinal <= 6 && final.getDay() === inicio.getDay() + 1);
+        horasFinal > 19 ||
+        (horasFinal <= 6 && cruzaDia);
 
         if (esNocturno) {
             ordinarias = totalHoras;
-            extrasDiurnas = 5 - almuerzo;
+            extrasDiurnas = 3 - almuerzo;
             extrasNocturnas = totalHoras - (esDesdeRadio ? 13 : 11);
-        } else if (horasFinal <= 21 && horasFinal > 6) {
+
+        } else if (horasFinal <= 19 && horasFinal > 6) {
             extrasDiurnas = ordinarias - 8;
         }
+
+        console.log(esNocturno,totalHoras,ordinarias,extrasDiurnas,extrasNocturnas);
 
         actualizarCampo(elements.diurnasOrd, Math.min(ordinarias, 8));
         actualizarCampo(elements.diurnasExt, Math.max(extrasDiurnas, 0));

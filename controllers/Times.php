@@ -100,7 +100,7 @@ class Times
             $to = (!empty($_GET["to"])) ? $_GET["to"] : null;
             $horas = Time::getAgentPayments($from, $to, $_GET["param"]);
 
-        } else if ($_GET["table"] == "auditar" && in_array($_SESSION["mode"], ["GOD", "AUDITER"])) {
+        } else if ($_GET["table"] == "auditar" && in_array(strtolower($_SESSION["mode"]), ["god", "auditer"])) {
             $horas = Time::all("si");
 
             if (!empty($_GET["column"]) && !empty($_GET["param"])) {

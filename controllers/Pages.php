@@ -54,8 +54,8 @@ class Pages
 
 class ExportHandler
 {
-    private const EMPLEADO_HEADERS = ["EMPLEADO", "CLIENTE", "MODALIDAD", "INICIO DE JORNADA", "ALMUERZO", "FINAL DE JORNADA", "DIURNAS ORDINARIAS", "DIURNAS EXTRAS", "NOCTURNAS ORDINARIAS", "NOCTURNAS EXTRAS", "CENA", "TAXI", "MONTO EXTRAS DIURNAS", "MONTO EXTRAS NOCTURNAS", "TOTAL A PAGAR", "COMENTARIOS"];
-    private const CLIENTE_HEADERS = ['CLIENTE', 'HORAS EXTRAS DIURNAS', 'HORAS EXTRAS DIURNAS DOMINICALES', 'HORAS ORDINARIAS DIURNAS DOMINICALES', 'HORAS EXTRAS NOCTURNAS', 'HORAS EXTRAS NOCTURNAS DOMINICALES', 'MONTO EXTRAS DIURNAS', 'MONTO EXTRAS NOCTURNAS', 'MONTO LOGISTICA', 'SUBTOTAL'];
+    private const EMPLEADO_HEADERS = ["EMPLEADO", "CLIENTE", "MODALIDAD", "INICIO DE JORNADA", "ALMUERZO", "FINAL DE JORNADA", "DIURNAS ORDINARIAS", "DIURNAS EXTRAS","DIURNAS ORDINARIAS DOMINICALES", "NOCTURNAS ORDINARIAS", "NOCTURNAS EXTRAS","NOCTURNAS ORDINARIAS DOMINICALES", "CENA", "TAXI", "MONTO EXTRAS DIURNAS", "MONTO EXTRAS NOCTURNAS", "TOTAL A PAGAR", "COMENTARIOS"];
+    private const CLIENTE_HEADERS = ['CLIENTE', 'HORAS EXTRAS DIURNAS', 'HORAS EXTRAS DIURNAS DOMINICALES', 'HORAS ORDINARIAS DIURNAS DOMINICALES', 'HORAS EXTRAS NOCTURNAS', 'HORAS EXTRAS NOCTURNAS DOMINICALES', 'HORAS NOCTURNAS ORDINARIAS DOMINICALES','MONTO EXTRAS DIURNAS', 'MONTO EXTRAS NOCTURNAS', 'MONTO LOGISTICA', 'SUBTOTAL'];
     private const EMPLEADO_INFO_HEADERS = ['NOMBRE', 'APELLIDO', 'TIPO DE DOCUMENTO', 'DOCUMENTO', 'SEDE', 'CARGO', 'SALARIO'];
     private const CLIENTE = ['NOMBRE', 'APELLIDO', 'TIPO'];
 
@@ -72,13 +72,15 @@ class ExportHandler
     public function handleExport()
     {
         $table = $_GET["table"];
+        $column = $_GET['column'];
+        $param = $_GET['param'];
         $from = $this->getDateParameter("from");
         $to = $this->getDateParameter("to");
 
         switch ($table) {
             case "empleados":
                 if ($from && $to) {
-                    $this->exportEmpleados($from, $to);
+                    $this->exportEmpleados($column,$param,$from, $to);
                 } else {
                     $this->exportEmpleadosInfo();
                 }
@@ -114,11 +116,10 @@ class ExportHandler
 
 
 
-    private function exportEmpleados($from, $to)
+    private function exportEmpleados($column=null,$param=null,$from, $to)
     {
         $filename = "reporte_" . strtotime($from) . "-" . strtotime($to) . ".xlsx";
-        $horas = Time::getPayments(null, null, $from, $to);
-
+        $horas = Time::getPayments($column, $param, $from, $to);
         $this->hojaEmpleados();
         $hojas = ["AVSAS" => 2, "AVCA" => 2, "OPS" => 2];
 
@@ -218,8 +219,10 @@ class ExportHandler
             strtoupper($hora["final"]),
             strtoupper($hora["diurnas_ordinarias"]),
             strtoupper($hora["diurnas_extras"]),
+            strtoupper($hora["diurnas_ordinarias_dominicales"]),
             strtoupper($hora["nocturnas_ordinarias"]),
             strtoupper($hora["nocturnas_extras"]),
+            strtoupper($hora["nocturnas_ordinarias_dominicales"]),
             strtoupper($hora["cena"]),
             strtoupper($hora["taxi"]),
             strtoupper($hora["diurnas_monto"]),
@@ -239,6 +242,7 @@ class ExportHandler
             $hora["diurnas_ordinarias_domingo"],
             $hora["nocturnas"],
             $hora["nocturnas_domingo"],
+            $hora["nocturnas_ordinarias_domingo"],
             $hora["diurnas_monto"],
             $hora["nocturnas_monto"],
             $hora["logistica"],

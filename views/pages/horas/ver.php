@@ -56,7 +56,7 @@
         <?php if ($_GET["from"] && $_GET["to"]) { ?>
             <div class="container-buttons">
                 <a href="/horas/ver?table=<?php echo $_GET["table"] ?>" class="boton-fucsia-inline">Borrar Filtro <i class='bx bxs-trash bx-tada'></i></a>
-                <a href="/export?table=<?php echo $_GET["table"] ?>&from=<?php echo $_GET["from"] ?>&to=<?php echo $_GET["to"] ?>" class="boton-fucsia-inline">Exportar <i class='bx bxs-save bx-tada'></i></a>
+                <a href="/export?table=<?php echo $_GET["table"] ?>&column=empleado&param=<?php echo $_GET['param']?>&from=<?php echo $_GET["from"] ?>&to=<?php echo $_GET["to"] ?>" class="boton-fucsia-inline">Exportar <i class='bx bxs-save bx-tada'></i></a>
             </div>
         <?php } ?>
 

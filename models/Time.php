@@ -49,6 +49,33 @@ class Time extends BaseModel
     }
 
 
+    public static function findByDateAndName($column = null, $param = null,$range1, $range2, $audit = "no")
+{
+    // Partes del WHERE
+    $whereParts = [];
+
+    // Filtro de fechas
+    $whereParts[] = "(
+        (inicio BETWEEN '$range1 00:00:00' AND '$range2 23:59:59') OR
+        (final BETWEEN '$range1 00:00:00' AND '$range2 23:59:59')
+    )";
+
+    // Filtro de nombre/columna (opcional)
+    if ($column && $param) {
+        $whereParts[] = "$column LIKE '$param%'";
+    }
+
+    // Filtro audit
+    $whereParts[] = "auditar = '$audit'";
+
+    // Construcción final
+    $whereClause = "WHERE " . implode(" AND ", $whereParts);
+
+    $query = "SELECT * FROM " . static::$tabla . " $whereClause ORDER BY id DESC";
+    return self::consultarSQL($query);
+}
+
+
     public static function all($audit = "no")
     {
         $query = "SELECT * FROM " . static::$tabla . " WHERE auditar = '$audit' ORDER BY id DESC,inicio ASC";
@@ -93,10 +120,12 @@ class Time extends BaseModel
     public static function getPaymentsPaginated($page = 1, $perPage = 20, $column = null, $param = null, $from = null, $to = null)
     {
         if ($from && $to) {
-            $times = static::findByDatePaginated($from, $to, "no", $page, $perPage);
+            $times = static::findByDateAndNamePaginated($from, $to,$column, $param, "no", $page, $perPage);
+            
         } else {
             $times = static::filterPaginated($column, $param, "no", $page, $perPage);
         }
+
 
         $resultado = [];
         $i = 0;
@@ -105,7 +134,6 @@ class Time extends BaseModel
             $inicio = date_timestamp_get(new DateTime($time->inicio));
             $empleado = Empleados::getByFullName(strtolower($time->empleado));
             $salarioHora = $empleado->salario / (8 * 30);
-
             if ($empleado->modalidad == "oficina" && $empleado->sede == "colombia") {
                 $diurnasExtra = round($salarioHora + ($salarioHora * .25), 2);
                 $nocturnasExtra = round($salarioHora + ($salarioHora * .75), 2);
@@ -138,6 +166,7 @@ class Time extends BaseModel
             $i++;
         }
 
+
         return [
             "data" => $resultado,
             "pagination" => [
@@ -152,6 +181,55 @@ class Time extends BaseModel
             ]
         ];
     }
+
+    public static function findByDateAndNamePaginated($range1, $range2, $column = null, $param = null, $audit = "no", $page = 1, $perPage = 20)
+{
+    $offset = ($page - 1) * $perPage;
+
+    // Filtro por fechas
+    $whereParts = [];
+    $whereParts[] = "((inicio BETWEEN '$range1 00:00:00' AND '$range2 23:59:59')
+                    OR (final BETWEEN '$range1 00:00:00' AND '$range2 23:59:59'))";
+
+    // Filtro por nombre/columna si existe
+    if ($column && $param) {
+        $whereParts[] = "$column LIKE '%$param%'";
+    }
+
+    // Filtro de audit
+    $whereParts[] = "auditar = '$audit'";
+
+    // Construcción final del WHERE
+    $whereClause = "WHERE " . implode(" AND ", $whereParts);
+
+    // Consulta para obtener total
+    $countQuery = "SELECT COUNT(*) as total FROM " . static::$tabla . " $whereClause";
+    $result = self::$db->query($countQuery);
+    $totalRecords = $result->fetch_assoc()["total"];
+
+    // Consulta paginada
+    $dataQuery = "SELECT * FROM " . static::$tabla . " 
+                  $whereClause 
+                  ORDER BY id DESC 
+                  LIMIT $perPage OFFSET $offset";
+
+    $data = self::consultarSQL($dataQuery);
+
+    $totalPages = ceil($totalRecords / $perPage);
+
+    return [
+        "data" => $data,
+        "current_page" => $page,
+        "per_page" => $perPage,
+        "total_records" => $totalRecords,
+        "total_pages" => $totalPages,
+        "has_next" => $page < $totalPages,
+        "has_prev" => $page > 1,
+        "next_page" => $page < $totalPages ? $page + 1 : null,
+        "prev_page" => $page > 1 ? $page - 1 : null,
+    ];
+}
+
 
     public static function filterPaginated($column, $param, $audit = "no", $page = 1, $perPage = 20)
     {
@@ -293,11 +371,7 @@ class Time extends BaseModel
 
     public static function getPayments($column = null, $param = null, $from = null, $to = null)
     {
-        if ($from && $to) {
-            $times = static::findByDate($from, $to, "no");
-        } else {
-            $times = static::filter($column, $param);
-        }
+            $times = static::findByDateAndName($column,$param,$from, $to, "no");
 
         $resultado = [];
         $i = 0;
@@ -341,6 +415,8 @@ class Time extends BaseModel
             $resultado[$i]["moneda"] = $moneda;
             $i++;
         }
+
+
 
         return $resultado;
     }
