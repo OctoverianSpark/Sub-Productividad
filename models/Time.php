@@ -145,17 +145,66 @@ class Time extends BaseModel
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
             } else if ($empleado->modalidad == "hogar") {
-                $extras = 2.8;
+                $extras = 3.5;
                 $moneda = "Dolares";
 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
             } else if ($empleado->modalidad == "oficina" && $empleado->sede == "venezuela") {
-                $extras = 2;
                 $moneda = "Dolares";
-
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
+            
+                $salarioHora = $empleado->salario / (8 * 30); // salario / 240
+            
+                // Tabla de referencia para interpolar el factor
+                $tablaFactores = [
+                    175 => 1.7 / (175 / 240),
+                    350 => 2.0 / (350 / 240),  // ~1.3714
+                    400 => 2.3 / (400 / 240),  // ~1.3800
+                    450 => 2.5 / (450 / 240),  // ~1.3333
+                    550 => 3.0 / (550 / 240),  // ~1.3090
+                    800 => 4.0 / (800 / 240),  // ~1.2000
+                ];
+            
+                // Interpolación lineal entre los dos salarios más cercanos
+                $salario = $empleado->salario;
+                $claves = array_keys($tablaFactores);
+                sort($claves);
+            
+                $factor = null;
+            
+                if ($salario <= $claves[0]) {
+                    // Menor al mínimo → usar el primer factor
+                    $factor = $tablaFactores[$claves[0]];
+                } elseif ($salario >= end($claves)) {
+                    // Mayor al máximo → usar el último factor
+                    $factor = $tablaFactores[end($claves)];
+                } else {
+                    // Interpolación entre dos puntos
+                    foreach ($claves as $idx => $clave) {
+                        if ($salario < $clave) {
+                            $s1 = $claves[$idx - 1];
+                            $s2 = $clave;
+                            $f1 = $tablaFactores[$s1];
+                            $f2 = $tablaFactores[$s2];
+            
+                            // Interpolar: f1 + (f2 - f1) * (salario - s1) / (s2 - s1)
+                            $factor = $f1 + ($f2 - $f1) * ($salario - $s1) / ($s2 - $s1);
+                            break;
+                        }
+                    }
+                }
+            
+                $extras = round($salarioHora * $factor, 2);
+            
+                $esDominicalOFestivo = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si");
+            
+                $resultado[$i]["diurnas_monto"] = $esDominicalOFestivo
+                    ? ($time->diurnas_ordinarias * $salarioHora) + ($time->diurnas_extras * $extras)
+                    : $time->diurnas_extras * $extras;
+            
+                $resultado[$i]["nocturnas_monto"] = $esDominicalOFestivo
+                    ? ($time->nocturnas_ordinarias * $salarioHora) + ($time->nocturnas_extras * $extras)
+                    : $time->nocturnas_extras * $extras;
             }
 
             foreach ($time as $key => $value) {
@@ -393,7 +442,7 @@ class Time extends BaseModel
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
                 $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday"  || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
             } else if ($empleado->modalidad == "hogar") {
-                $extras = 2.8;
+                $extras = 3.5;
                 $moneda = "Dolares";
 
                 $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;

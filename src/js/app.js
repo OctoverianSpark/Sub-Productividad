@@ -135,7 +135,7 @@ function calculate(page) {
         if (esNocturno) {
             ordinarias = totalHoras;
             extrasDiurnas = 3 - almuerzo;
-            extrasNocturnas = totalHoras - (esDesdeRadio ? 13 : 11);
+            extrasNocturnas = totalHoras - 11;
 
         } else if (horasFinal <= 19 && horasFinal > 6) {
             extrasDiurnas = ordinarias - 8;
