@@ -1,12 +1,8 @@
 <main class="main-title">
 
+    <h1 class="title">BIENVENIDO <?php echo s($_SESSION["name"] ?? "") ?></h1>
 
-    <h1 class="title">BIENVENIDO <?php echo $_SESSION["name"] ?></h1>
-
-
-
-
-    <?php if (in_array(strtoupper($_SESSION["mode"]), ["GOD", "ADMIN", "AUDITER"])) { ?>
+    <?php if (puede("ver_logs")) { ?>
         <h2>Registros de Eventos</h2>
         <table class="tabla-logs">
             <thead>
@@ -15,28 +11,18 @@
                 <th>Descripcion</th>
             </thead>
             <tbody>
-
-
-
                 <?php foreach ($logs as $log) { ?>
-
                     <tr>
-                        <td><?php echo $log->fecha ?></td>
-                        <td><?php echo strtoupper($log->titulo) ?></td>
-                        <td><?php echo strtoupper($log->contenido) ?></td>
+                        <td><?php echo s($log->fecha) ?></td>
+                        <td><?php echo s(mb_strtoupper($log->titulo)) ?></td>
+                        <td><?php echo s(mb_strtoupper($log->contenido)) ?></td>
                     </tr>
-
                 <?php } ?>
-
-
             </tbody>
-
-
-
         </table>
-        
+
         <!-- Paginacion -->
         <?php include "../includes/templates/pagination.php"; ?>
-        
-        <?php } ?>
+
+    <?php } ?>
 </main>

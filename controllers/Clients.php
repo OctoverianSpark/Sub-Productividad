@@ -2,88 +2,65 @@
 
 namespace Controllers;
 
-
-
 use MVC\Router;
 use Models\Clientes;
 use Models\Logs;
 
 class Clients
 {
-
-
-
-
-
     public static function index(Router $router)
     {
-
-        $clientes = Clientes::filter($_GET["column"], $_GET["param"]);
-        $columnas = Clientes::getColumns();
         $router->render("settings/clientes/index", [
-            "clientes" => $clientes,
-            "columnas" => $columnas
+            "clientes" => Clientes::filter($_GET["column"] ?? null, $_GET["param"] ?? null),
+            "columnas" => Clientes::getColumns(),
         ]);
     }
 
     public static function crear(Router $router)
     {
+        $cliente = new Clientes();
+        $errores = [];
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $cliente = new Clientes($_POST["clientes"]);
+            $datos = (array) ($_POST["clientes"] ?? []);
+            unset($datos["id"]);
+            $cliente = new Clientes($datos);
             $errores = $cliente->validar();
 
             if (empty($errores)) {
                 $cliente->guardar();
-                header("Location: /settings/clientes?resultado=1");
+                Logs::registrar("cliente creado", "El usuario " . $_SESSION["name"] . " ha creado al cliente " . $cliente->nombreCompleto());
+                redirigir("/settings/clientes?resultado=1");
             }
         }
-
-        $logData = [
-            "titulo" => "cliente creado",
-            "contenido" => "El usuario " . $_SESSION["name"] . " ha creado al cliente " . $cliente->nombre . " " . $cliente->apellido . "",
-        ];
-
-        $log = new Logs($logData);
-        $log->guardar();
-
-
 
         $router->render("settings/clientes/crear", [
             "cliente" => $cliente,
             "errores" => $errores
         ]);
     }
+
     public static function actualizar(Router $router)
     {
-
         $id = validarID();
         $cliente = Clientes::find($id);
-
-        $logData = [
-            "titulo" => "cliente actualizado",
-            "contenido" => "El usuario " . $_SESSION["name"] . " ha actulizado al cliente " . $cliente->nombre . " " . $cliente->apellido . "",
-        ];
-        $log = new Logs($logData);
+        if (!$cliente) {
+            redirigir("/settings/clientes");
+        }
+        $errores = [];
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-            $_POST["clientes"]["id"] = $id;
-
-            $cliente = new Clientes($_POST["clientes"]);
-
+            $datos = (array) ($_POST["clientes"] ?? []);
+            $datos["id"] = $id;
+            $cliente = new Clientes($datos);
             $errores = $cliente->validar();
 
-
-
             if (empty($errores)) {
-                $log->guardar();
                 $cliente->guardar();
-                header("Location: /settings/clientes?resultado=2");
+                Logs::registrar("cliente actualizado", "El usuario " . $_SESSION["name"] . " ha actualizado al cliente " . $cliente->nombreCompleto());
+                redirigir("/settings/clientes?resultado=2");
             }
         }
-
-
 
         $router->render("settings/clientes/actualizar", [
             "cliente" => $cliente,
@@ -91,23 +68,16 @@ class Clients
         ]);
     }
 
-
     public static function eliminar()
     {
         $id = validarID();
         $cliente = Clientes::find($id);
 
-        $logData = [
-            "titulo" => "cliente eliminado",
-            "contenido" => "El usuario " . $_SESSION["name"] . " ha eliminado al cliente " . $cliente->nombre . " " . $cliente->apellido . "",
-        ];
+        if ($cliente) {
+            $cliente->eliminar();
+            Logs::registrar("cliente eliminado", "El usuario " . $_SESSION["name"] . " ha eliminado al cliente " . $cliente->nombreCompleto());
+        }
 
-        $log = new Logs($logData);
-        $log->guardar();
-
-
-        $cliente->eliminar();
-
-        header("Location: /settings/clientes?resultado=3");
+        redirigir("/settings/clientes?resultado=3");
     }
 }

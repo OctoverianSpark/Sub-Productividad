@@ -7,32 +7,19 @@ use Models\Clientes;
 use Models\Users;
 use MVC\Router;
 
-
-class Settings{
-    
-    public static function index(Router $router){
-
+class Settings
+{
+    public static function index(Router $router)
+    {
         $clientes = count(Clientes::all());
         $empleados = count(Empleados::all());
         $usuarios = count(Users::all());
-        $total=$empleados + $clientes;
 
-        $router->render("settings/index",[
-            "clientes"=>$clientes,
-            "empleados"=>$empleados,
-            "usuarios"=>$usuarios,
-            "total"=>$total
-
-        ]
-        );
+        $router->render("settings/index", [
+            "clientes" => $clientes,
+            "empleados" => $empleados,
+            "usuarios" => $usuarios,
+            "total" => $empleados + $clientes
+        ]);
     }
-
-
-
-
-
-
-
 }
-
-?>

@@ -1,0 +1,71 @@
+{
+    "app": {
+        "zona_horaria": "America/Bogota",
+        "sesion_inactividad_minutos": 120
+    },
+
+    "paginacion": {
+        "por_pagina_defecto": 20,
+        "por_pagina_permitidos": [20, 50, 100]
+    },
+
+    "roles": {
+        "disponibles": {
+            "god": "GOD MODE (CONTROL ABSOLUTO DEL SISTEMA)",
+            "admin": "ADMIN MODE (CONTROL EN LAS CONFIGURACIONES BASICAS Y CARGA DE HORAS)",
+            "auditer": "AUDITER MODE (CONTROL EN LAS CONFIGURACIONES BASICAS Y AUDITORIAS)",
+            "charger": "CHARGER MODE (CONTROL DE CARGA DE HORAS)",
+            "audited": "AUDITED MODE (CONTROL DE CARGA DE HORAS LIMITADO)"
+        },
+        "permisos": {
+            "gestionar_horas": ["*"],
+            "eliminar_horas": ["*"],
+            "exportar_horas": ["*"],
+            "ver_logs": ["god", "admin", "auditer"],
+            "configuracion": ["god", "admin", "auditer"],
+            "exportar_maestros": ["god", "admin", "auditer"],
+            "auditar": ["god", "auditer"],
+            "usuarios": ["god"]
+        },
+        "cargan_sin_auditoria": ["audited"]
+    },
+
+    "nomina": {
+        "horas_mes": 240,
+        "colombia_oficina": {
+            "moneda": "COP",
+            "recargo_diurna_extra": 0.25,
+            "recargo_nocturna_extra": 0.75,
+            "recargo_dominical": 0.75,
+            "recargo_diurna_extra_dominical": 1.0,
+            "recargo_nocturna_extra_dominical": 1.5
+        },
+        "hogar": {
+            "moneda": "Dolares",
+            "valor_hora": 3.5
+        },
+        "venezuela_oficina": {
+            "moneda": "Dolares",
+            "tabla_valor_hora_extra": [
+                { "salario": 175, "valor_hora_extra": 1.7 },
+                { "salario": 350, "valor_hora_extra": 2.0 },
+                { "salario": 400, "valor_hora_extra": 2.3 },
+                { "salario": 450, "valor_hora_extra": 2.5 },
+                { "salario": 550, "valor_hora_extra": 3.0 },
+                { "salario": 800, "valor_hora_extra": 4.0 }
+            ]
+        }
+    },
+
+    "clientes": {
+        "moneda": "Dolares",
+        "tarifas": {
+            "nuevo": { "diurna": 6.5, "nocturna": 7.0, "diurna_dominical": 7.5, "nocturna_dominical": 8.0 },
+            "viejo": { "diurna": 6.0, "nocturna": 6.5, "diurna_dominical": 7.0, "nocturna_dominical": 7.5 }
+        },
+        "logistica": {
+            "cena": 5,
+            "taxi": 5
+        }
+    }
+}

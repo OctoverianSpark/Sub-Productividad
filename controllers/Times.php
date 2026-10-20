@@ -1,10 +1,7 @@
 <?php
 
-
-
 namespace Controllers;
 
-use Google\Service\CloudDebugger\Resource\Debugger;
 use Models\Clientes;
 use Models\Empleados;
 use Models\Logs;
@@ -14,37 +11,39 @@ use MVC\Router;
 
 class Times
 {
-
     public static function crear(Router $router)
     {
         $empleados = Empleados::all();
         $clientes = Clientes::all();
+        $errores = [];
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $errores = [];
-            foreach ($_POST["horas"] as $key=>$hora) {
-                $hora["inicio"] = str_replace("T", " ", $hora["inicio"]);
-                $hora["final"] = str_replace("T", " ", $hora["final"]); 
-                
-                if (isset($_SESSION["mode"]) && $_SESSION["mode"] === "audited") {
-                    $hora["auditar"] = "no";
+            $horas = [];
+
+            // Primero se validan todas las entradas; si alguna falla no se guarda ninguna
+            foreach ((array) ($_POST["horas"] ?? []) as $indice => $datos) {
+                $time = Time::desdeFormulario((array) $datos);
+                $time->auditar = Time::estadoAuditoriaPara(modoActual());
+
+                foreach ($time->validar() as $error) {
+                    $errores[] = "Entrada " . ((int) $indice + 1) . " - " . $error;
                 }
-                $times = new Time($hora);
-                $logData = [
-                    "titulo" => "Hora Cargada",
-                    "contenido" => "El usuario " . $_SESSION["name"] . " cargo las horas de " . $times->empleado . " en la fecha " . $times->inicio
-                ];
-                $log = new Logs($logData);
-                $errores = $times->validar();
-
-                $times->guardar();
-                $log->guardar();
-
-
+                $horas[] = $time;
             }
-            header("Location: /horas/ver?resultado=1");
 
+            if (!$horas) {
+                $errores[] = "No se recibieron horas para registrar";
+            }
+
+            if (empty($errores)) {
+                foreach ($horas as $time) {
+                    $time->guardar();
+                    Logs::registrar("Hora Cargada", "El usuario " . $_SESSION["name"] . " cargo las horas de " . $time->empleado . " en la fecha " . $time->inicio);
+                }
+                redirigir("/horas/ver?resultado=1");
+            }
         }
+
         $router->render("pages/horas/crear", [
             "empleados" => $empleados,
             "clientes" => $clientes,
@@ -52,171 +51,124 @@ class Times
         ]);
     }
 
-
     public static function ver(Router $router)
     {
-        $page = (int)($_GET["page"] ?? 1);
-        $perPage = (int)($_GET["per_page"] ?? 100);
+        $page = $_GET["page"] ?? 1;
+        $perPage = $_GET["per_page"] ?? null;
+        $table = ($_GET["table"] ?? "") ?: "empleados";
+        $column = $_GET["column"] ?? null;
+        $param = $_GET["param"] ?? null;
+        $from = $_GET["from"] ?? null;
+        $to = $_GET["to"] ?? null;
 
-        if ($page < 1) $page = 1;
-
-        $allowedPerPage = [20, 50, 100];
-
-        if (!in_array($perPage, $allowedPerPage)) {
-            $perPage = 20;
-        }
-
+        $horas = [];
         $paginacion = null;
         $pagination_links = null;
-        $filtros = [];
-        if ($_GET["table"] == "empleados" || !$_GET["table"]) {
 
-            if (!empty($_GET["column"]) && !empty($_GET["param"])) {
-                $filtros["column"] = $_GET["column"];
-                $filtros["param"] = $_GET["param"];
-            }
-
-            if (!empty($_GET["from"]) || !empty($_GET["to"])) {
-                $filtros["from"] = $_GET["from"];
-                $filtros["to"] = $_GET["to"];
-            }
-
-            $result = Time::getPaymentsPaginated($page, $perPage, $_GET["column"], $_GET["param"], $_GET["from"], $_GET["to"]);
+        if ($table === "empleados") {
+            $result = Time::getPaymentsPaginated($page, $perPage, $column, $param, $from, $to);
             $horas = $result["data"];
             $paginacion = $result["pagination"];
 
-            $urlFilters = [];
-            if (!empty($_GET["table"])) $urlFilters["table"] = $_GET["table"];
-            if (!empty($_GET["column"])) $urlFilters["column"] = $_GET["column"];
-            if (!empty($_GET["param"])) $urlFilters["param"] = $_GET["param"];
-            if (!empty($_GET["from"])) $urlFilters["from"] = $_GET["from"];
-            if (!empty($_GET["to"])) $urlFilters["to"] = $_GET["to"];
-            $urlFilters["per_page"] = $perPage;
-
+            $urlFilters = compact("table", "column", "param", "from", "to");
             $pagination_links = Paginacion::buildPaginationLinks("/horas/ver", $paginacion, $urlFilters);
-        } else if ($_GET["table"] == "clientes") {
+        } else if ($table === "clientes") {
+            $horas = Time::getAgentPayments($from, $to, $param);
+        } else if ($table === "auditar" && puede("auditar")) {
+            $paginacion = Time::allPaginated($page, $perPage, "si", ["column" => $column, "param" => $param]);
+            $horas = $paginacion["data"];
 
-            $from = (!empty($_GET["from"])) ? $_GET["from"] : null;
-            $to = (!empty($_GET["to"])) ? $_GET["to"] : null;
-            $horas = Time::getAgentPayments($from, $to, $_GET["param"]);
-
-        } else if ($_GET["table"] == "auditar" && in_array(strtolower($_SESSION["mode"]), ["god", "auditer"])) {
-            $horas = Time::all("si");
-
-            if (!empty($_GET["column"]) && !empty($_GET["param"])) {
-                $filtros["column"] = $_GET["column"];
-                $filtros["param"] = $_GET["param"];
-            }
-
-            $result = Time::allPaginated($page, $perPage, "si", $filtros);
-            $horas = $result['data'];
-            $paginacion = $result;
-
-            $urlFilters = [];
-            $urlFilters["table"] = "auditar";
-            if (!empty($_GET["column"])) $urlFilters["column"] = $_GET["column"];
-            if (!empty($_GET["param"])) $urlFilters["param"] = $_GET["param"];
-            $urlFilters["per_page"] = $perPage;
-
-            $pagination_links = Paginacion::buildPaginationLinks('/horas/ver', $paginacion, $urlFilters);
+            $urlFilters = compact("table", "column", "param");
+            $pagination_links = Paginacion::buildPaginationLinks("/horas/ver", $paginacion, $urlFilters);
         } else {
-            header("Location:/");
+            redirigir("/");
         }
+
         $router->render("pages/horas/ver", [
             "horas" => $horas,
             "paginacion" => $paginacion,
             "pagination_links" => $pagination_links,
-            "filtros" => $_GET,
+            "table" => $table,
         ]);
     }
 
-
     public static function hora(Router $router)
     {
-
-
         $id = validarID();
 
         $hora = Time::find($id);
-        $empleados = Empleados::all();
-        $clientes = Clientes::all();
+        if (!$hora) {
+            redirigir("/horas/ver");
+        }
+
+        $errores = [];
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            // Se parte de los datos actuales y se sobreescriben solo los campos enviados.
+            // Las casillas (cena, taxi, festivo) se toman solo del formulario: si no vienen, es "no".
+            $actual = $hora->atributos();
+            unset($actual["cena"], $actual["taxi"], $actual["festivo"]);
 
-            $_POST["horas"]["id"] = $id;
+            $horas = Time::desdeFormulario(array_merge($actual, (array) ($_POST["horas"] ?? [])));
+            $horas->id = $id;
+            $horas->auditar = Time::estadoAuditoriaPara(modoActual());
 
-            $_POST["horas"]["auditar"] = "no";
+            $errores = $horas->validar();
 
-            $horas = new Time($_POST["horas"]);
+            if (empty($errores)) {
+                $horas->guardar();
+                Logs::registrar("Hora Actualizada", "El usuario " . $_SESSION["name"] . " hizo una actualizacion de las horas de " . $horas->empleado . " en la fecha " . $horas->inicio);
 
-
-            $logData = [
-                "titulo" => "Hora Actualizada",
-                "contenido" => "El usuario " . $_SESSION["name"] . " hizo una actualizacion de las horas de " . $horas->empleado . " en la fecha " . $horas->inicio
-            ];
-
-            $log = new Logs($logData);
-
-
-            $horas->guardar();
-
-            $log->guardar();
-             $table = $_GET["table"] ?? null;
-            if ($table) {
-                header("Location:/horas/ver?table=" . $table . "&resultado=2");
-            } else {
-                header("Location:/horas/ver?resultado=2");
+                $table = $_GET["table"] ?? null;
+                redirigir("/horas/ver?" . http_build_query(array_filter(["table" => $table, "resultado" => 2])));
             }
         }
 
         $router->render("pages/horas/hora", [
             "hora" => $hora,
-            "empleados" => $empleados,
-            "clientes" => $clientes
-
+            "empleados" => Empleados::all(),
+            "clientes" => Clientes::all(),
+            "errores" => $errores,
         ]);
     }
+
     public static function cliente(Router $router)
     {
+        $nombre = trim((string) ($_GET["name"] ?? ""));
 
-        $horas = Time::getClientHours($_GET["name"], ($_GET["from"]) ? str_replace("T", " ", $_GET["from"]) : null, str_replace("T", " ", $_GET["to"]));
+        $horas = $nombre !== ""
+            ? Time::getClientHours($nombre, $_GET["from"] ?? null, $_GET["to"] ?? null)
+            : [];
 
         $router->render("pages/horas/cliente", [
-            "horas" => $horas
+            "horas" => $horas,
+            "nombre" => $nombre,
         ]);
     }
 
     public static function aproove()
     {
-
         $id = validarID();
+        $time = Time::find($id);
 
-        Time::aprooveAudition($id);
+        if ($time) {
+            Time::aprooveAudition($id);
+            Logs::registrar("Auditoria Aprobada", "El usuario " . $_SESSION["name"] . " aprobo las horas de " . $time->empleado . " en la fecha " . $time->inicio);
+        }
 
-        header("Location: /horas/ver?table=auditar");
+        redirigir("/horas/ver?table=auditar");
     }
 
     public static function eliminar()
     {
         $id = validarID();
-
-
-
-        $hora = new Time($args = ["id" => $id]);
-
         $time = Time::find($id);
 
-        $logData = [
-            "titulo" => "Hora Eliminada",
-            "contenido" => "El usuario " . $_SESSION["name"] . " ha eliminado las horas de " . $time->empleado . " en la fecha " . $time->inicio
-        ];
+        if ($time) {
+            $time->eliminar();
+            Logs::registrar("Hora Eliminada", "El usuario " . $_SESSION["name"] . " ha eliminado las horas de " . $time->empleado . " en la fecha " . $time->inicio);
+        }
 
-        $hora->eliminar();
-
-        $log = new Logs($logData);
-
-        $log->guardar();
-
-        header("Location: /horas/ver?resultado=3");
+        redirigir("/horas/ver?resultado=3");
     }
 }

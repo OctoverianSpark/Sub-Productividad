@@ -1,3 +1,8 @@
+<?php
+    $param = $_GET["param"] ?? "";
+    $from = $_GET["from"] ?? "";
+    $to = $_GET["to"] ?? "";
+?>
 <main class="main-settings-ver">
 
     <h1 class="title">Visualizar Horas</h1>
@@ -8,61 +13,62 @@
             <div class="radio">
                 <div class="container-input-search">
                     <label for="empleados">EMPLEADOS</label>
-                    <input type="radio" name="table" id="radio-selector" value="empleados" <?php echo ($_GET["table"] === "empleados" || !$_GET["table"]) ? "checked" : "" ?>>
+                    <input type="radio" name="table" id="radio-selector" value="empleados" <?php echo ($table === "empleados") ? "checked" : "" ?>>
                 </div>
                 <div class="container-input-search">
                     <label for="clientes">CLIENTES</label>
-                    <input type="radio" name="table" id="radio-selector" value="clientes" <?php echo ($_GET["table"] === "clientes") ? "checked" : "" ?>>
+                    <input type="radio" name="table" id="radio-selector" value="clientes" <?php echo ($table === "clientes") ? "checked" : "" ?>>
                 </div>
-                <?php if (in_array(strtoupper($_SESSION["mode"]), ["GOD", "AUDITER"])) { ?>
+                <?php if (puede("auditar")) { ?>
                     <div class="container-input-search">
-                        <label for="au2ditar">AUDITAR</label>
-                        <input type="radio" name="table" id="radio-selector" value="auditar" <?php echo ($_GET["table"] === "auditar") ? "checked" : "" ?>>
+                        <label for="auditar">AUDITAR</label>
+                        <input type="radio" name="table" id="radio-selector" value="auditar" <?php echo ($table === "auditar") ? "checked" : "" ?>>
                     </div>
                 <?php } ?>
             </div>
         </div>
         <?php
-        $defaultColumn = (isset($_GET["table"]) && $_GET["table"] === "clientes") ? "cliente" : "empleado";
-        $currentColumn = isset($_GET["column"]) ? htmlspecialchars($_GET["column"]) : $defaultColumn;
+        $defaultColumn = ($table === "clientes") ? "cliente" : "empleado";
+        $currentColumn = $_GET["column"] ?? $defaultColumn;
         ?>
-        <input type="hidden" name="column" value="<?php echo $currentColumn; ?>">
+        <input type="hidden" name="column" value="<?php echo s($currentColumn) ?>">
         <div class="container-inputs-search" id="date-search">
             <div class="container-input-search" id="text-search">
                 <label for="param">Buscar por nombre</label>
-                <input type="text" name="param" id="param" value="<?php echo htmlspecialchars($_GET['param'] ?? '') ?>" <?php echo (isset($_GET["column"]) && $_GET["column"] === "fecha") ? 'disabled' : '' ?>>
+                <input type="text" name="param" id="param" value="<?php echo s($param) ?>">
             </div>
 
-            <?php if ($_GET["table"] !== "auditar") { ?>
+            <?php if ($table !== "auditar") { ?>
             <div class="container-input-search">
                 <label for="date-search">DESDE</label>
-                <input type="date" name="from" id="date-search-input" value="<?php echo $_GET["from"] ?>">
+                <input type="date" name="from" id="date-search-input" value="<?php echo s($from) ?>">
             </div>
             <div class="container-input-search">
                 <label for="date-search">HASTA</label>
-                <input type="date" name="to" id="date-search-input" value="<?php echo $_GET["to"] ?>">
+                <input type="date" name="to" id="date-search-input" value="<?php echo s($to) ?>">
             </div>
-            <?php } ?> 
+            <?php } ?>
         </div>
 
 
         <!-- Mantener parámetros de paginación en el formulario de búsqueda -->
         <?php if (isset($_GET["per_page"])): ?>
-            <input type="hidden" name="per_page" value="<?php echo $_GET["per_page"]; ?>">
+            <input type="hidden" name="per_page" value="<?php echo (int) $_GET["per_page"] ?>">
         <?php endif; ?>
 
         <button type="submit" class="boton-morado-inline">BUSCAR <i class='bx bx-search bx-tada'></i></button>
 
-        <?php if ($_GET["from"] && $_GET["to"]) { ?>
+        <?php if ($from && $to) { ?>
+            <?php $exportQuery = http_build_query(["table" => $table, "column" => "empleado", "param" => $param, "from" => $from, "to" => $to]) ?>
             <div class="container-buttons">
-                <a href="/horas/ver?table=<?php echo $_GET["table"] ?>" class="boton-fucsia-inline">Borrar Filtro <i class='bx bxs-trash bx-tada'></i></a>
-                <a href="/export?table=<?php echo $_GET["table"] ?>&column=empleado&param=<?php echo $_GET['param']?>&from=<?php echo $_GET["from"] ?>&to=<?php echo $_GET["to"] ?>" class="boton-fucsia-inline">Exportar <i class='bx bxs-save bx-tada'></i></a>
+                <a href="/horas/ver?<?php echo s(http_build_query(["table" => $table])) ?>" class="boton-fucsia-inline">Borrar Filtro <i class='bx bxs-trash bx-tada'></i></a>
+                <a href="/export?<?php echo s($exportQuery) ?>" class="boton-fucsia-inline">Exportar <i class='bx bxs-save bx-tada'></i></a>
             </div>
         <?php } ?>
 
     </form>
 
-    <?php if ($_GET["table"] === "empleados" || !$_GET["table"]) { ?>
+    <?php if ($table === "empleados") { ?>
 
         <table class="tabla-empleados">
             <thead>
@@ -83,18 +89,18 @@
                 <?php if (!empty($horas)): ?>
                     <?php foreach ($horas as $hora) { ?>
                         <tr>
-                            <td><?php echo strtoupper(s($hora["inicio"])) ?></td>
-                            <td><?php echo strtoupper(s($hora["empleado"])) ?></td>
-                            <td><?php echo strtoupper(s($hora["cliente"])) ?></td>
-                            <td><?php echo strtoupper(s($hora["diurnas_ordinarias"])) ?></td>
-                            <td><?php echo strtoupper(s($hora["nocturnas_ordinarias"])) ?></td>
-                            <td><?php echo strtoupper(s($hora["diurnas_extras"])) ?></td>
-                            <td>$ <?php echo strtoupper(s($hora["diurnas_monto"])) . " " . $hora["moneda"] ?></td>
-                            <td><?php echo strtoupper(s($hora["nocturnas_extras"])) ?></td>
-                            <td>$ <?php echo strtoupper(s($hora["nocturnas_monto"])) . " " . $hora["moneda"] ?></td>
-                            <td>$ <?php echo floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"]))  . " " . $hora["moneda"] ?></td>
+                            <td><?php echo s($hora["inicio"]) ?></td>
+                            <td><?php echo s(mb_strtoupper($hora["empleado"])) ?></td>
+                            <td><?php echo s(mb_strtoupper($hora["cliente"])) ?></td>
+                            <td><?php echo s($hora["diurnas_ordinarias"]) ?></td>
+                            <td><?php echo s($hora["nocturnas_ordinarias"]) ?></td>
+                            <td><?php echo s($hora["diurnas_extras"]) ?></td>
+                            <td>$ <?php echo s($hora["diurnas_monto"]) . " " . s($hora["moneda"]) ?></td>
+                            <td><?php echo s($hora["nocturnas_extras"]) ?></td>
+                            <td>$ <?php echo s($hora["nocturnas_monto"]) . " " . s($hora["moneda"]) ?></td>
+                            <td>$ <?php echo s((float) $hora["diurnas_monto"] + (float) $hora["nocturnas_monto"]) . " " . s($hora["moneda"]) ?></td>
                             <td>
-                                <a href="/horas/ver/hora?id=<?php echo s($hora["id"]) ?>" class="boton-morado-inline">Gestionar</a>
+                                <a href="/horas/ver/hora?id=<?php echo (int) $hora["id"] ?>" class="boton-morado-inline">Gestionar</a>
                             </td>
                         </tr>
                     <?php } ?>
@@ -112,7 +118,8 @@
         <!-- Paginacion -->
         <?php include "../includes/templates/pagination.php"; ?>
 
-    <?php } else if ($_GET["table"] === "clientes") { ?>
+    <?php } else if ($table === "clientes") { ?>
+        <?php $moneda = s(mb_strtoupper(\MVC\Config::get("clientes.moneda", "Dolares"))) ?>
         <table class="tabla-clientes">
             <thead>
                 <th>CLIENTE</th>
@@ -132,17 +139,17 @@
                 <?php if (!empty($horas)): ?>
                     <?php foreach ($horas as $hora) { ?>
                         <tr>
-                            <td><?php echo strtoupper(s($hora["cliente"])) ?></td>
+                            <td><?php echo s(mb_strtoupper($hora["cliente"])) ?></td>
                             <td><?php echo s($hora["diurnas"]) ?></td>
                             <td><?php echo s($hora["diurnas_domingo"]) ?></td>
                             <td><?php echo s($hora["diurnas_ordinarias_domingo"]) ?></td>
-                            <td><?php echo s($hora["diurnas_monto"]) ?> DOLARES</td>
+                            <td><?php echo s($hora["diurnas_monto"]) ?> <?php echo $moneda ?></td>
                             <td><?php echo s($hora["nocturnas"]) ?></td>
                             <td><?php echo s($hora["nocturnas_domingo"]) ?></td>
-                            <td><?php echo s($hora["nocturnas_monto"]) ?> DOLARES</td>
-                            <td><?php echo s($hora["logistica"]) ?> DOLARES</td>
-                            <td><?php echo floatval(s($hora["diurnas_monto"])) + floatval(s($hora["nocturnas_monto"])) + floatval(s($hora["logistica"])) ?> DOLARES</td>
-                            <td><a href="/horas/ver/cliente?name=<?php echo $hora["cliente"] ?>" class="boton-morado-inline">Gestionar</a></td>
+                            <td><?php echo s($hora["nocturnas_monto"]) ?> <?php echo $moneda ?></td>
+                            <td><?php echo s($hora["logistica"]) ?> <?php echo $moneda ?></td>
+                            <td><?php echo s((float) $hora["diurnas_monto"] + (float) $hora["nocturnas_monto"] + (float) $hora["logistica"]) ?> <?php echo $moneda ?></td>
+                            <td><a href="/horas/ver/cliente?<?php echo s(http_build_query(["name" => $hora["cliente"]])) ?>" class="boton-morado-inline">Gestionar</a></td>
                         </tr>
                     <?php } ?>
                 <?php else: ?>
@@ -156,7 +163,7 @@
         </table>
 
 
-    <?php } else if ($_GET["table"] === "auditar") { ?>
+    <?php } else if ($table === "auditar") { ?>
 
 
         <table class="tabla-empleados">
@@ -175,15 +182,22 @@
                 <?php if (!empty($horas)): ?>
                     <?php foreach ($horas as $hora) { ?>
                         <tr>
-                            <td><?php echo strtoupper(s($hora->inicio)) ?> <a title="Aprobar Auditoria" href="/aproove?id=<?php echo $hora->id ?>"><i style="font-size:18px" class="bi bi-check2-all"></i></a></td>
-                            <td><?php echo strtoupper(s($hora->empleado)) ?></td>
-                            <td><?php echo strtoupper(s($hora->cliente)) ?></td>
-                            <td><?php echo strtoupper(s($hora->diurnas_ordinarias)) ?></td>
-                            <td><?php echo strtoupper(s($hora->nocturnas_ordinarias)) ?></td>
-                            <td><?php echo strtoupper(s($hora->diurnas_extras)) ?></td>
-                            <td><?php echo strtoupper(s($hora->nocturnas_extras)) ?></td>
                             <td>
-                                <a href="/horas/ver/hora?id=<?php echo s($hora->id) ?>&table=auditar" class="boton-morado-inline">Gestionar</a>
+                                <?php echo s($hora->inicio) ?>
+                                <form method="post" action="/aproove" style="display:inline">
+                                    <?php echo csrfField() ?>
+                                    <input type="hidden" name="id" value="<?php echo (int) $hora->id ?>">
+                                    <button type="submit" title="Aprobar Auditoria" style="background:none;border:none;cursor:pointer"><i style="font-size:18px" class="bi bi-check2-all"></i></button>
+                                </form>
+                            </td>
+                            <td><?php echo s(mb_strtoupper($hora->empleado)) ?></td>
+                            <td><?php echo s(mb_strtoupper($hora->cliente)) ?></td>
+                            <td><?php echo s($hora->diurnas_ordinarias) ?></td>
+                            <td><?php echo s($hora->nocturnas_ordinarias) ?></td>
+                            <td><?php echo s($hora->diurnas_extras) ?></td>
+                            <td><?php echo s($hora->nocturnas_extras) ?></td>
+                            <td>
+                                <a href="/horas/ver/hora?id=<?php echo (int) $hora->id ?>&table=auditar" class="boton-morado-inline">Gestionar</a>
                             </td>
                         </tr>
                     <?php } ?>

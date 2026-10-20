@@ -2,77 +2,84 @@
 
 namespace MVC;
 
-
 class Router
 {
-
     private $rutas = [
         "GET" => [],
         "POST" => [],
     ];
 
-    public function get($url, $fn)
+    // Rutas accesibles sin sesion
+    private const RUTAS_PUBLICAS = ["/login", "/logout", "/redirect"];
+
+    // $permiso: clave de "roles.permisos" en config/parametros.json (null = cualquier usuario logueado)
+    public function get(string $url, callable $fn, ?string $permiso = null): void
     {
-        $this->rutas["GET"][$url] = $fn;
+        $this->rutas["GET"][$url] = ["fn" => $fn, "permiso" => $permiso];
     }
-    public function post($url, $fn)
+
+    public function post(string $url, callable $fn, ?string $permiso = null): void
     {
-        $this->rutas["POST"][$url] = $fn;
+        $this->rutas["POST"][$url] = ["fn" => $fn, "permiso" => $permiso];
     }
 
-
-    public function comprobarRutas()
+    public function comprobarRutas(): void
     {
-        session_start();
-        $auth = $_SESSION["login"] ?? null;
-        $modo = strtoupper($_SESSION["mode"]) ?? null;
-
-        $rutasPublicas = [
-            "/login",
-            "/logout",
-            "/redirect",
-        ];
-
-        $rutasGOD = [
-            "/settings/usuarios",
-            "/settings/usuarios/crear",
-            "/settings/usuarios/actualizar",
-            "/settings/usuarios/eliminar"
-        ];
+        iniciarSesion();
 
         $urlActual = $_SERVER["PATH_INFO"] ?? "/";
         $metodo = $_SERVER["REQUEST_METHOD"];
+        $esPublica = in_array($urlActual, self::RUTAS_PUBLICAS, true);
 
-        // RUTAS PUBLICAS
-        if (!in_array($urlActual, $rutasPublicas) && !$auth) {
-            header("Location: /login");
-            exit;
+        if (!$esPublica) {
+            if (!estaLogueado()) {
+                redirigir("/login");
+            }
+            $this->controlarInactividad();
         }
 
-        // RUTAS GOD
-        if (in_array($urlActual, $rutasGOD) && $modo !== "GOD") {
-            header("Location: /");
-            exit;
+        if ($metodo === "POST" && !csrfValido()) {
+            http_response_code(403);
+            echo "La sesion del formulario expiro. Vuelve a la pagina anterior, recargala e intenta de nuevo.";
+            return;
         }
 
-        $fn = $this->rutas[$metodo][$urlActual] ?? null;
+        $ruta = $this->rutas[$metodo][$urlActual] ?? null;
 
-        if ($fn) {
-            call_user_func($fn, $this);
-        } else {
+        if (!$ruta) {
+            http_response_code(404);
             echo "Pagina no Encontrada";
+            return;
         }
+
+        if ($ruta["permiso"] && !puede($ruta["permiso"])) {
+            redirigir("/");
+        }
+
+        call_user_func($ruta["fn"], $this);
     }
 
-    public function render($view, $datos = [])
+    private function controlarInactividad(): void
     {
-        foreach ($datos as $key => $value) {
-            $$key = $value;
+        $limite = (int) Config::get("app.sesion_inactividad_minutos", 120) * 60;
+        $ultima = $_SESSION["last_activity"] ?? 0;
+
+        if (time() - $ultima > $limite) {
+            $_SESSION = [];
+            session_destroy();
+            redirigir("/login");
         }
+        $_SESSION["last_activity"] = time();
+    }
+
+    public function render(string $view, array $datos = []): void
+    {
+        extract($datos, EXTR_SKIP);
 
         $viewPath = __DIR__ . "/views/$view.php";
         if (!file_exists($viewPath)) {
-            echo "La vista $view no existe.";
+            http_response_code(404);
+            echo "La vista no existe.";
             return;
         }
 

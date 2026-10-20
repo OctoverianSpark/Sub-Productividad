@@ -2,15 +2,19 @@
 
 namespace Models;
 
-use DateTime;
-use Models\Empleados;
+use MVC\Config;
 
 class Time extends BaseModel
 {
     protected static $tabla = "horas_extras";
     protected static $columnasDB = ["id", "empleado", "cliente", "inicio", "almuerzo", "final", "diurnas_ordinarias", "nocturnas_ordinarias", "diurnas_extras", "nocturnas_extras", "cena", "taxi", "comentarios", "auditar", "festivo"];
+    protected static $conservarMayusculas = ["comentarios"];
+    protected static $omitirVaciosAlActualizar = true;
+
     public $id, $empleado, $cliente, $inicio, $almuerzo, $final, $diurnas_ordinarias, $nocturnas_ordinarias, $diurnas_extras, $nocturnas_extras, $cena, $taxi, $comentarios, $auditar, $festivo;
 
+    // Campos que el usuario puede enviar desde un formulario ("auditar" nunca viene del cliente)
+    private const CAMPOS_FORMULARIO = ["empleado", "cliente", "inicio", "almuerzo", "final", "diurnas_ordinarias", "nocturnas_ordinarias", "diurnas_extras", "nocturnas_extras", "cena", "taxi", "comentarios", "festivo"];
 
     public function __construct($args = [])
     {
@@ -31,511 +35,191 @@ class Time extends BaseModel
         $this->festivo = $args["festivo"] ?? "no";
     }
 
-
-    public static function aprooveAudition($id)
+    // Crea una hora solo con los campos permitidos del formulario
+    public static function desdeFormulario(array $datos): static
     {
-        $query = "UPDATE " . static::$tabla . " SET auditar = 'no' WHERE id = " . $id;
-        self::$db->query($query);
-    }
-
-    public static function findByDate($range1, $range2, $audit)
-    {
-        $query = "SELECT * FROM " . static::$tabla . " WHERE ";
-        $query .= "((DATE(inicio) BETWEEN '$range1 00:00:00' AND '$range2 23:59:00') OR";
-        $query .= "(DATE(final) BETWEEN '$range1 00:00:00' AND '$range2 23:59:00'))";
-        $query .= " AND auditar = '$audit'";
-        $resultado = self::consultarSQL($query);
-        return $resultado;
-    }
-
-
-    public static function findByDateAndName($column = null, $param = null,$range1, $range2, $audit = "no")
-{
-    // Partes del WHERE
-    $whereParts = [];
-
-    // Filtro de fechas
-    $whereParts[] = "(
-        (inicio BETWEEN '$range1 00:00:00' AND '$range2 23:59:59') OR
-        (final BETWEEN '$range1 00:00:00' AND '$range2 23:59:59')
-    )";
-
-    // Filtro de nombre/columna (opcional)
-    if ($column && $param) {
-        $whereParts[] = "$column LIKE '$param%'";
-    }
-
-    // Filtro audit
-    $whereParts[] = "auditar = '$audit'";
-
-    // Construcción final
-    $whereClause = "WHERE " . implode(" AND ", $whereParts);
-
-    $query = "SELECT * FROM " . static::$tabla . " $whereClause ORDER BY id DESC";
-    return self::consultarSQL($query);
-}
-
-
-    public static function all($audit = "no")
-    {
-        $query = "SELECT * FROM " . static::$tabla . " WHERE auditar = '$audit' ORDER BY id DESC,inicio ASC";
-        $resultado = self::consultarSQL($query);
-        return $resultado;
-    }
-
-    public static function allPaginated($page = 1, $perPage = 20, $audit = "no", $filtros = [])
-    {
-        $offset = ($page - 1) *  $perPage;
-
-        $whereClause = " WHERE auditar = '$audit'";
-
-        if (!empty($filtros["column"]) && !empty($filtros["param"])) {
-            $column = self::$db->escape_string($filtros["column"]);
-            $param = self::$db->escape_string($filtros["param"]);
-            $whereClause .= " AND $column LIKE '%$param%'";
-        }
-
-        $countQuery = "SELECT COUNT(*) as total FROM " . static::$tabla . "$whereClause";
-        $result = self::$db->query($countQuery);
-        $totalRecords = $result->fetch_assoc()["total"];
-
-        $dataQuery = "SELECT * FROM " . static::$tabla . " $whereClause ORDER BY id DESC LIMIT $perPage OFFSET $offset";
-        $data = self::consultarSQL($dataQuery);
-
-        $totalPages = ceil($totalRecords / $perPage);
-
-        return [
-            "data" => $data,
-            "current_page" => $page,
-            "per_page" => $perPage,
-            "total_records" => $totalRecords,
-            "total_pages" => $totalPages,
-            "has_next" => $page < $totalPages,
-            "has_prev" => $page > 1,
-            "next_page" => $page < $totalPages ? $page + 1 : null,
-            "prev_page" => $page > 1 ? $page - 1 : null,
-        ];
-    }
-
-    public static function getPaymentsPaginated($page = 1, $perPage = 20, $column = null, $param = null, $from = null, $to = null)
-    {
-        if ($from && $to) {
-            $times = static::findByDateAndNamePaginated($from, $to,$column, $param, "no", $page, $perPage);
-            
-        } else {
-            $times = static::filterPaginated($column, $param, "no", $page, $perPage);
-        }
-
-
-        $resultado = [];
-        $i = 0;
-
-        foreach ($times["data"] as $time) {
-            $inicio = date_timestamp_get(new DateTime($time->inicio));
-            $empleado = Empleados::getByFullName(strtolower($time->empleado));
-            $salarioHora = $empleado->salario / (8 * 30);
-            if ($empleado->modalidad == "oficina" && $empleado->sede == "colombia") {
-                $diurnasExtra = round($salarioHora + ($salarioHora * .25), 2);
-                $nocturnasExtra = round($salarioHora + ($salarioHora * .75), 2);
-                $horaDominical = round($salarioHora + ($salarioHora * .75), 2);
-                $diurnasExtraDominicales = round($salarioHora + $salarioHora, 2);
-                $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5), 2);
-                $moneda = "COP";
-
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
-            } else if ($empleado->modalidad == "hogar") {
-                $extras = 3.5;
-                $moneda = "Dolares";
-
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
-            } else if ($empleado->modalidad == "oficina" && $empleado->sede == "venezuela") {
-                $moneda = "Dolares";
-            
-                $salarioHora = $empleado->salario / (8 * 30); // salario / 240
-            
-                // Tabla de referencia para interpolar el factor
-                $tablaFactores = [
-                    175 => 1.7 / (175 / 240),
-                    350 => 2.0 / (350 / 240),  // ~1.3714
-                    400 => 2.3 / (400 / 240),  // ~1.3800
-                    450 => 2.5 / (450 / 240),  // ~1.3333
-                    550 => 3.0 / (550 / 240),  // ~1.3090
-                    800 => 4.0 / (800 / 240),  // ~1.2000
-                ];
-            
-                // Interpolación lineal entre los dos salarios más cercanos
-                $salario = $empleado->salario;
-                $claves = array_keys($tablaFactores);
-                sort($claves);
-            
-                $factor = null;
-            
-                if ($salario <= $claves[0]) {
-                    // Menor al mínimo → usar el primer factor
-                    $factor = $tablaFactores[$claves[0]];
-                } elseif ($salario >= end($claves)) {
-                    // Mayor al máximo → usar el último factor
-                    $factor = $tablaFactores[end($claves)];
-                } else {
-                    // Interpolación entre dos puntos
-                    foreach ($claves as $idx => $clave) {
-                        if ($salario < $clave) {
-                            $s1 = $claves[$idx - 1];
-                            $s2 = $clave;
-                            $f1 = $tablaFactores[$s1];
-                            $f2 = $tablaFactores[$s2];
-            
-                            // Interpolar: f1 + (f2 - f1) * (salario - s1) / (s2 - s1)
-                            $factor = $f1 + ($f2 - $f1) * ($salario - $s1) / ($s2 - $s1);
-                            break;
-                        }
-                    }
-                }
-            
-                $extras = round($salarioHora * $factor, 2);
-            
-                $esDominicalOFestivo = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si");
-            
-                $resultado[$i]["diurnas_monto"] = $esDominicalOFestivo
-                    ? ($time->diurnas_ordinarias * $salarioHora) + ($time->diurnas_extras * $extras)
-                    : $time->diurnas_extras * $extras;
-            
-                $resultado[$i]["nocturnas_monto"] = $esDominicalOFestivo
-                    ? ($time->nocturnas_ordinarias * $salarioHora) + ($time->nocturnas_extras * $extras)
-                    : $time->nocturnas_extras * $extras;
+        $limpio = array_intersect_key($datos, array_flip(self::CAMPOS_FORMULARIO));
+        foreach (["inicio", "final"] as $campo) {
+            if (isset($limpio[$campo])) {
+                $limpio[$campo] = normalizarFecha((string) $limpio[$campo]) ?? "";
             }
-
-            foreach ($time as $key => $value) {
-                $resultado[$i][$key] = $value;
-            }
-
-            $resultado[$i]["moneda"] = $moneda;
-            $i++;
         }
+        $limpio["cena"] = ($limpio["cena"] ?? "") === "si" ? "si" : "no";
+        $limpio["taxi"] = ($limpio["taxi"] ?? "") === "si" ? "si" : "no";
+        $limpio["festivo"] = ($limpio["festivo"] ?? "") === "si" ? "si" : "no";
 
-
-        return [
-            "data" => $resultado,
-            "pagination" => [
-                "current_page" => $times["current_page"],
-                "per_page" => $times["per_page"],
-                "total_records" => $times["total_records"],
-                "total_pages" => $times["total_pages"],
-                "has_next" => $times["has_next"],
-                "has_prev" => $times["has_prev"],
-                "next_page" => $times["next_page"],
-                "prev_page" => $times["prev_page"]
-            ]
-        ];
+        return new static($limpio);
     }
 
-    public static function findByDateAndNamePaginated($range1, $range2, $column = null, $param = null, $audit = "no", $page = 1, $perPage = 20)
-{
-    $offset = ($page - 1) * $perPage;
-
-    // Filtro por fechas
-    $whereParts = [];
-    $whereParts[] = "((inicio BETWEEN '$range1 00:00:00' AND '$range2 23:59:59')
-                    OR (final BETWEEN '$range1 00:00:00' AND '$range2 23:59:59'))";
-
-    // Filtro por nombre/columna si existe
-    if ($column && $param) {
-        $whereParts[] = "$column LIKE '%$param%'";
-    }
-
-    // Filtro de audit
-    $whereParts[] = "auditar = '$audit'";
-
-    // Construcción final del WHERE
-    $whereClause = "WHERE " . implode(" AND ", $whereParts);
-
-    // Consulta para obtener total
-    $countQuery = "SELECT COUNT(*) as total FROM " . static::$tabla . " $whereClause";
-    $result = self::$db->query($countQuery);
-    $totalRecords = $result->fetch_assoc()["total"];
-
-    // Consulta paginada
-    $dataQuery = "SELECT * FROM " . static::$tabla . " 
-                  $whereClause 
-                  ORDER BY id DESC 
-                  LIMIT $perPage OFFSET $offset";
-
-    $data = self::consultarSQL($dataQuery);
-
-    $totalPages = ceil($totalRecords / $perPage);
-
-    return [
-        "data" => $data,
-        "current_page" => $page,
-        "per_page" => $perPage,
-        "total_records" => $totalRecords,
-        "total_pages" => $totalPages,
-        "has_next" => $page < $totalPages,
-        "has_prev" => $page > 1,
-        "next_page" => $page < $totalPages ? $page + 1 : null,
-        "prev_page" => $page > 1 ? $page - 1 : null,
-    ];
-}
-
-
-    public static function filterPaginated($column, $param, $audit = "no", $page = 1, $perPage = 20)
+    // Una hora queda pendiente de auditoria salvo que la cargue/edite un rol que no requiere auditoria
+    public static function estadoAuditoriaPara(string $modo): string
     {
-        $offset = ($page - 1) * $perPage;
+        if (puede("auditar")) return "no";
+        return in_array($modo, Config::get("roles.cargan_sin_auditoria", []), true) ? "no" : "si";
+    }
 
-        if ($column && $param) {
-            $whereClause = " WHERE $column LIKE '%$param%' AND auditar = '$audit'";
-        } else {
-            $whereClause = " WHERE auditar = '$audit'";
+    public static function aprooveAudition(int $id): void
+    {
+        self::ejecutar("UPDATE " . static::$tabla . " SET auditar = 'no' WHERE id = ? LIMIT 1", [$id]);
+    }
+
+    public function validar(): array
+    {
+        $this->errores = [];
+
+        if (!trim($this->empleado)) {
+            $this->errores[] = "Empleado: Selecciona un empleado";
         }
-
-        $countQuery = "SELECT COUNT(*) as total FROM " . static::$tabla . " $whereClause";
-        $result = self::$db->query($countQuery);
-        $totalRecords = $result->fetch_assoc()["total"];
-
-        $dataQuery = "SELECT * FROM " . static::$tabla . " $whereClause ORDER BY id DESC LIMIT $perPage OFFSET $offset";
-        $data = self::consultarSQL($dataQuery);
-
-        $totalPages = ceil($totalRecords / $perPage);
-
-        return [
-            "data" => $data,
-            "current_page" => $page,
-            "per_page" => $perPage,
-            "total_records" => $totalRecords,
-            "total_pages" => $totalPages,
-            "has_next" => $page < $totalPages,
-            "has_prev" => $page > 1,
-            "next_page" => $page < $totalPages ? $page + 1 : null,
-            "prev_page" => $page > 1 ? $page - 1 : null,
-        ];
-    }
-
-    public static function findByDatePaginated($range1, $range2, $audit, $page = 1, $perPage = 20)
-    {
-        $offset = ($page - 1) * $perPage;
-
-        $whereClause = "WHERE ((DATE(inicio) BETWEEN '$range1 00:00:00' AND '$range2 23:59:00') OR";
-        $whereClause .= "(DATE(final) BETWEEN '$range1 00:00:00' AND '$range2 23:59:00'))";
-        $whereClause .= " AND auditar = '$audit'";
-
-        $countQuery = "SELECT COUNT(*) as total FROM " . static::$tabla . " $whereClause";
-        $result = self::$db->query($countQuery);
-        $totalRecords = $result->fetch_assoc()['total'];
-
-        $dataQuery = "SELECT * FROM " . static::$tabla . " $whereClause ORDER BY id DESC LIMIT $perPage OFFSET $offset";
-        $data = self::consultarSQL($dataQuery);
-
-        $totalPages = ceil($totalRecords / $perPage);
-
-        return [
-            'data' => $data,
-            'current_page' => $page,
-            'per_page' => $perPage,
-            'total_records' => $totalRecords,
-            'total_pages' => $totalPages,
-            'has_next' => $page < $totalPages,
-            'has_prev' => $page > 1,
-            'next_page' => $page < $totalPages ? $page + 1 : null,
-            'prev_page' => $page > 1 ? $page - 1 : null
-        ];
-    }
-
-
-    public function actualizar()
-    {
-        $atributos = $this->sanitizarAtributos();
-        $valores = [];
-
-        foreach ($atributos as $key => $value) {
-            if ($atributos[$key] === "" || $atributos[$key] === null) continue;
-            if ($key === "creado") continue;
-            $valores[] = "$key='$value'";
+        if (!trim($this->cliente)) {
+            $this->errores[] = "Cliente: Selecciona un cliente";
         }
-        $atributos["auditar"] = "no";
-        $query = "UPDATE " . static::$tabla . " SET ";
-        $query .= strtolower(join(",", $valores));
-        $query .= " WHERE id = '" . self::$db->escape_string($this->id) . "'";
-
-        $resultado = self::$db->query($query);
-        return $resultado;
-    }
-
-    public static function filter($column, $param, $audit = "no")
-    {
-        if ($column && $param) {
-            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%' AND auditar = '$audit'";
-            $resultado = self::consultarSQL($query);
-        } else {
-            $resultado = static::all($audit);
-        }
-        return $resultado;
-    }
-
-
-    public function validar()
-    {
         if (!$this->inicio) {
-            static::$errores[] = "Inicio: No puede quedar vacio";
+            $this->errores[] = "Inicio: No puede quedar vacio o tiene un formato invalido";
         }
         if (!$this->final) {
-            static::$errores[] = "Final: No puede quedar vacio";
+            $this->errores[] = "Final: No puede quedar vacio o tiene un formato invalido";
         }
-        if ($this->diurnas_extras < 0) {
-            static::$errores[] = "Diurnas Extras: Valor Negativo no valido";
+        if ($this->inicio && $this->final && $this->final <= $this->inicio) {
+            $this->errores[] = "Final: Debe ser posterior al inicio";
         }
-        if ($this->nocturnas_extras < 0) {
-            static::$errores[] = "Nocturnas Extras: Valor Negativo no valido";
+        $campos = [
+            "diurnas_ordinarias" => "Diurnas Ordinarias",
+            "nocturnas_ordinarias" => "Nocturnas Ordinarias",
+            "diurnas_extras" => "Diurnas Extras",
+            "nocturnas_extras" => "Nocturnas Extras",
+        ];
+        foreach ($campos as $campo => $nombre) {
+            if (!is_numeric($this->$campo) || $this->$campo < 0) {
+                $this->errores[] = "$nombre: Debe ser un numero mayor o igual a 0";
+            }
         }
-        if ($this->diurnas_ordinarias < 0) {
-            static::$errores[] = "Diurnas Ordinarias: Valor Negativo no valido";
+        if (!in_array((string) $this->almuerzo, ["0", "1", "2"], true)) {
+            $this->errores[] = "Almuerzo: Coloca un valor en el almuerzo";
         }
-        if ($this->nocturnas_ordinarias < 0) {
-            static::$errores[] = "Nocturnas Ordinarias: Valor Negativo no valido";
-        }
-        if ($this->almuerzo == "") {
-            static::$errores[] = "Almuerzo: Coloca un valor en el almuerzo";
-        }
-
-        return static::$errores;
+        return $this->errores;
     }
 
+    // ==========
+    // CONSULTAS
+    // ==========
 
-    public static function getClientHours($name, $from = null, $to = null)
+    /**
+     * Construye el WHERE comun: rango de fechas, filtro por columna y estado de auditoria.
+     * Todo con placeholders; los valores van en $params.
+     */
+    private static function condiciones(?string $column, ?string $param, ?string $from, ?string $to, ?string $audit, array &$params): string
     {
-        $query = "SELECT * FROM " . self::$tabla . " WHERE cliente = '$name'";
+        $partes = [];
 
-        if ($from && $to) {
-            $query .= "AND ((inicio BETWEEN '$from 00:00:00' AND '$to 23:59:00') OR";
-            $query .= "(final BETWEEN '$from 00:00:00' AND '$to 23:59:00'))";
+        $desde = normalizarFecha($from);
+        $hasta = normalizarFecha($to, true);
+        if ($desde && $hasta) {
+            $partes[] = "((inicio BETWEEN ? AND ?) OR (final BETWEEN ? AND ?))";
+            array_push($params, $desde, $hasta, $desde, $hasta);
         }
-        $query .= " AND NOT cliente = 'administrativo'";
-        $query .= " ORDER BY inicio DESC, id DESC";
-        $resultado = self::consultarSQL($query);
 
-        return $resultado;
+        if ($like = self::condicionLike($column, $param, $params)) {
+            $partes[] = $like;
+        }
+
+        if ($audit !== null) {
+            $partes[] = "auditar = ?";
+            $params[] = $audit;
+        }
+
+        return $partes ? "WHERE " . implode(" AND ", $partes) : "";
     }
 
-
-    public static function getPayments($column = null, $param = null, $from = null, $to = null)
+    public static function allPaginated($page = 1, $perPage = null, string $audit = "no", array $filtros = []): array
     {
-            $times = static::findByDateAndName($column,$param,$from, $to, "no");
+        $params = [];
+        $where = self::condiciones($filtros["column"] ?? null, $filtros["param"] ?? null, null, null, $audit, $params);
+        return static::paginar($where, $params, $page, $perPage);
+    }
 
+    // Horas aprobadas con su monto calculado, paginadas (pantalla "Ver Horas")
+    public static function getPaymentsPaginated($page = 1, $perPage = null, ?string $column = null, ?string $param = null, ?string $from = null, ?string $to = null): array
+    {
+        $params = [];
+        $where = self::condiciones($column, $param, $from, $to, "no", $params);
+        $paginacion = static::paginar($where, $params, $page, $perPage);
+
+        $data = self::conMontos($paginacion["data"]);
+        unset($paginacion["data"]);
+
+        return ["data" => $data, "pagination" => $paginacion];
+    }
+
+    // Horas aprobadas con su monto calculado, sin paginar (exportacion)
+    public static function getPayments(?string $column = null, ?string $param = null, ?string $from = null, ?string $to = null): array
+    {
+        $params = [];
+        $where = self::condiciones($column, $param, $from, $to, "no", $params);
+        return self::conMontos(self::consultarSQL("SELECT * FROM " . static::$tabla . " $where ORDER BY id DESC", $params));
+    }
+
+    // Convierte cada hora en un arreglo con sus montos (una sola consulta de empleados para todas)
+    private static function conMontos(array $times): array
+    {
+        $empleados = Empleados::indexadosPorNombre();
         $resultado = [];
-        $i = 0;
+
         foreach ($times as $time) {
-            $inicio = date_timestamp_get(new DateTime($time->inicio));
-
-            $empleado = Empleados::getByFullName(strtolower($time->empleado));
-
-            $salarioHora = $empleado->salario / (8 * 30);
-
-            if ($empleado->modalidad == "oficina" && $empleado->sede == "colombia") {
-                $diurnasExtra = round($salarioHora + ($salarioHora * .25), 2);
-                $nocturnasExtra = round($salarioHora + ($salarioHora * .75), 2);
-                $horaDominical = round($salarioHora + ($salarioHora * .75), 2);
-                $diurnasExtraDominicales = round($salarioHora + $salarioHora, 2);
-                $nocturnasExtraDominicales = round($salarioHora + ($salarioHora * 1.5), 2);
-                $moneda = "COP";
-
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $horaDominical) + ($time->diurnas_extras * $diurnasExtraDominicales) : $time->diurnas_extras * $diurnasExtra;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday"  || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $horaDominical) + ($time->nocturnas_extras * $nocturnasExtraDominicales) : $time->nocturnas_extras * $nocturnasExtra;
-            } else if ($empleado->modalidad == "hogar") {
-                $extras = 3.5;
-                $moneda = "Dolares";
-
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
-            } else if ($empleado->modalidad == "oficina" && $empleado->sede == "venezuela") {
-                $extras = 2;
-                $moneda = "Dolares";
-
-
-                $resultado[$i]["diurnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->diurnas_ordinarias * $extras) + ($time->diurnas_extras * $extras) : $time->diurnas_extras * $extras;
-                $resultado[$i]["nocturnas_monto"] = (getdate($inicio)["weekday"] == "Sunday" || $time->festivo == "si") ? ($time->nocturnas_ordinarias * $extras) + ($time->nocturnas_extras * $extras) : $time->nocturnas_extras * $extras;
-            }
-
-
-            foreach ($time as $key => $value) {
-                $resultado[$i][$key] = $value;
-            }
-
-            $resultado[$i]["moneda"] = $moneda;
-            $i++;
+            $empleado = $empleados[mb_strtolower(trim($time->empleado), "UTF-8")] ?? null;
+            $fila = get_object_vars($time);
+            unset($fila["errores"]);
+            $resultado[] = array_merge($fila, CalculadoraPagos::pagoEmpleado($time, $empleado));
         }
-
-
-
         return $resultado;
     }
 
-    public static function getAgentPayments($from = null, $to = null, $param = null)
+    public static function getClientHours(string $name, ?string $from = null, ?string $to = null): array
     {
-        if (!is_null($param)) {
-            $clientes = Clientes::getByFullName($param);
-        } else {
-            $clientes = Clientes::all();
+        $params = [$name];
+        $where = "WHERE cliente = ? AND NOT cliente = 'administrativo'";
+
+        $desde = normalizarFecha($from);
+        $hasta = normalizarFecha($to, true);
+        if ($desde && $hasta) {
+            $where .= " AND ((inicio BETWEEN ? AND ?) OR (final BETWEEN ? AND ?))";
+            array_push($params, $desde, $hasta, $desde, $hasta);
+        }
+
+        return self::consultarSQL("SELECT * FROM " . static::$tabla . " $where ORDER BY inicio DESC, id DESC", $params);
+    }
+
+    // Resumen de cobro por cliente (una sola consulta de horas para todos los clientes)
+    public static function getAgentPayments(?string $from = null, ?string $to = null, ?string $param = null): array
+    {
+        $clientes = ($param !== null && trim($param) !== "") ? Clientes::getByFullName(trim($param)) : Clientes::all();
+        if (!$clientes) return [];
+
+        $params = [];
+        $where = "WHERE NOT cliente = 'administrativo'";
+        $desde = normalizarFecha($from);
+        $hasta = normalizarFecha($to, true);
+        if ($desde && $hasta) {
+            $where .= " AND ((inicio BETWEEN ? AND ?) OR (final BETWEEN ? AND ?))";
+            array_push($params, $desde, $hasta, $desde, $hasta);
+        }
+
+        $horasPorCliente = [];
+        foreach (self::consultarSQL("SELECT * FROM " . static::$tabla . " $where", $params) as $time) {
+            $horasPorCliente[mb_strtolower(trim($time->cliente), "UTF-8")][] = $time;
         }
 
         $resultado = [];
-        $i = 0;
-
         foreach ($clientes as $cliente) {
+            $nombre = $cliente->nombreCompleto();
+            $horas = $horasPorCliente[mb_strtolower($nombre, "UTF-8")] ?? [];
+            if (!$horas) continue;
 
-            $tipo = strtolower($cliente->tipo);
-            if ($tipo === "nuevo") {
-
-                $diurnasExtra = 6.5;
-                $nocturnasExtra = 7;
-                $diurnasExtraDominicales = 7.5;
-                $nocturnasExtraDominicales = 8;
-            } else if ($tipo === "viejo") {
-
-                $diurnasExtra = 6;
-                $nocturnasExtra = 6.5;
-                $diurnasExtraDominicales = 7;
-                $nocturnasExtraDominicales = 7.5;
+            $resumen = CalculadoraPagos::resumenClienteVacio($nombre);
+            foreach ($horas as $time) {
+                CalculadoraPagos::acumularCliente($resumen, $time, $cliente->tipo);
             }
-
-            $resultado[$i]["cliente"] = $cliente->nombre . " " . $cliente->apellido;
-            $resultado[$i]["diurnas"] = 0;
-            $resultado[$i]["diurnas_domingo"] = 0;
-            $resultado[$i]["nocturnas"] = 0;
-            $resultado[$i]["nocturnas_domingo"] = 0;
-            $resultado[$i]["diurnas_monto"] = 0;
-            $resultado[$i]["nocturnas_monto"] = 0;
-
-            $query = "SELECT * FROM " . static::$tabla . " WHERE cliente = '" . $resultado[$i]["cliente"] . "' AND NOT cliente = 'administrativo'";
-
-            if (!is_null($from) && !is_null($to)) {
-                $query .= " AND ((inicio between '$from 00:00:00' and '$to 23:59:59') OR";
-                $query .= " (final between '$from 00:00:00' and '$to 23:59:59'))";
-            }
-
-            $times = self::consultarSQL($query);
-
-            if (count($times) <= 0) continue;
-            foreach ($times as $time) {
-
-                $inicio = date_timestamp_get(new DateTime($time->inicio));
-                $resultado[$i]["diurnas"] +=  (getdate($inicio)["weekday"] != "Sunday") ? $time->diurnas_extras : 0;
-                $resultado[$i]["nocturnas"] +=  (getdate($inicio)["weekday"] != "Sunday") ? $time->nocturnas_extras : 0;
-                $resultado[$i]["diurnas_domingo"] +=  (getdate($inicio)["weekday"] == "Sunday") ? $time->diurnas_extras : 0;
-                $resultado[$i]["diurnas_ordinarias_domingo"] +=  (getdate($inicio)["weekday"] == "Sunday") ? $time->diurnas_ordinarias : 0;
-                $resultado[$i]["nocturnas_domingo"] +=  (getdate($inicio)["weekday"] == "Sunday") ? $time->nocturnas_extras : 0;
-                $resultado[$i]["nocturnas_ordinarias_domingo"] +=  (getdate($inicio)["weekday"] == "Sunday") ? $time->nocturnas_ordinarias : 0;
-                $resultado[$i]["diurnas_monto"] += (getdate($inicio)["weekday"] == "Sunday") ? $time->diurnas_extras * $diurnasExtraDominicales : $time->diurnas_extras * $diurnasExtra;
-                $resultado[$i]["nocturnas_monto"] += (getdate($inicio)["weekday"] == "Sunday") ? $time->nocturnas_extras * $nocturnasExtraDominicales : $time->nocturnas_extras * $nocturnasExtra;
-                $resultado[$i]["diurnas_monto"] += (getdate($inicio)["weekday"] == "Sunday") ? $time->diurnas_ordinarias * $diurnasExtraDominicales : 0;
-
-                $resultado[$i]["logistica"] += ($time->cena === "si") ? 5 : 0;
-                $resultado[$i]["logistica"] += ($time->taxi === "si") ? 5 : 0;
-            }
-
-            $i++;
+            $resultado[] = $resumen;
         }
-
         return $resultado;
     }
 }

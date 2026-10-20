@@ -7,6 +7,7 @@
             <img src="/build/img/logo.png" type="image/png" alt="Logo inicio de sesion">
         </picture>
         <form method="POST" class="inicio-sesion">
+            <?php echo csrfField() ?>
             <h1 class="title">INICIO DE SESION</h1>
 
              <a href="/redirect"  class="google-btn">

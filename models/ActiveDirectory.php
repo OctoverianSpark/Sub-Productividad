@@ -2,7 +2,6 @@
 
 namespace Models;
 
-
 use Adldap\Adldap;
 use Exception;
 
@@ -15,12 +14,13 @@ class ActiveDirectory
 
     public function __construct($args = [])
     {
+        // Credenciales tomadas de .env (ver .env.example). Nunca escribirlas en el codigo.
         $config = [
-            'account_suffix' => "@asistentevirtualsas.com",
-            'domain_controllers' => array("AV-SRV-DC1.asistentevirtualsas.com"),
-            'base_dn' => 'dc=AsistenteVirtualSAS,dc=com',
-            'admin_username' => 'Administrador',
-            'admin_password' => 'Venezu22366@',
+            "account_suffix" => $_ENV["AD_ACCOUNT_SUFFIX"],
+            "domain_controllers" => array_map("trim", explode(",", $_ENV["AD_DOMAIN_CONTROLLERS"])),
+            "base_dn" => $_ENV["AD_BASE_DN"],
+            "admin_username" => $_ENV["AD_ADMIN_USERNAME"],
+            "admin_password" => $_ENV["AD_ADMIN_PASSWORD"],
         ];
 
         $this->ad = new Adldap($config);

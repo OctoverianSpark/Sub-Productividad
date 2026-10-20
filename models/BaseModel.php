@@ -2,125 +2,202 @@
 
 namespace Models;
 
+use mysqli;
+use mysqli_stmt;
+use MVC\Config;
 
 abstract class BaseModel
 {
-
-    protected static $db;
+    protected static mysqli $db;
     protected static $tabla = "";
     protected static $columnasDB = [];
-    public static $errores = [];
+
+    // Columnas que se guardan tal cual; el resto se guarda en minusculas
+    protected static $conservarMayusculas = [];
+
+    // Si es true, al actualizar se ignoran los campos vacios (no se sobreescriben)
+    protected static $omitirVaciosAlActualizar = false;
+
+    protected array $errores = [];
 
     public $id;
 
-    // Conexion a la base de datos
-    public static function setDB($db)
+    public static function setDB(mysqli $db): void
     {
         self::$db = $db;
     }
 
     // Retorna todas las columnas excepto la ID
-  public static function getColumns()
-{
-    $columnas = [];
-    foreach (static::$columnasDB as $columna) {
-        if ($columna === "id") continue;
-        $columnas[] = $columna;
+    public static function getColumns(): array
+    {
+        return array_values(array_filter(static::$columnasDB, fn($c) => $c !== "id"));
     }
-    return $columnas;
-}
+
+    // Solo se aceptan nombres de columna declarados en el modelo (lista blanca)
+    public static function columnaValida(?string $columna): bool
+    {
+        return $columna !== null && in_array($columna, static::$columnasDB, true);
+    }
 
     // ===========
     // CRUD BASICO
     // ===========
 
-    public static function all()
+    public static function all(): array
     {
-        return self::consultarSQL("SELECT * FROM " . static::$tabla);
+        return self::consultarSQL("SELECT * FROM " . static::$tabla . " ORDER BY id DESC");
     }
 
-    public static function get($limit)
+    public static function find($id): ?static
     {
-        $query = "SELECT * FROM " . static::$tabla . " LIMIT " . $limit;
-        return self::consultarSQL($query);
+        $resultado = self::consultarSQL("SELECT * FROM " . static::$tabla . " WHERE id = ? LIMIT 1", [(int) $id]);
+        return $resultado[0] ?? null;
     }
 
-    public static function find($id)
-    {
-        $query = "SELECT * FROM " . static::$tabla . " WHERE id = $id";
-        $resultado = self::consultarSQL($query);
-        return array_shift($resultado);
-    }
-
-    public function guardar()
+    public function guardar(): bool
     {
         return !$this->id ? $this->crear() : $this->actualizar();
     }
 
-    public function crear()
+    public function crear(): bool
     {
-        $atributos = $this->sanitizarAtributos();
+        $atributos = $this->atributosParaGuardar();
+        $columnas = array_keys($atributos);
 
-        $query = "INSERT INTO " . static::$tabla . " (";
-        $query .= join(", ", array_keys($atributos));
-        $query .= ")VALUES ('";
-        $query .= strtolower(join("' , '", array_values($atributos)));
-        $query .= "')";
+        $query = "INSERT INTO " . static::$tabla . " (`" . implode("`, `", $columnas) . "`) VALUES (";
+        $query .= implode(", ", array_fill(0, count($columnas), "?")) . ")";
 
-        return self::$db->query($query);
+        self::ejecutar($query, array_values($atributos));
+        $this->id = self::$db->insert_id;
+        return true;
     }
 
-    public function actualizar()
+    public function actualizar(): bool
     {
-        $atributos = $this->sanitizarAtributos();
+        $sets = [];
         $valores = [];
 
-        foreach ($atributos as $key => $value) {
-            if ($key === "id") continue;
-            $valores[] = "$key='$value'";
+        foreach ($this->atributosParaGuardar() as $columna => $valor) {
+            if (static::$omitirVaciosAlActualizar && $valor === "") continue;
+            $sets[] = "`$columna` = ?";
+            $valores[] = $valor;
         }
+        if (!$sets) return false;
 
-        $query = "UPDATE " . static::$tabla . " SET ";
-        $query .= join(", ", $valores);
-        $query .= " WHERE id = '" . self::$db->escape_string($this->id) . "' LIMIT 1";
-
-        return self::$db->query($query);
+        $valores[] = (int) $this->id;
+        self::ejecutar("UPDATE " . static::$tabla . " SET " . implode(", ", $sets) . " WHERE id = ? LIMIT 1", $valores);
+        return true;
     }
 
-    public function eliminar()
+    public function eliminar(): bool
     {
-        $id = self::$db->escape_string($this->id);
-        $query = "DELETE FROM " . static::$tabla . " WHERE id = $id";
-        self::$db->query($query);
+        self::ejecutar("DELETE FROM " . static::$tabla . " WHERE id = ? LIMIT 1", [(int) $this->id]);
+        return true;
     }
 
-    public static function filter($column, $param)
+    // Busqueda parcial por una columna permitida
+    public static function filter(?string $column, ?string $param): array
     {
-        if ($column && $param) {
-            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%'";
-            return self::consultarSQL($query);
-        } else {
-            return static::all();
-        }
+        $params = [];
+        $where = self::condicionLike($column, $param, $params);
+
+        return self::consultarSQL(
+            "SELECT * FROM " . static::$tabla . ($where ? " WHERE $where" : "") . " ORDER BY id DESC",
+            $params
+        );
+    }
+
+    public static function paginarConFiltros($page = 1, $perPage = null, array $filtros = []): array
+    {
+        $params = [];
+        $where = self::condicionLike($filtros["column"] ?? null, $filtros["param"] ?? null, $params);
+
+        return static::paginar($where ? "WHERE $where" : "", $params, $page, $perPage);
     }
 
     //==========
     //UTILIDADES
     //==========
-    public static function consultarSQL($query)
+
+    // Ejecuta una consulta preparada. Los valores SIEMPRE van como parametros, nunca concatenados.
+    protected static function ejecutar(string $query, array $params = []): mysqli_stmt
     {
-        $resultado = self::$db->query($query);
+        $stmt = self::$db->prepare($query);
+
+        if ($params) {
+            $tipos = "";
+            foreach ($params as $p) {
+                $tipos .= is_int($p) ? "i" : (is_float($p) ? "d" : "s");
+            }
+            $stmt->bind_param($tipos, ...array_values($params));
+        }
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public static function consultarSQL(string $query, array $params = []): array
+    {
+        $resultado = self::ejecutar($query, $params)->get_result();
 
         $array = [];
         while ($registro = $resultado->fetch_assoc()) {
             $array[] = static::crearObjeto($registro);
         }
-
         $resultado->free();
         return $array;
     }
 
-    protected static function crearObjeto($registro)
+    protected static function contar(string $where, array $params): int
+    {
+        $fila = self::ejecutar("SELECT COUNT(*) AS total FROM " . static::$tabla . " $where", $params)
+            ->get_result()->fetch_assoc();
+        return (int) $fila["total"];
+    }
+
+    // Arma "`columna` LIKE ?" si la columna es valida y hay valor; agrega el parametro a $params
+    protected static function condicionLike(?string $columna, ?string $valor, array &$params): ?string
+    {
+        if (!static::columnaValida($columna) || $valor === null || trim($valor) === "") {
+            return null;
+        }
+        $params[] = "%" . trim($valor) . "%";
+        return "`$columna` LIKE ?";
+    }
+
+    /**
+     * Paginacion unica para todos los modelos.
+     * $where debe venir con placeholders (?) y sus valores en $params.
+     */
+    protected static function paginar(string $where, array $params, $page, $perPage, string $orden = "id DESC"): array
+    {
+        $page = max(1, (int) $page);
+        $permitidos = Config::get("paginacion.por_pagina_permitidos", [20, 50, 100]);
+        $perPage = in_array((int) $perPage, $permitidos, true)
+            ? (int) $perPage
+            : (int) Config::get("paginacion.por_pagina_defecto", 20);
+
+        $totalRecords = static::contar($where, $params);
+        $totalPages = (int) ceil($totalRecords / $perPage);
+
+        $data = self::consultarSQL(
+            "SELECT * FROM " . static::$tabla . " $where ORDER BY $orden LIMIT ? OFFSET ?",
+            [...$params, $perPage, ($page - 1) * $perPage]
+        );
+
+        return [
+            "data" => $data,
+            "current_page" => $page,
+            "per_page" => $perPage,
+            "total_records" => $totalRecords,
+            "total_pages" => $totalPages,
+            "has_next" => $page < $totalPages,
+            "has_prev" => $page > 1,
+            "next_page" => $page < $totalPages ? $page + 1 : null,
+            "prev_page" => $page > 1 ? $page - 1 : null,
+        ];
+    }
+
+    protected static function crearObjeto(array $registro): static
     {
         $objeto = new static;
 
@@ -132,7 +209,7 @@ abstract class BaseModel
         return $objeto;
     }
 
-    public function atributos()
+    public function atributos(): array
     {
         $atributos = [];
         foreach (static::$columnasDB as $columna) {
@@ -142,51 +219,22 @@ abstract class BaseModel
         return $atributos;
     }
 
-    public function sanitizarAtributos()
+    // Normaliza valores antes de guardarlos: null -> "" y minusculas salvo columnas excluidas
+    protected function atributosParaGuardar(): array
     {
-        $atributos = $this->atributos();
-        $sanitizado = [];
-
-        foreach ($atributos as $key => $value) {
-            $sanitizado[$key] = self::$db->escape_string($value);
+        $atributos = [];
+        foreach ($this->atributos() as $columna => $valor) {
+            $valor = trim((string) ($valor ?? ""));
+            if (!in_array($columna, static::$conservarMayusculas, true)) {
+                $valor = mb_strtolower($valor, "UTF-8");
+            }
+            $atributos[$columna] = $valor;
         }
-        return $sanitizado;
+        return $atributos;
     }
 
-
- public static function paginarConFiltros($page = 1, $perPage = 100, $filtros = [])
+    public function getErrores(): array
     {
-        $offset = ($page - 1) * $perPage;
-
-        $whereClause = "";
-        if (!empty($filtros["column"]) && !empty($filtros["param"])) {
-            $column = self::$db->escape_string($filtros["column"]);
-            $param = self::$db->escape_string($filtros["param"]);
-            $whereClause = " WHERE $column LIKE '%$param%'";
-        }
-
-        $countQuery = "SELECT COUNT(*) as total FROM " . static::$tabla . " $whereClause";
-        $resultado = self::$db->query($countQuery);
-        $totalRecords = $resultado->fetch_assoc()["total"];
-
-        $dataQuery = "SELECT * FROM " . static::$tabla . " $whereClause ORDER BY id DESC LIMIT $perPage OFFSET $offset";
-        $data = self::consultarSQL($dataQuery);
-
-        $totalPages = ceil($totalRecords / $perPage);
-
-        return [
-             "data" => $data,
-            "current_page" => $page,
-            "per_page" => $perPage,
-            "total_records" => $totalRecords,
-            "total_pages" => $totalPages,
-            "has_next" => $page < $totalPages,
-            "has_prev" => $page > 1,
-            "next_page" => $page < $totalPages ?  $page + 1 : null,
-            "prev_page" => $page > 1 ? $page - 1 : null,
-        ];
+        return $this->errores;
     }
-
-
-
 }

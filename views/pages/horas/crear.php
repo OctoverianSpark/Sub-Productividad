@@ -3,6 +3,7 @@
 
 
 <form method="post" class="form-times" >
+    <?php echo csrfField() ?>
 
     <div class="container-bg">
         <picture class="logo-1" loading="lazy">
@@ -66,7 +67,7 @@
                         <label for="empleado">EMPLEADO</label>
                         <select name="horas[0][empleado]" id="empleado">
                             <?php foreach($empleados as $empleado){ ?>
-                                <option value="<?php echo $empleado->nombre . " " . $empleado->apellido ?>" ><?php echo strtoupper($empleado->nombre . " " . $empleado->apellido) ?></option>    
+                                <option value="<?php echo s($empleado->nombreCompleto()) ?>" ><?php echo s(mb_strtoupper($empleado->nombreCompleto())) ?></option>
                             <?php }?>
                         </select>
                     </div>
@@ -75,7 +76,7 @@
                         <select name="horas[0][cliente]" id="cliente">
                             <option value="administrativo">HORAS ADMINISTRATIVAS</option>
                             <?php foreach($clientes as $cliente){ ?>
-                                <option value="<?php echo $cliente->nombre . " " . $cliente->apellido ?>"><?php echo strtoupper($cliente->nombre . " " . $cliente->apellido) ?></option>    
+                                <option value="<?php echo s($cliente->nombreCompleto()) ?>"><?php echo s(mb_strtoupper($cliente->nombreCompleto())) ?></option>
                             <?php }?>
                         </select>
                     </div>
@@ -91,7 +92,7 @@
                         </div>
                     <div class="container-input input-horas">
                         <label for="inicio">INICIO DE JORNADA</label>
-                        <input type="datetime-local" name="horas[0][inicio]" id="inicio" class="inicio" value="<?php echo $time->inicio?? date("Y-m-d") . "T08:00:00" ?>">
+                        <input type="datetime-local" name="horas[0][inicio]" id="inicio" class="inicio" value="<?php echo date("Y-m-d") . "T08:00" ?>">
                     </div>
                     <div class="container-input input-horas">
                         <label for="almuerzo">HORAS DE ALMUERZO</label>
@@ -99,17 +100,17 @@
                         <div class="radio">
                             <div class="radio-input">
                                 <label for="almuerzo-0">0</label>
-                                <input type="radio" name="horas[0][almuerzo]" value="0" id="almuerzo-0" <?php echo ($time->almuerzo == 0)? "checked":"" ?>>
+                                <input type="radio" name="horas[0][almuerzo]" value="0" id="almuerzo-0">
                             </div>
 
                             <div class="radio-input">
                                 <label for="almuerzo-1">1</label>
-                                <input type="radio" name="horas[0][almuerzo]" value="1" id="almuerzo-1" <?php echo ($time->almuerzo == 1)? "checked":"" ?>>
+                                <input type="radio" name="horas[0][almuerzo]" value="1" id="almuerzo-1">
 
                             </div>
                             <div class="radio-input">
                                 <label for="almuerzo-2">2</label>
-                                <input type="radio" name="horas[0][almuerzo]" value="2" id="almuerzo-2" <?php echo ($time->almuerzo == 2 || !$time->almuerzo)? "checked":"" ?>>
+                                <input type="radio" name="horas[0][almuerzo]" value="2" id="almuerzo-2" checked>
 
                             </div>
 
@@ -117,7 +118,7 @@
                     </div>
                     <div class="container-input input-horas">
                         <label for="final">FINAL DE JORNADA</label>
-                        <input type="datetime-local" name="horas[0][final]" id="final" class="final" value="<?php echo $time->final?? date("Y-m-d") . "T18:00:00" ?>">
+                        <input type="datetime-local" name="horas[0][final]" id="final" class="final" value="<?php echo date("Y-m-d") . "T18:00" ?>">
                     </div>
 
 

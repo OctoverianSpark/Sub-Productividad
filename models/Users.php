@@ -2,10 +2,13 @@
 
 namespace Models;
 
+use MVC\Config;
+
 class Users extends BaseModel
 {
     protected static $tabla = "users";
     protected static $columnasDB = ["id", "user", "email", "mode"];
+    protected static $omitirVaciosAlActualizar = true;
     public $id, $user, $email, $mode;
 
     public function __construct($args = [])
@@ -16,57 +19,37 @@ class Users extends BaseModel
         $this->mode = $args["mode"] ?? null;
     }
 
-    public static function all()
+    public static function all(): array
     {
-        $query = "SELECT * FROM " . static::$tabla . " ORDER BY mode ASC";
-        return self::consultarSQL($query);
+        return self::consultarSQL("SELECT * FROM " . static::$tabla . " ORDER BY mode ASC");
     }
 
-
-    public function actualizar()
+    public function validar(): array
     {
-        $atributos = $this->sanitizarAtributos();
-        $valores = [];
+        $this->errores = [];
 
-        foreach ($atributos as $key => $value) {
-            if ($atributos[$key] === "" || $atributos[$key] === null) continue;
-            if ($key === "creado") continue;
-            $valores[] = "$key='$value'";
+        if (!trim((string) $this->user) && !trim((string) $this->email)) {
+            $this->errores[] = "Debes indicar el usuario de dominio o el correo";
         }
-
-        $query = "UPDATE " . static::$tabla . " SET ";
-        $query .= strtolower(join(",", $valores));
-        $query .= " WHERE id = '" . self::$db->escape_string($this->id) . "'";
-        $query .= " LIMIT 1";
-
-        $resultado = self::$db->query($query);
-        return $resultado;
+        if ($this->email && !filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            $this->errores[] = "El correo no es valido";
+        }
+        $roles = array_keys(Config::get("roles.disponibles", []));
+        if (!in_array(strtolower((string) $this->mode), $roles, true)) {
+            $this->errores[] = "El permiso seleccionado no es valido";
+        }
+        return $this->errores;
     }
 
-
-    public static function  findUser($mail = null, $user = null)
+    public static function findUser(?string $mail = null, ?string $user = null): ?static
     {
-        $query = "SELECT * FROM " . self::$tabla . " WHERE ";
-
         if ($mail) {
-            $query .= "email = '$mail'";
-        }
-        if ($user) {
-            $query .= "user = '$user'";
-        }
-        $resultado = self::consultarSQL(query: $query);
-
-        return array_shift($resultado);
-    }
-
-
-    public static function filter($column, $param)
-    {
-        if ($column && $param) {
-            $query = "SELECT * FROM " . static::$tabla . " WHERE $column LIKE '%$param%' ORDER BY nombre ASC";
-            return self::consultarSQL($query);
+            $resultado = self::consultarSQL("SELECT * FROM " . self::$tabla . " WHERE email = ? LIMIT 1", [$mail]);
+        } elseif ($user) {
+            $resultado = self::consultarSQL("SELECT * FROM " . self::$tabla . " WHERE user = ? LIMIT 1", [$user]);
         } else {
-            return static::all();
+            return null;
         }
+        return $resultado[0] ?? null;
     }
 }

@@ -1,23 +1,19 @@
 <main class="main-settings-clientes">
 
-
-
-    <h1 class="title">GESTION DE HORAS DEL CLIENTE <?php echo strtoupper($_GET["name"])  ?></h1>
-
-
-
+    <h1 class="title">GESTION DE HORAS DEL CLIENTE <?php echo s(mb_strtoupper($nombre)) ?></h1>
 
     <form method="get" class="form-search">
         <h2 class="subtitle">FILTRO POR RANGO DE FECHAS</h2>
+        <input type="hidden" name="name" value="<?php echo s($nombre) ?>">
 
         <div class="container-inputs-search" id="date-search">
             <div class="container-input-search">
                 <label for="date-search">DESDE</label>
-                <input type="datetime-local" name="from" id="date-search-input" value="<?php echo $_GET["from"] ?>">
+                <input type="datetime-local" name="from" id="date-search-input" value="<?php echo s($_GET["from"] ?? "") ?>">
             </div>
             <div class="container-input-search">
                 <label for="date-search">HASTA</label>
-                <input type="datetime-local" name="to" id="date-search-input" value="<?php echo $_GET["to"] ?>">
+                <input type="datetime-local" name="to" id="date-search-input" value="<?php echo s($_GET["to"] ?? "") ?>">
             </div>
 
         </div>
@@ -25,7 +21,7 @@
         <div class="container-buttons">
             <button type="submit" class="boton-morado-inline">BUSCAR <i class='bx bx-search bx-tada'></i></button>
 
-            <a href="/horas/ver/cliente?name=<?php echo urlencode($_GET['name']) ?>" class="boton-fucsia-inline">Borrar Filtro <i class='bx bxs-trash bx-tada'></i></a>
+            <a href="/horas/ver/cliente?<?php echo s(http_build_query(["name" => $nombre])) ?>" class="boton-fucsia-inline">Borrar Filtro <i class='bx bxs-trash bx-tada'></i></a>
 
         </div>
 
@@ -37,7 +33,6 @@
 
     <?php if (!empty($horas)) { ?>
         <div class="datos-cliente">
-
 
             <table class="tabla-historial">
                 <thead>
@@ -51,22 +46,17 @@
                     <th>TAXI</th>
                 </thead>
                 <tbody>
-                    <?php foreach ($horas as $hora) {
-                         ?>
-
-
+                    <?php foreach ($horas as $hora) { ?>
                         <tr>
-                            <td><?php echo strtoupper(s($hora->empleado)) ?></td>
+                            <td><?php echo s(mb_strtoupper($hora->empleado)) ?></td>
                             <td><?php echo s($hora->inicio) ?></td>
                             <td><?php echo s($hora->almuerzo) ?></td>
                             <td><?php echo s($hora->final) ?></td>
                             <td><?php echo s($hora->diurnas_extras) ?></td>
                             <td><?php echo s($hora->nocturnas_extras) ?></td>
-                            <td><?php echo strtoupper(s($hora->cena)) ?></td>
-                            <td><?php echo strtoupper(s($hora->taxi)) ?></td>
+                            <td><?php echo s(mb_strtoupper($hora->cena)) ?></td>
+                            <td><?php echo s(mb_strtoupper($hora->taxi)) ?></td>
                         </tr>
-
-
                     <?php } ?>
                 </tbody>
 

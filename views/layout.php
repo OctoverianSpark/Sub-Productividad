@@ -1,32 +1,27 @@
-
 <?php
-    $auth = estalogueado();
+    $auth = estaLogueado();
 ?>
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sub-Productividad</title>
-    
+
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/build/css/app.css">
-    
+
 </head>
 <body>
-    
 
-<?php $mensaje=mostrarNotificacion($_GET["resultado"])?>
+<?php $mensaje = mostrarNotificacion($_GET["resultado"] ?? null) ?>
 <?php if($mensaje){ ?>
     <div class="modal modal-exito">
-        <p><?php echo $mensaje ?></p>        
+        <p><?php echo $mensaje /* texto fijo definido en mostrarNotificacion() */ ?></p>
         <button class="close-button"><i class='bx bxs-x-circle' ></i></button>
     </div>
 <?php } ?>
-    
 
     <header>
     <?php if($auth){ ?>
@@ -38,7 +33,7 @@
                         <ul>
                                 <li><a href="/horas/registrar">Ingresar Horas</a></li>
                                 <li><a href="/horas/ver" >Ver Horas</a></li>
-                                <?php if(in_array(strtoupper($_SESSION["mode"]),["GOD","ADMIN","AUDITER"])){ ?>
+                                <?php if(puede("configuracion")){ ?>
                                     <li><a href="/settings" >Configuracion</a></li>
                                 <?php } ?>
                                 <li><a href="/logout" >Cerrar Sesion</a></li>
@@ -57,7 +52,7 @@
     <?php echo $contenido ?>
 
 
-<!-- jQuery para Select2 -->    
+<!-- jQuery para Select2 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
