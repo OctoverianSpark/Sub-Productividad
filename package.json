@@ -31,10 +31,6 @@
     "gulp-sourcemaps": "^3.0.0",
     "gulp-terser-js": "^5.2.2",
     "gulp-webp": "^4.0.1",
-    "ngx-pretty-checkbox": "^18.0.0",
-    "pretty-checkbox": "^3.0.3",
-    "sass": "^1.49.9",
-    "terser": "^4.8.0",
-    "web-push": "^3.6.7"
+    "sass": "^1.49.9"
   }
 }
