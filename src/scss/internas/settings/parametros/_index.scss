@@ -1,0 +1,114 @@
+.main-parametros {
+    width: min(120rem, 95%);
+    margin: 0 auto $separacion auto;
+
+    .parametros-ayuda {
+        text-align: center;
+        font-size: 1.6rem;
+        color: darken($fucsia, 35);
+        margin-bottom: 3rem;
+    }
+}
+
+.form-parametros {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.parametros-seccion {
+    border: 2px solid $fucsia;
+    border-radius: 1rem;
+    padding: 2rem;
+
+    legend {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: $morado;
+        padding: 0 1rem;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+        color: $morado;
+        margin: 2.5rem 0 1rem 0;
+    }
+
+    small,
+    .parametros-ayuda-sm {
+        display: block;
+        font-size: 1.3rem;
+        color: darken($fucsia, 30);
+        margin: .5rem 0 1rem 0;
+    }
+}
+
+.parametros-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @include tablet {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    input {
+        width: 100%;
+    }
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+}
+
+.tabla-parametros {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+
+    th {
+        background-color: $morado;
+        color: $blanco;
+        padding: .8rem;
+        text-align: center;
+    }
+
+    td {
+        padding: .5rem;
+        text-align: center;
+        border-bottom: 1px solid lighten($fucsia, 10);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        min-width: 8rem;
+        padding: .5rem;
+    }
+
+    input[type="checkbox"] {
+        width: 1.8rem;
+        height: 1.8rem;
+        cursor: pointer;
+    }
+
+    .texto-permiso {
+        text-align: left;
+        font-weight: 700;
+        color: $morado;
+    }
+}
+
+.parametros-acciones {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2rem;
+
+    .boton-morado-block {
+        width: auto;
+        border: none;
+        cursor: pointer;
+    }
+}

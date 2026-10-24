@@ -13,6 +13,12 @@
                     <span>Clientes Registrados: <?php echo (int) $clientes ?></span>
                     <a href="settings/clientes" class="boton-morado-block">Clientes</a>
                 </div>
+                <?php if(puede("parametros")){ ?>
+                    <div class="container-count-action">
+                        <span>Tarifas, recargos y permisos</span>
+                        <a href="settings/parametros" class="boton-morado-block">Parametros</a>
+                    </div>
+                <?php } ?>
                 <?php if(puede("usuarios")){ ?>
                     <div class="container-count-action">
                         <span>Usuarios con Acceso: <?php echo (int) $usuarios ?></span>

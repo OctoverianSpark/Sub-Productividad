@@ -25,7 +25,8 @@
             "configuracion": ["god", "admin", "auditer"],
             "exportar_maestros": ["god", "admin", "auditer"],
             "auditar": ["god", "auditer"],
-            "usuarios": ["god"]
+            "usuarios": ["god"],
+            "parametros": ["god"]
         },
         "cargan_sin_auditoria": ["audited"]
     },

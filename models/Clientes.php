@@ -41,6 +41,13 @@ class Clientes extends BaseModel
         return $this->errores;
     }
 
+    // Tipos de cliente que tienen al menos un cliente registrado (en minusculas)
+    public static function tiposEnUso(): array
+    {
+        $filas = self::ejecutar("SELECT DISTINCT tipo FROM " . static::$tabla)->get_result()->fetch_all(MYSQLI_ASSOC);
+        return array_values(array_unique(array_map(fn($f) => strtolower(trim((string) $f["tipo"])), $filas)));
+    }
+
     // Busca clientes cuyo nombre coincida parcialmente con el parametro.
     public static function getByFullName(string $name): array
     {

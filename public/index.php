@@ -5,6 +5,7 @@ use Controllers\Clients;
 use Controllers\Employees;
 use Controllers\Login;
 use Controllers\Pages;
+use Controllers\Parametros;
 use Controllers\Settings;
 use Controllers\Times;
 use Controllers\Users;
@@ -55,6 +56,10 @@ $router->post("/settings/usuarios/crear", [Users::class, "crear"], "usuarios");
 $router->get("/settings/usuarios/actualizar", [Users::class, "actualizar"], "usuarios");
 $router->post("/settings/usuarios/actualizar", [Users::class, "actualizar"], "usuarios");
 $router->post("/settings/usuarios/eliminar", [Users::class, "eliminar"], "usuarios");
+
+/* Parametros (tarifas, permisos, configuracion general) */
+$router->get("/settings/parametros", [Parametros::class, "index"], "parametros");
+$router->post("/settings/parametros", [Parametros::class, "index"], "parametros");
 
 /* Login */
 $router->get("/login", [Login::class, "login"]);
