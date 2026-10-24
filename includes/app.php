@@ -17,10 +17,17 @@ $dotenv->required([
 ])->notEmpty();
 $dotenv->required("DB_PASS");
 
-// APP_URL debe ser solo el dominio con protocolo, ej: https://subproductividad.asistentevirtualsas.com
-if (!preg_match('#^https?://[^/\s]+/?$#', $_ENV["APP_URL"])) {
-    throw new RuntimeException("APP_URL en .env debe ser solo el dominio con http:// o https:// (sin /redirect ni otras rutas)");
+// APP_URL debe quedar como el dominio con protocolo, ej: https://subproductividad.asistentevirtualsas.com
+// Se corrigen errores comunes: espacios, falta de https://, "/" final o "/redirect" al final.
+$appUrl = trim($_ENV["APP_URL"], " \t\"'");
+$appUrl = preg_replace('#/redirect/?$#i', "", rtrim($appUrl, "/"));
+if (!preg_match('#^https?://#i', $appUrl)) {
+    $appUrl = "https://" . $appUrl;
 }
+if (!preg_match('#^https?://[^/\s]+$#i', $appUrl)) {
+    throw new RuntimeException("APP_URL en .env no es valido: \"{$_ENV["APP_URL"]}\". Debe ser solo el dominio, ej: https://subproductividad.asistentevirtualsas.com");
+}
+$_ENV["APP_URL"] = $appUrl;
 
 date_default_timezone_set(Config::get("app.zona_horaria", "America/Bogota"));
 setlocale(LC_ALL, "es_CO.UTF-8", "es_CO", "esp");
