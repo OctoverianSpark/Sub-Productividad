@@ -119,12 +119,15 @@ class Parametros
 
         $ven = (array) ($n["venezuela_oficina"] ?? []);
         $p["nomina"]["venezuela_oficina"]["moneda"] = self::texto($ven["moneda"] ?? "", "Moneda Venezuela oficina", $errores);
+        $filas = array_values(array_filter((array) ($ven["tabla"] ?? []), fn($f) =>
+            trim((string) ($f["salario"] ?? "")) !== "" || trim((string) ($f["valor_hora_extra"] ?? "")) !== ""));
         $tabla = [];
-        foreach ((array) ($ven["tabla"] ?? []) as $fila) {
+        foreach ($filas as $fila) {
             $salario = trim((string) ($fila["salario"] ?? ""));
             $valor = trim((string) ($fila["valor_hora_extra"] ?? ""));
-            if ($salario === "" && $valor === "") continue; // fila vacia
-            $s = self::numero($salario, "Tabla Venezuela: salario", $errores, 0.01);
+            // Con una sola fila el valor aplica a todos, asi que el salario es opcional
+            if (count($filas) === 1 && $salario === "") $salario = "0";
+            $s = self::numero($salario, "Tabla Venezuela: salario", $errores, count($filas) === 1 ? 0 : 0.01);
             $v = self::numero($valor, "Tabla Venezuela: valor hora extra", $errores, 0.01);
             if (isset($tabla[(string) $s])) {
                 $errores[] = "Tabla Venezuela: el salario $s esta repetido";

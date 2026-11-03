@@ -76,7 +76,11 @@ class CalculadoraPagos
         if ($modalidad === "oficina" && $sede === "venezuela") {
             $t = Config::get("nomina.venezuela_oficina");
             $hora = self::salarioHora($empleado);
-            $extra = round($hora * self::factorVenezuela((float) $empleado->salario), 2);
+            $tabla = $t["tabla_valor_hora_extra"] ?? [];
+            // Con una sola fila en la tabla, ese valor de hora extra aplica igual para todos
+            $extra = count($tabla) === 1
+                ? round((float) $tabla[0]["valor_hora_extra"], 2)
+                : round($hora * self::factorVenezuela((float) $empleado->salario), 2);
 
             return [
                 "diurnas_monto" => $dominical ? $do * $hora + $de * $extra : $de * $extra,

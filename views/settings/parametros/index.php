@@ -74,7 +74,7 @@
                     <input type="text" id="ven_moneda" name="nomina[venezuela_oficina][moneda]" value="<?php echo s($ven["moneda"]) ?>" maxlength="20" required>
                 </div>
             </div>
-            <p class="parametros-ayuda-sm">Valor de la hora extra segun el salario. Para salarios intermedios se calcula proporcionalmente entre las dos filas mas cercanas.</p>
+            <p class="parametros-ayuda-sm">Valor de la hora extra segun el salario. Para salarios intermedios se calcula proporcionalmente entre las dos filas mas cercanas. Si la tabla tiene una sola fila, ese valor de hora extra se paga igual a todos sin importar el salario (el salario se puede dejar vacio).</p>
             <table class="tabla-parametros" data-tabla="venezuela">
                 <thead>
                     <tr><th>Salario mensual</th><th>Valor hora extra</th><th></th></tr>
