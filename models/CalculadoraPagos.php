@@ -61,11 +61,14 @@ class CalculadoraPagos
 
         if ($modalidad === "hogar") {
             $t = Config::get("nomina.hogar");
-            $valor = (float) $t["valor_hora"];
+            $diurna = (float) $t["valor_hora"];
+            $nocturna = (float) ($t["valor_hora_nocturna"] ?? $diurna);
+            $dominicalValor = (float) ($t["valor_hora_dominical"] ?? $diurna);
 
+            // Domingo/festivo: todas las horas (ordinarias y extras, diurnas y nocturnas) al valor dominical
             return [
-                "diurnas_monto" => $dominical ? ($do + $de) * $valor : $de * $valor,
-                "nocturnas_monto" => $dominical ? ($no + $ne) * $valor : $ne * $valor,
+                "diurnas_monto" => $dominical ? ($do + $de) * $dominicalValor : $de * $diurna,
+                "nocturnas_monto" => $dominical ? ($no + $ne) * $dominicalValor : $ne * $nocturna,
                 "moneda" => $t["moneda"],
             ];
         }

@@ -53,10 +53,19 @@
                     <input type="text" id="hog_moneda" name="nomina[hogar][moneda]" value="<?php echo s($hog["moneda"]) ?>" maxlength="20" required>
                 </div>
                 <div class="container-input">
-                    <label for="hog_valor">Valor por hora extra</label>
+                    <label for="hog_valor">Valor hora extra diurna</label>
                     <input type="number" step="any" min="0" id="hog_valor" name="nomina[hogar][valor_hora]" value="<?php echo $num($hog["valor_hora"]) ?>" required>
                 </div>
+                <div class="container-input">
+                    <label for="hog_nocturna">Valor hora extra nocturna</label>
+                    <input type="number" step="any" min="0" id="hog_nocturna" name="nomina[hogar][valor_hora_nocturna]" value="<?php echo $num($hog["valor_hora_nocturna"] ?? $hog["valor_hora"]) ?>" required>
+                </div>
+                <div class="container-input">
+                    <label for="hog_dominical">Valor hora dominical / festiva</label>
+                    <input type="number" step="any" min="0" id="hog_dominical" name="nomina[hogar][valor_hora_dominical]" value="<?php echo $num($hog["valor_hora_dominical"] ?? $hog["valor_hora"]) ?>" required>
+                </div>
             </div>
+            <p class="parametros-ayuda-sm">Entre semana se pagan solo las horas extras (diurnas y nocturnas). En domingo o festivo se pagan todas las horas trabajadas, ordinarias y extras, al valor dominical.</p>
 
             <h3>Venezuela - Oficina</h3>
             <div class="parametros-grid">

@@ -43,7 +43,9 @@
         },
         "hogar": {
             "moneda": "Dolares",
-            "valor_hora": 3.5
+            "valor_hora": 3.5,
+            "valor_hora_nocturna": 3.5,
+            "valor_hora_dominical": 3.5
         },
         "venezuela_oficina": {
             "moneda": "Dolares",

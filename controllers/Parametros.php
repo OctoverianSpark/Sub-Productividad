@@ -113,7 +113,9 @@ class Parametros
 
         $hog = (array) ($n["hogar"] ?? []);
         $p["nomina"]["hogar"]["moneda"] = self::texto($hog["moneda"] ?? "", "Moneda hogar", $errores);
-        $p["nomina"]["hogar"]["valor_hora"] = self::numero($hog["valor_hora"] ?? null, "Valor hora hogar", $errores);
+        $p["nomina"]["hogar"]["valor_hora"] = self::numero($hog["valor_hora"] ?? null, "Hogar: valor hora extra diurna", $errores);
+        $p["nomina"]["hogar"]["valor_hora_nocturna"] = self::numero($hog["valor_hora_nocturna"] ?? null, "Hogar: valor hora extra nocturna", $errores);
+        $p["nomina"]["hogar"]["valor_hora_dominical"] = self::numero($hog["valor_hora_dominical"] ?? null, "Hogar: valor hora dominical/festiva", $errores);
 
         $ven = (array) ($n["venezuela_oficina"] ?? []);
         $p["nomina"]["venezuela_oficina"]["moneda"] = self::texto($ven["moneda"] ?? "", "Moneda Venezuela oficina", $errores);
