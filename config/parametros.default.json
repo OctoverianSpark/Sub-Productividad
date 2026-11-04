@@ -37,6 +37,7 @@
             "moneda": "COP",
             "recargo_diurna_extra": 0.25,
             "recargo_nocturna_extra": 0.75,
+            "recargo_nocturno": 0.35,
             "recargo_dominical": 0.75,
             "recargo_diurna_extra_dominical": 1.0,
             "recargo_nocturna_extra_dominical": 1.5

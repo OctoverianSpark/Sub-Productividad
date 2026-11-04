@@ -32,6 +32,7 @@ class Parametros
     private const RECARGOS_COLOMBIA = [
         "recargo_diurna_extra" => "Hora extra diurna",
         "recargo_nocturna_extra" => "Hora extra nocturna",
+        "recargo_nocturno" => "Nocturno (hora ordinaria nocturna)",
         "recargo_dominical" => "Hora ordinaria dominical/festiva",
         "recargo_diurna_extra_dominical" => "Hora extra diurna dominical/festiva",
         "recargo_nocturna_extra_dominical" => "Hora extra nocturna dominical/festiva",
