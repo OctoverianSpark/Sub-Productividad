@@ -52,8 +52,25 @@
         grid-template-columns: repeat(3, 1fr);
     }
 
-    input {
-        width: 100%;
+    // Etiqueta arriba y campo abajo (el estilo global pone la etiqueta al lado con 20% de ancho)
+    .container-input {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: .6rem;
+        padding: .5rem;
+
+        label {
+            width: 100%;
+            font-size: 1.6rem;
+            line-height: 1.3;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: .8rem 1rem;
+        }
     }
 }
 
