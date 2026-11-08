@@ -10,7 +10,8 @@
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/build/css/app.css">
+    <?php // ?v= cambia con cada compilacion para que el navegador no use una version vieja en cache ?>
+    <link rel="stylesheet" href="/build/css/app.css?v=<?php echo (int) @filemtime(__DIR__ . "/../public/build/css/app.css") ?>">
 
 </head>
 <body>
@@ -57,7 +58,7 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<script src="/build/js/bundle.min.js"></script>
+<script src="/build/js/bundle.min.js?v=<?php echo (int) @filemtime(__DIR__ . "/../public/build/js/bundle.min.js") ?>"></script>
 
 <footer>
             <a href="/" class="mainLogoFooter">

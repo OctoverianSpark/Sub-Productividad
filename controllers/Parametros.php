@@ -101,6 +101,18 @@ class Parametros
         }
         $p["paginacion"] = ["por_pagina_defecto" => $porDefecto, "por_pagina_permitidos" => $permitidos];
 
+        // ---- Jornada (calculo automatico del formulario de horas)
+        $j = (array) ($post["jornada"] ?? []);
+        foreach (["inicio_nocturno" => "Inicio horario nocturno", "fin_nocturno" => "Fin horario nocturno"] as $clave => $nombre) {
+            $hora = trim((string) ($j[$clave] ?? ""));
+            if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora)) {
+                $errores[] = "$nombre: usa el formato HH:MM (ej: 19:00)";
+            }
+            $p["jornada"][$clave] = $hora;
+        }
+        $p["jornada"]["horas_ordinarias_dia"] = self::numero($j["horas_ordinarias_dia"] ?? null, "Horas ordinarias por dia", $errores, 1, 24);
+        $p["jornada"]["max_horas_registro"] = self::numero($j["max_horas_registro"] ?? null, "Maximo de horas por registro", $errores, 1, 48);
+
         // ---- Nomina
         $n = (array) ($post["nomina"] ?? []);
         $p["nomina"]["horas_mes"] = self::numero($n["horas_mes"] ?? null, "Horas laborales al mes", $errores, 1, 744);

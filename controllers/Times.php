@@ -7,6 +7,7 @@ use Models\Empleados;
 use Models\Logs;
 use Models\Paginacion;
 use Models\Time;
+use MVC\Config;
 use MVC\Router;
 
 class Times
@@ -34,6 +35,7 @@ class Times
             if (!$horas) {
                 $errores[] = "No se recibieron horas para registrar";
             }
+            $errores = array_merge($errores, Time::solapadasEntreSi($horas));
 
             if (empty($errores)) {
                 foreach ($horas as $time) {
@@ -44,10 +46,29 @@ class Times
             }
         }
 
+        // Si hubo errores se vuelven a mostrar las entradas tal como se enviaron (maximo 8)
+        $entradas = array_slice(array_values(array_filter((array) ($_POST["horas"] ?? []), "is_array")), 0, 8);
+        if (!$entradas) {
+            $entradas = [[
+                "inicio" => date("Y-m-d") . "T08:00",
+                "final" => date("Y-m-d") . "T18:00",
+                "almuerzo" => "2",
+                "cliente" => "administrativo",
+                "diurnas_ordinarias" => 8,
+            ]];
+        }
+
         $router->render("pages/horas/crear", [
             "empleados" => $empleados,
             "clientes" => $clientes,
-            "errores" => $errores
+            "errores" => $errores,
+            "entradas" => $entradas,
+            "jornada" => [
+                "inicioNocturno" => Config::get("jornada.inicio_nocturno", "19:00"),
+                "finNocturno" => Config::get("jornada.fin_nocturno", "06:00"),
+                "horasDia" => (float) Config::get("jornada.horas_ordinarias_dia", 8),
+                "maxHoras" => (float) Config::get("jornada.max_horas_registro", 24),
+            ],
         ]);
     }
 

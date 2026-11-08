@@ -96,7 +96,53 @@ class Time extends BaseModel
         if (!in_array((string) $this->almuerzo, ["0", "1", "2"], true)) {
             $this->errores[] = "Almuerzo: Coloca un valor en el almuerzo";
         }
+
+        // Coherencia entre la jornada y las horas registradas
+        if (!$this->errores) {
+            $transcurridas = (strtotime($this->final) - strtotime($this->inicio)) / 3600;
+            $maximo = (float) Config::get("jornada.max_horas_registro", 24);
+            $disponibles = $transcurridas - (float) $this->almuerzo;
+            $registradas = (float) $this->diurnas_ordinarias + (float) $this->nocturnas_ordinarias
+                + (float) $this->diurnas_extras + (float) $this->nocturnas_extras;
+
+            if ($transcurridas > $maximo) {
+                $this->errores[] = "Jornada: Dura " . round($transcurridas, 2) . " horas y el maximo permitido es $maximo. Revisa las fechas de inicio y final";
+            } elseif ($disponibles <= 0) {
+                $this->errores[] = "Almuerzo: Es igual o mayor que la jornada completa";
+            } elseif ($registradas <= 0) {
+                $this->errores[] = "Horas: Registra al menos una hora";
+            } elseif ($registradas > $disponibles + 0.05) {
+                $this->errores[] = "Horas: Registraste " . round($registradas, 2) . " horas pero entre el inicio y el final (sin almuerzo) solo hay " . round($disponibles, 2);
+            } elseif ($otra = $this->registroSolapado()) {
+                $this->errores[] = "Jornada: Se cruza con otro registro de " . $this->empleado . " (" . $otra->inicio . " a " . $otra->final . ")";
+            }
+        }
         return $this->errores;
+    }
+
+    // Otro registro del mismo empleado cuyo horario se cruza con este (evita cargar dos veces lo mismo)
+    private function registroSolapado(): ?static
+    {
+        $filas = self::consultarSQL(
+            "SELECT * FROM " . static::$tabla . " WHERE LOWER(empleado) = LOWER(?) AND inicio < ? AND final > ? AND id <> ? LIMIT 1",
+            [trim($this->empleado), $this->final, $this->inicio, (int) ($this->id ?? 0)]
+        );
+        return $filas[0] ?? null;
+    }
+
+    // Verifica que las entradas de un mismo envio no se crucen entre si
+    public static function solapadasEntreSi(array $horas): array
+    {
+        $errores = [];
+        foreach ($horas as $i => $a) {
+            foreach ($horas as $k => $b) {
+                if ($k <= $i || !$a->inicio || !$b->inicio) continue;
+                if (mb_strtolower(trim($a->empleado)) === mb_strtolower(trim($b->empleado)) && $a->inicio < $b->final && $b->inicio < $a->final) {
+                    $errores[] = "Entradas " . ($i + 1) . " y " . ($k + 1) . ": son del mismo empleado y sus horarios se cruzan";
+                }
+            }
+        }
+        return $errores;
     }
 
     // ==========

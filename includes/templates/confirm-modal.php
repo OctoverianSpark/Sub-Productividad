@@ -1,8 +1,9 @@
-
-
 <div class="modal modal-confirmacion" style="display: none;">
 
     <h3 class="title">Confirmar Registro?</h3>
+
+    <!-- Resumen de las entradas y avisos (lo llena app.js antes de mostrar el modal) -->
+    <div class="confirm-resumen"></div>
 
     <div class="container-confirm">
 
@@ -12,4 +13,3 @@
     </div>
 
 </div>
-

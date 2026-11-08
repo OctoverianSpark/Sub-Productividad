@@ -20,6 +20,33 @@
     <form method="post" class="form-parametros">
         <?php echo csrfField() ?>
 
+        <!-- ================= JORNADA ================= -->
+        <?php $jor = $p["jornada"] ?? []; ?>
+        <fieldset class="parametros-seccion">
+            <legend>Jornada (registro de horas)</legend>
+            <p class="parametros-ayuda-sm">Con estos valores el formulario de registro calcula solo las horas diurnas, nocturnas, ordinarias y extras a partir del inicio, el final y el almuerzo.</p>
+            <div class="parametros-grid">
+                <div class="container-input">
+                    <label for="jor_inicio_nocturno">Inicio horario nocturno</label>
+                    <input type="time" id="jor_inicio_nocturno" name="jornada[inicio_nocturno]" value="<?php echo s($jor["inicio_nocturno"] ?? "19:00") ?>" required>
+                </div>
+                <div class="container-input">
+                    <label for="jor_fin_nocturno">Fin horario nocturno</label>
+                    <input type="time" id="jor_fin_nocturno" name="jornada[fin_nocturno]" value="<?php echo s($jor["fin_nocturno"] ?? "06:00") ?>" required>
+                </div>
+                <div class="container-input">
+                    <label for="jor_horas_dia">Horas ordinarias por dia</label>
+                    <input type="number" step="any" min="1" max="24" id="jor_horas_dia" name="jornada[horas_ordinarias_dia]" value="<?php echo $num($jor["horas_ordinarias_dia"] ?? 8) ?>" required>
+                    <small>Lo trabajado por encima de este numero (sin contar almuerzo) se registra como extra.</small>
+                </div>
+                <div class="container-input">
+                    <label for="jor_max">Maximo de horas por registro</label>
+                    <input type="number" step="any" min="1" max="48" id="jor_max" name="jornada[max_horas_registro]" value="<?php echo $num($jor["max_horas_registro"] ?? 24) ?>" required>
+                    <small>Evita errores de fecha (por ejemplo, poner el final un dia despues por accidente).</small>
+                </div>
+            </div>
+        </fieldset>
+
         <!-- ================= NOMINA ================= -->
         <fieldset class="parametros-seccion">
             <legend>Pago a empleados</legend>

@@ -31,10 +31,9 @@ function css() {
 
 function javascript() {
     return src(paths.js)
-      .pipe(sourcemaps.init())
+      // Sin sourcemaps: gulp-terser-js falla al combinarlos con concat
       .pipe(concat('bundle.js'))
       .pipe(terser())
-      .pipe(sourcemaps.write('.'))
       .pipe(rename({ suffix: '.min' }))
       .pipe(dest('./public/build/js'))
 }
@@ -68,6 +67,7 @@ function prettyCheck(){
 }
 
 exports.css = css;
+exports.js = javascript;
 exports.watchArchivos = watchArchivos;
 
 exports.default = parallel(css, javascript, imagenes, versionWebp, watchArchivos); 

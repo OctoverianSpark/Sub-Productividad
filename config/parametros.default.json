@@ -31,6 +31,13 @@
         "cargan_sin_auditoria": ["audited"]
     },
 
+    "jornada": {
+        "inicio_nocturno": "19:00",
+        "fin_nocturno": "06:00",
+        "horas_ordinarias_dia": 8,
+        "max_horas_registro": 24
+    },
+
     "nomina": {
         "horas_mes": 240,
         "colombia_oficina": {

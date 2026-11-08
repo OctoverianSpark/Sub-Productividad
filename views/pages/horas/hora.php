@@ -59,24 +59,24 @@
                     </div>
                 <div class="container-input input-horas range-number-container">
                     <label for="diurnas_ordinarias">DIURNAS ORDINARIAS</label>
-                    <input type="range" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias" value="<?php echo s($hora->diurnas_ordinarias) ?>" max="10" step="0.1">
+                    <input type="range" id="diurnas_ordinarias" aria-hidden="true" tabindex="-1" value="<?php echo s($hora->diurnas_ordinarias) ?>" max="10" step="0.1">
                     <input type="number" name="horas[diurnas_ordinarias]" id="diurnas_ordinarias_value" value="<?php echo s($hora->diurnas_ordinarias) ?>" class="calcTime">
                 </div>
 
                 <div class="container-input input-horas range-number-container">
                     <label for="nocturnas_ordinarias">NOCTURNAS ORDINARIAS</label>
-                    <input type="range" name="horas[nocturnas_ordinarias]" id="nocturnas_ordinarias" value="<?php echo s($hora->nocturnas_ordinarias) ?>" max="10" step="0.1">
+                    <input type="range" id="nocturnas_ordinarias" aria-hidden="true" tabindex="-1" value="<?php echo s($hora->nocturnas_ordinarias) ?>" max="10" step="0.1">
                     <input type="number" name="horas[nocturnas_ordinarias]" id="nocturnas_ordinarias_value" value="<?php echo s($hora->nocturnas_ordinarias) ?>" class="calcTime">
                 </div>
                 <div class="container-input input-horas range-number-container">
                     <label for="diurnas_extras">DIURNAS EXTRAS</label>
-                    <input type="range" name="horas[diurnas_extras]" id="diurnas_extras" value="<?php echo s($hora->diurnas_extras) ?>" max="10" step="0.2">
+                    <input type="range" id="diurnas_extras" aria-hidden="true" tabindex="-1" value="<?php echo s($hora->diurnas_extras) ?>" max="10" step="0.2">
                     <input type="number" name="horas[diurnas_extras]" id="diurnas_extras_value" value="<?php echo s($hora->diurnas_extras) ?>" class="calcTime">
                 </div>
 
                 <div class="container-input input-horas range-number-container">
                     <label for="nocturnas_extras">NOCTURNAS EXTRAS</label>
-                    <input type="range" name="horas[nocturnas_extras]" id="nocturnas_extras" value="<?php echo s($hora->nocturnas_extras) ?>" max="10" step="0.2">
+                    <input type="range" id="nocturnas_extras" aria-hidden="true" tabindex="-1" value="<?php echo s($hora->nocturnas_extras) ?>" max="10" step="0.2">
                     <input type="number" name="horas[nocturnas_extras]" id="nocturnas_extras_value" value="<?php echo s($hora->nocturnas_extras) ?>" class="calcTime">
                 </div>
                 <div class="container-input container-logistica">

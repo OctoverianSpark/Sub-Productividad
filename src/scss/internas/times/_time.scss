@@ -46,3 +46,61 @@
         }
     }
 }
+
+
+// ===== Formulario de registro de horas =====
+.resumen-horas {
+    margin: 1rem 0 0 0;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $morado;
+    background-color: rgba($blanco, .6);
+
+    &:empty {
+        display: none;
+    }
+}
+
+.resumen-error {
+    color: $rojo;
+    background-color: rgba($rojo, .08);
+}
+
+.festivo-aviso {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: darken($fucsia, 25);
+}
+
+.label-radio {
+    font-weight: 700;
+    font-size: 2rem;
+    color: $morado;
+    width: 20%;
+}
+
+.input-horas-ordinarias-extras legend small {
+    font-size: 1.3rem;
+    font-weight: 400;
+}
+
+.confirm-resumen {
+    max-height: 40vh;
+    overflow-y: auto;
+    width: min(60rem, 90%);
+    margin-bottom: 2rem;
+
+    p {
+        font-size: 1.5rem;
+        margin: .5rem 0;
+        padding: .5rem 1rem;
+        border-radius: .8rem;
+    }
+}
+
+.confirm-button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
