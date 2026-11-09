@@ -111,8 +111,6 @@ class Time extends BaseModel
                 $this->errores[] = "Almuerzo: Es igual o mayor que la jornada completa";
             } elseif ($registradas <= 0) {
                 $this->errores[] = "Horas: Registra al menos una hora";
-            } elseif ($registradas > $disponibles + 0.05) {
-                $this->errores[] = "Horas: Registraste " . round($registradas, 2) . " horas pero entre el inicio y el final (sin almuerzo) solo hay " . round($disponibles, 2);
             } elseif ($otra = $this->registroSolapado()) {
                 $this->errores[] = "Jornada: Se cruza con otro registro de " . $this->empleado . " (" . $otra->inicio . " a " . $otra->final . ")";
             }

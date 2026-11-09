@@ -350,12 +350,15 @@ function datosPagina(pagina, cfg) {
     }
     if (transcurridas <= 0) errores.push("El final debe ser despues del inicio.");
     else if (transcurridas > cfg.maxHoras) errores.push(`La jornada dura mas de ${cfg.maxHoras} horas: revisa las fechas.`);
-    else if (registradas > transcurridas - almuerzo + 0.05) errores.push("Registraste mas horas de las que hay en la jornada.");
     else if (registradas <= 0) errores.push("Registra al menos una hora.");
 
-    const texto = transcurridas > 0
+    let texto = transcurridas > 0
         ? `Jornada ${redondear(transcurridas)} h − ${almuerzo} h almuerzo = ${redondear(transcurridas - almuerzo)} h · Registradas: ${redondear(registradas)} h`
         : "";
+    // Solo informativo: se guardan las horas escritas aunque no coincidan con el inicio/final
+    if (transcurridas > 0 && Math.abs(registradas - (transcurridas - almuerzo)) > 0.05) {
+        texto += " (no coincide con el horario, se guardan las horas registradas)";
+    }
     return { errores, texto, registradas };
 }
 
