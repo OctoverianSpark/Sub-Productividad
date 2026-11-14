@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "gulp"
+    "dev": "gulp",
+    "db:respaldo": "php database/migrar_cliente_empleado.php --solo-respaldo",
+    "db:migrar:simular": "php database/migrar_cliente_empleado.php",
+    "db:migrar": "php database/migrar_cliente_empleado.php --ejecutar"
   },
   "repository": {
     "type": "git",

@@ -252,6 +252,11 @@ class Time extends BaseModel
             $horasPorCliente[mb_strtolower(trim($time->cliente), "UTF-8")][] = $time;
         }
 
+        // El tipo de cobro depende de la pareja cliente-empleado; sin relacion se usa el tipo por defecto
+        $empleados = Empleados::indexadosPorNombre();
+        $relaciones = ClienteEmpleado::indice();
+        $tipoDefecto = ClienteEmpleado::tipoPorDefecto();
+
         $resultado = [];
         foreach ($clientes as $cliente) {
             $nombre = $cliente->nombreCompleto();
@@ -260,7 +265,9 @@ class Time extends BaseModel
 
             $resumen = CalculadoraPagos::resumenClienteVacio($nombre);
             foreach ($horas as $time) {
-                CalculadoraPagos::acumularCliente($resumen, $time, $cliente->tipo);
+                $empleado = $empleados[mb_strtolower(trim($time->empleado), "UTF-8")] ?? null;
+                $tipo = $empleado ? ($relaciones[$cliente->id . ":" . $empleado->id] ?? $tipoDefecto) : $tipoDefecto;
+                CalculadoraPagos::acumularCliente($resumen, $time, $tipo);
             }
             $resultado[] = $resumen;
         }

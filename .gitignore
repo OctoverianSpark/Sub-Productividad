@@ -10,3 +10,6 @@ composer.phar
 # Parametros editados desde la web (los valores por defecto estan en config/parametros.default.json)
 /config/parametros.json
 /config/historial/
+
+# Respaldos de base de datos (contienen datos sensibles como salarios)
+/database/respaldos/

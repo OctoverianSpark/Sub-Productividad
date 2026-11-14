@@ -99,3 +99,56 @@
     }
 
 }
+// Relaciones cliente-empleado (formulario)
+.settings-clientes-from .relaciones-cliente {
+    .relaciones-ayuda {
+        font-size: 1.4rem;
+        margin: 0.5rem 0 1rem;
+        color: rgba(80, 80, 80, 1);
+    }
+
+    .tabla-relaciones {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+
+        th {
+            text-align: left;
+            padding: 0.5rem;
+        }
+
+        td {
+            padding: 0.5rem;
+            vertical-align: middle;
+        }
+
+        td:last-child {
+            width: 1%;
+            white-space: nowrap;
+        }
+    }
+}
+
+// Relaciones cliente-empleado (listado)
+.main-settings-clientes .lista-relaciones {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+
+    li {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid rgba(220, 220, 220, 1);
+
+        span {
+            font-weight: bold;
+        }
+    }
+}
+
+.main-settings-clientes .sin-relaciones {
+    color: rgba(128, 128, 128, 1);
+    font-style: italic;
+}

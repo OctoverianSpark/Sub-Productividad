@@ -70,9 +70,12 @@
 
     "clientes": {
         "moneda": "Dolares",
+        "tipo_defecto": "tarifa_1",
         "tarifas": {
-            "nuevo": { "diurna": 6.5, "nocturna": 7.0, "diurna_dominical": 7.5, "nocturna_dominical": 8.0 },
-            "viejo": { "diurna": 6.0, "nocturna": 6.5, "diurna_dominical": 7.0, "nocturna_dominical": 7.5 }
+            "tarifa_1": { "diurna": 6.0, "nocturna": 6.5, "diurna_dominical": 7.0, "nocturna_dominical": 7.5 },
+            "tarifa_2": { "diurna": 6.5, "nocturna": 7.0, "diurna_dominical": 7.5, "nocturna_dominical": 8.0 },
+            "tarifa_3": { "diurna": 7.0, "nocturna": 7.5, "diurna_dominical": 8.0, "nocturna_dominical": 8.5 },
+            "bilingue": { "diurna": 10.0, "nocturna": 10.5, "diurna_dominical": 11.0, "nocturna_dominical": 11.5 }
         },
         "logistica": {
             "cena": 5,

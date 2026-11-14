@@ -15,8 +15,17 @@
 
         <div class="container-datos-cliente">
             <h2><?php echo s(ucwords($cliente->nombreCompleto())) ?></h2>
-            <p>TIPO</p>
-            <p><?php echo s(mb_strtoupper($cliente->tipo)) ?></p>
+            <p>EMPLEADOS</p>
+            <?php $asignados = $relaciones[(int) $cliente->id] ?? []; ?>
+            <?php if ($asignados) { ?>
+                <ul class="lista-relaciones">
+                    <?php foreach ($asignados as $relacion) { ?>
+                        <li><?php echo s(mb_strtoupper($relacion["empleado"])) ?> <span><?php echo s(mb_strtoupper($relacion["tipo"])) ?></span></li>
+                    <?php } ?>
+                </ul>
+            <?php } else { ?>
+                <p class="sin-relaciones">Sin empleados asignados</p>
+            <?php } ?>
             <div class="actions">
             <a href="clientes/actualizar?id=<?php echo (int) $cliente->id ?>" class="boton-fucsia-inline">Actualizar</a>
             <form method="post" action="/settings/clientes/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este cliente?')">

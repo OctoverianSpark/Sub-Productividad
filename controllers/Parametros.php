@@ -2,7 +2,7 @@
 
 namespace Controllers;
 
-use Models\Clientes;
+use Models\ClienteEmpleado;
 use Models\Logs;
 use MVC\Config;
 use MVC\Router;
@@ -179,11 +179,17 @@ class Parametros
         if (!$tarifas) {
             $errores[] = "Tipos de cliente: debe existir al menos uno";
         }
-        $enUso = array_diff(Clientes::tiposEnUso(), array_keys($tarifas), [""]);
+        $enUso = array_diff(ClienteEmpleado::tiposEnUso(), array_keys($tarifas), [""]);
         if ($enUso) {
-            $errores[] = "No puedes quitar el tipo de cliente \"" . implode("\", \"", $enUso) . "\" porque hay clientes registrados con ese tipo. Cambialos primero.";
+            $errores[] = "No puedes quitar el tipo \"" . implode("\", \"", $enUso) . "\" porque hay relaciones cliente-empleado con ese tipo. Cambialas primero.";
         }
         $p["clientes"]["tarifas"] = $tarifas;
+
+        $tipoDefecto = strtolower(trim((string) ($c["tipo_defecto"] ?? "")));
+        if ($tarifas && !isset($tarifas[$tipoDefecto])) {
+            $errores[] = "Tipo por defecto: debe ser uno de los tipos configurados (" . implode(", ", array_keys($tarifas)) . ")";
+        }
+        $p["clientes"]["tipo_defecto"] = $tipoDefecto;
 
         // ---- Permisos
         $permisosPost = (array) ($post["permisos"] ?? []);

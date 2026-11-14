@@ -5,6 +5,7 @@ namespace Controllers;
 use Exception;
 use InvalidArgumentException;
 use Models\CalculadoraPagos;
+use Models\ClienteEmpleado;
 use Models\Clientes;
 use MVC\Router;
 use Models\Empleados;
@@ -61,7 +62,7 @@ class ExportHandler
     private const EMPLEADO_HEADERS = ["EMPLEADO", "CLIENTE", "MODALIDAD", "INICIO DE JORNADA", "ALMUERZO", "FINAL DE JORNADA", "DIURNAS ORDINARIAS", "DIURNAS EXTRAS", "DIURNAS ORDINARIAS DOMINICALES", "NOCTURNAS ORDINARIAS", "NOCTURNAS EXTRAS", "NOCTURNAS ORDINARIAS DOMINICALES", "CENA", "TAXI", "MONTO EXTRAS DIURNAS", "MONTO EXTRAS NOCTURNAS", "TOTAL A PAGAR", "COMENTARIOS"];
     private const CLIENTE_HEADERS = ['CLIENTE', 'HORAS EXTRAS DIURNAS', 'HORAS EXTRAS DIURNAS DOMINICALES', 'HORAS ORDINARIAS DIURNAS DOMINICALES', 'HORAS EXTRAS NOCTURNAS', 'HORAS EXTRAS NOCTURNAS DOMINICALES', 'HORAS NOCTURNAS ORDINARIAS DOMINICALES', 'MONTO EXTRAS DIURNAS', 'MONTO EXTRAS NOCTURNAS', 'MONTO LOGISTICA', 'SUBTOTAL'];
     private const EMPLEADO_INFO_HEADERS = ['NOMBRE', 'APELLIDO', 'TIPO DE DOCUMENTO', 'DOCUMENTO', 'SEDE', 'CARGO', 'SALARIO'];
-    private const CLIENTE = ['NOMBRE', 'APELLIDO', 'TIPO'];
+    private const CLIENTE = ['NOMBRE', 'APELLIDO', 'EMPLEADO', 'TIPO'];
 
     private $spreadsheet;
     private $writer;
@@ -178,11 +179,16 @@ class ExportHandler
     private function exportClientesInfo()
     {
         $clientes = Clientes::all();
+        $relaciones = ClienteEmpleado::agrupadasPorCliente();
 
         $this->createClienteInfoSheet();
 
-        foreach ($clientes as $index => $cliente) {
-            $this->addClienteInfoRow($cliente, $index + 2);
+        // Una fila por relacion cliente-empleado; el cliente sin empleados sale con una fila vacia
+        $row = 2;
+        foreach ($clientes as $cliente) {
+            foreach ($relaciones[(int) $cliente->id] ?? [["empleado" => "", "tipo" => ""]] as $relacion) {
+                $this->addClienteInfoRow($cliente, $relacion, $row++);
+            }
         }
         $this->setFilename("clientesInfo.xlsx");
     }
@@ -278,12 +284,13 @@ class ExportHandler
         ], $row);
     }
 
-    private function addClienteInfoRow($cliente, $row)
+    private function addClienteInfoRow($cliente, array $relacion, $row)
     {
         $this->escribirFila([
             strtoupper($cliente->nombre),
             strtoupper($cliente->apellido),
-            strtoupper($cliente->tipo),
+            strtoupper($relacion["empleado"]),
+            strtoupper($relacion["tipo"]),
         ], $row);
     }
 

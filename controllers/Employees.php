@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Models\ClienteEmpleado;
 use Models\Empleados;
 use Models\Logs;
 use Models\Paginacion;
@@ -85,6 +86,7 @@ class Employees
         $empleados = Empleados::find($id);
 
         if ($empleados) {
+            ClienteEmpleado::eliminarDeEmpleado((int) $empleados->id);
             $empleados->eliminar();
             Logs::registrar("Empleado eliminado", "El usuario " . $_SESSION["name"] . " ha eliminado al empleado " . $empleados->nombreCompleto());
         }

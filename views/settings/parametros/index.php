@@ -138,7 +138,18 @@
                 </div>
             </div>
 
-            <p class="parametros-ayuda-sm">Tarifa por hora segun el tipo de cliente. Un tipo nuevo aparece automaticamente al crear o editar un cliente.</p>
+            <div class="parametros-grid">
+                <div class="container-input">
+                    <label for="cli_tipo_defecto">Tipo por defecto (horas sin relacion cliente-empleado)</label>
+                    <select id="cli_tipo_defecto" name="clientes[tipo_defecto]" required>
+                        <?php foreach (array_keys($cli["tarifas"] ?? []) as $tipo) { ?>
+                            <option value="<?php echo s($tipo) ?>" <?php echo ($tipo === ($cli["tipo_defecto"] ?? "")) ? "selected" : "" ?>><?php echo s(mb_strtoupper($tipo)) ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+            </div>
+
+            <p class="parametros-ayuda-sm">Tarifa por hora segun el tipo de servicio entre cliente y empleado (ej: PAMELA &rarr; VALERIA = nuevo). Los tipos se asignan en cada cliente, en "Empleados asignados". Si agregas un tipo nuevo, guarda primero para poder elegirlo como tipo por defecto.</p>
             <table class="tabla-parametros" data-tabla="tipos">
                 <thead>
                     <tr>

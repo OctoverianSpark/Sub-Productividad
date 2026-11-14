@@ -155,7 +155,7 @@ class CalculadoraPagos
         ];
     }
 
-    // Acumula una hora en el resumen del cliente segun su tipo (nuevo/viejo)
+    // Acumula una hora en el resumen del cliente segun el tipo de la relacion cliente-empleado (nuevo/viejo)
     public static function acumularCliente(array &$resumen, Time $time, string $tipoCliente): void
     {
         $tarifa = Config::get("clientes.tarifas." . strtolower($tipoCliente));
