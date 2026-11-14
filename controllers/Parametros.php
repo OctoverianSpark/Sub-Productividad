@@ -51,12 +51,16 @@ class Parametros
         $errores = [];
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            [$parametros, $errores] = self::desdeFormulario($_POST, Config::todo());
+            [$parametros, $errores, $renombres] = self::desdeFormulario($_POST, Config::todo());
 
             if (empty($errores)) {
                 try {
-                    Config::guardar($parametros);
-                    Logs::registrar("Parametros actualizados", "El usuario " . $_SESSION["name"] . " actualizo los parametros del sistema (tarifas, permisos y configuracion general)");
+                    // Renombrar un tipo actualiza tambien las relaciones cliente-empleado que lo usan
+                    ClienteEmpleado::renombrarTipos($renombres, fn() => Config::guardar($parametros));
+                    $detalle = $renombres
+                        ? " Tipos renombrados: " . implode(", ", array_map(fn($a, $b) => "$a -> $b", array_keys($renombres), $renombres))
+                        : "";
+                    Logs::registrar("Parametros actualizados", "El usuario " . $_SESSION["name"] . " actualizo los parametros del sistema (tarifas, permisos y configuracion general)." . $detalle);
                     redirigir("/settings/parametros?resultado=2");
                 } catch (RuntimeException $e) {
                     error_log($e->getMessage());
@@ -78,7 +82,7 @@ class Parametros
     /**
      * Convierte el POST en el arreglo de parametros. Parte de los valores actuales para no
      * perder claves que no se editan en pantalla (zona horaria, nombres de roles...).
-     * @return array{0: array, 1: string[]}
+     * @return array{0: array, 1: string[], 2: array<string,string>} parametros, errores y tipos renombrados [anterior => nuevo]
      */
     private static function desdeFormulario(array $post, array $actual): array
     {
@@ -162,9 +166,15 @@ class Parametros
         ];
 
         $tarifas = [];
+        $renombres = [];
+        $tiposActuales = array_keys($actual["clientes"]["tarifas"] ?? []);
         foreach ((array) ($post["tipos"] ?? []) as $fila) {
             $nombre = strtolower(trim((string) ($fila["nombre"] ?? "")));
+            $original = strtolower(trim((string) ($fila["original"] ?? "")));
             if ($nombre === "") continue;
+            if ($original !== "" && $original !== $nombre && in_array($original, $tiposActuales, true)) {
+                $renombres[$original] = $nombre;
+            }
             if (!preg_match('/^[a-z0-9_]{1,30}$/', $nombre)) {
                 $errores[] = "Tipo de cliente \"$nombre\": usa solo letras minusculas, numeros o _ (sin espacios ni tildes)";
                 continue;
@@ -179,13 +189,15 @@ class Parametros
         if (!$tarifas) {
             $errores[] = "Tipos de cliente: debe existir al menos uno";
         }
-        $enUso = array_diff(ClienteEmpleado::tiposEnUso(), array_keys($tarifas), [""]);
+        // Un tipo en uso que se renombra no se esta quitando: sus relaciones pasan al nombre nuevo
+        $enUso = array_diff(ClienteEmpleado::tiposEnUso(), array_keys($tarifas), array_keys($renombres), [""]);
         if ($enUso) {
             $errores[] = "No puedes quitar el tipo \"" . implode("\", \"", $enUso) . "\" porque hay relaciones cliente-empleado con ese tipo. Cambialas primero.";
         }
         $p["clientes"]["tarifas"] = $tarifas;
 
         $tipoDefecto = strtolower(trim((string) ($c["tipo_defecto"] ?? "")));
+        $tipoDefecto = $renombres[$tipoDefecto] ?? $tipoDefecto; // el select muestra los nombres anteriores
         if ($tarifas && !isset($tarifas[$tipoDefecto])) {
             $errores[] = "Tipo por defecto: debe ser uno de los tipos configurados (" . implode(", ", array_keys($tarifas)) . ")";
         }
@@ -207,7 +219,7 @@ class Parametros
         }
         $p["roles"]["cargan_sin_auditoria"] = array_values(array_intersect($roles, (array) ($post["sin_auditoria"] ?? [])));
 
-        return [$p, $errores];
+        return [$p, $errores, $renombres];
     }
 
     private static function numero($valor, string $campo, array &$errores, float $min = 0, ?float $max = null): float

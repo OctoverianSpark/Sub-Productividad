@@ -142,6 +142,34 @@ class ClienteEmpleado extends BaseModel
         }
     }
 
+    /**
+     * Renombra tipos en todas las relaciones y luego ejecuta $alConfirmar (guardar parametros).
+     * Si $alConfirmar falla se revierte el renombre, para que BD y parametros no queden desalineados.
+     * Pasa primero por nombres temporales: asi un intercambio (a -> b, b -> a) no mezcla relaciones.
+     * @param array<string,string> $renombres [anterior => nuevo]
+     */
+    public static function renombrarTipos(array $renombres, callable $alConfirmar): void
+    {
+        self::$db->begin_transaction();
+        try {
+            $temporales = [];
+            $i = 0;
+            foreach ($renombres as $anterior => $nuevo) {
+                $temporal = "__renombre_" . $i++;
+                self::ejecutar("UPDATE " . static::$tabla . " SET tipo = ? WHERE tipo = ?", [$temporal, $anterior]);
+                $temporales[$temporal] = $nuevo;
+            }
+            foreach ($temporales as $temporal => $nuevo) {
+                self::ejecutar("UPDATE " . static::$tabla . " SET tipo = ? WHERE tipo = ?", [$nuevo, $temporal]);
+            }
+            $alConfirmar();
+            self::$db->commit();
+        } catch (Throwable $e) {
+            self::$db->rollback();
+            throw $e;
+        }
+    }
+
     public static function eliminarDeCliente(int $clienteId): void
     {
         self::ejecutar("DELETE FROM " . static::$tabla . " WHERE cliente_id = ?", [$clienteId]);

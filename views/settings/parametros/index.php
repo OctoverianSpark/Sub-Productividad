@@ -161,7 +161,11 @@
                 <tbody>
                     <?php $i = 0; foreach (($cli["tarifas"] ?: ["" => []]) as $tipo => $tarifa) { ?>
                         <tr>
-                            <td><input type="text" name="tipos[<?php echo $i ?>][nombre]" value="<?php echo s($tipo) ?>" maxlength="30" pattern="[a-z0-9_]+" title="Solo minusculas, numeros o _"></td>
+                            <td>
+                                <input type="text" name="tipos[<?php echo $i ?>][nombre]" value="<?php echo s($tipo) ?>" maxlength="30" pattern="[a-z0-9_]+" title="Solo minusculas, numeros o _">
+                                <?php // Nombre guardado: si se cambia el nombre, las relaciones cliente-empleado se renombran ?>
+                                <input type="hidden" name="tipos[<?php echo $i ?>][original]" value="<?php echo s($tipo) ?>">
+                            </td>
                             <?php foreach ($tarifasCliente as $clave => $texto) { ?>
                                 <td><input type="number" step="any" min="0" name="tipos[<?php echo $i ?>][<?php echo s($clave) ?>]" value="<?php echo $num($tarifa[$clave] ?? 0) ?>"></td>
                             <?php } ?>
