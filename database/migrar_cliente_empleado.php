@@ -197,8 +197,51 @@ info("Tipos configurados en parametros: " . ($tiposConfig ? implode(", ", $tipos
 
 if (!$tiposConfig) fallo("No hay tipos en clientes.tarifas (config/parametros*.json)");
 
-// Nombres viejos de tipo -> nuevos (ver carpetas 140_30.13.2.C.6.x de tarifas de horas extra)
-const MAPEO_TIPOS = ["viejo" => "tarifa_1", "nuevo" => "tarifa_2"];
+// Nombres viejos de tipo -> nuevos. Los bilingues se cobran como clientes viejos (docx Noviembre 2026)
+const MAPEO_TIPOS = ["viejo" => "tarifa_1", "nuevo" => "tarifa_2", "bilingue" => "tarifa_1"];
+
+// Tipo por cliente segun "Desglose de clientes activos por tarifa Noviembre 2026.docx"
+const ARCHIVO_TIPOS_CLIENTE = __DIR__ . "/migraciones/clientes_por_tarifa_2026-11.php";
+
+// Normaliza para comparar nombres: minusculas, sin tildes ni signos, espacios simples
+function normalizar(string $texto): string
+{
+    $texto = mb_strtolower($texto, "UTF-8");
+    $texto = strtr($texto, ["á" => "a", "é" => "e", "í" => "i", "ó" => "o", "ú" => "u", "ü" => "u", "ñ" => "n", "à" => "a", "è" => "e", "ì" => "i", "ò" => "o", "ù" => "u"]);
+    return trim(preg_replace('/\s+/', " ", preg_replace('/[^a-z0-9]+/', " ", $texto)));
+}
+
+/**
+ * Busca un nombre del docx entre los clientes. Devuelve [ids, "exacta"|"parcial"|"aproximada"|null].
+ * exacta: mismo nombre | parcial: todas sus palabras estan en el cliente | aproximada: con errores de tipeo.
+ * Solo se acepta si hay UN cliente candidato en ese nivel.
+ */
+function buscarCliente(string $nombre, array $clientesNorm): array
+{
+    $palabras = explode(" ", normalizar($nombre));
+    $buscado = implode(" ", $palabras);
+
+    $exactos = array_keys(array_filter($clientesNorm, fn($c) => $c === $buscado));
+    if (count($exactos) === 1) return [$exactos, "exacta"];
+
+    $contiene = fn(array $tokensCliente, callable $igual) => array_reduce(
+        $palabras,
+        fn($ok, $p) => $ok && (bool) array_filter($tokensCliente, fn($t) => $igual($p, $t)),
+        true
+    );
+
+    $parciales = array_keys(array_filter($clientesNorm, fn($c) => $contiene(explode(" ", $c), fn($p, $t) => $p === $t)));
+    if (count($parciales) === 1) return [$parciales, "parcial"];
+
+    // Errores de tipeo: hasta 1 letra en palabras cortas, 2 en palabras de 5+ letras (Wulff/Wulf, Nuñes/Nuñez)
+    $aproximados = array_keys(array_filter($clientesNorm, fn($c) => $contiene(
+        explode(" ", $c),
+        fn($p, $t) => levenshtein($p, $t) <= (strlen($p) >= 5 ? 2 : 1)
+    )));
+    if (count($aproximados) === 1) return [$aproximados, "aproximada"];
+
+    return [[], count($parciales) > 1 || count($aproximados) > 1 ? "ambigua" : null];
+}
 
 // =====================================================================
 // 0. RESPALDO COMPLETO (antes de tocar cualquier cosa)
@@ -228,7 +271,7 @@ if (!$ejecutar && !$soloRespaldo) {
 }
 
 // =====================================================================
-// 1b. TIPOS DE TARIFA EN PARAMETROS (viejo/nuevo -> tarifa_1..3, bilingue)
+// 1b. TIPOS DE TARIFA EN PARAMETROS (viejo/nuevo/bilingue -> tarifa_1..3)
 // =====================================================================
 titulo("1b. Tipos de tarifa en parametros");
 
@@ -242,7 +285,7 @@ if (!is_file($archivoParametros)) {
     $parametros = Config::todo();
     $actuales = $parametros["clientes"]["tarifas"] ?? [];
 
-    // Las 4 tarifas oficiales + cualquier tipo propio que no sea viejo/nuevo
+    // Las tarifas oficiales (docx Noviembre 2026) + cualquier tipo propio que no sea viejo/nuevo/bilingue
     $extra = array_diff_key($actuales, $tarifasObjetivo, MAPEO_TIPOS);
     $nuevasTarifas = $tarifasObjetivo + $extra;
 
@@ -306,6 +349,59 @@ if ($tablaExiste) {
 }
 
 // =====================================================================
+// 2b. TIPO POR CLIENTE SEGUN EL DOCX DE TARIFAS
+// =====================================================================
+titulo("2b. Tipo por cliente (Desglose de clientes activos por tarifa Noviembre 2026)");
+
+$listaTipos = require ARCHIVO_TIPOS_CLIENTE;
+$clientesNorm = [];
+$nombresCliente = [];
+foreach ($filas("SELECT id, nombre, apellido FROM clientes ORDER BY id") as $c) {
+    $clientesNorm[(int) $c["id"]] = normalizar($c["nombre"] . " " . $c["apellido"]);
+    $nombresCliente[(int) $c["id"]] = mb_strtoupper(clave($c["nombre"] . " " . $c["apellido"]));
+}
+
+$tipoPorCliente = [];   // cliente_id => tipo
+$conflictos = [];
+foreach ($listaTipos as $tipo => $entradas) {
+    if (!in_array($tipo, $tiposConfig, true)) {
+        aviso("El tipo \"$tipo\" de la lista no esta configurado: se omiten sus " . count($entradas) . " clientes");
+        continue;
+    }
+    foreach ($entradas as $entrada) {
+        $encontrados = [];
+        $detalle = [];
+        foreach (array_map("trim", explode("/", $entrada)) as $alternativa) {
+            [$ids, $nivel] = buscarCliente($alternativa, $clientesNorm);
+            foreach ($ids as $id) {
+                $encontrados[$id] = true;
+                if ($nivel !== "exacta") $detalle[] = "\"$alternativa\" ~ {$nombresCliente[$id]} (coincidencia $nivel)";
+            }
+            if ($nivel === "ambigua") $detalle[] = "\"$alternativa\" coincide con varios clientes: no se usa";
+        }
+        if (!$encontrados) {
+            aviso("No se encontro en clientes: \"$entrada\" ($tipo). Asignalo a mano desde la pantalla del cliente");
+            continue;
+        }
+        foreach ($detalle as $d) aviso("Revisar: $d");
+        foreach (array_keys($encontrados) as $id) {
+            if (isset($tipoPorCliente[$id]) && $tipoPorCliente[$id] !== $tipo) $conflictos[$id] = true;
+            $tipoPorCliente[$id] = $tipo;
+        }
+    }
+}
+foreach (array_keys($conflictos) as $id) {
+    aviso("{$nombresCliente[$id]} aparece en varios grupos del docx: no se le asigna tipo automaticamente");
+    unset($tipoPorCliente[$id]);
+}
+$porTipo = array_count_values($tipoPorCliente);
+ksort($porTipo);
+info(count($tipoPorCliente) . " clientes identificados: " . implode(", ", array_map(fn($t, $n) => "$t=$n", array_keys($porTipo), $porTipo)));
+foreach (array_diff_key($nombresCliente, $tipoPorCliente) as $id => $nombre) {
+    info("    sin grupo en el docx: $nombre");
+}
+
+// =====================================================================
 // 3. CALCULAR RELACIONES DESDE LAS HORAS CARGADAS
 // =====================================================================
 titulo("3. Relaciones a partir de horas_extras");
@@ -362,8 +458,9 @@ if (!$tieneTipo) {
         $clientesConHoras[$c["id"]] = true;
         if (!$e) { $sinEmpleado[clave($p["empleado"])] = ($sinEmpleado[clave($p["empleado"])] ?? 0) + $p["horas"]; continue; }
 
+        // Manda el docx; si el cliente no esta en el docx se usa su tipo anterior convertido
         $tipo = strtolower(trim((string) $c["tipo"]));
-        $tipo = MAPEO_TIPOS[$tipo] ?? $tipo;
+        $tipo = $tipoPorCliente[(int) $c["id"]] ?? (MAPEO_TIPOS[$tipo] ?? $tipo);
         if (!in_array($tipo, $tiposConfig, true)) {
             $tipoInvalido[$c["id"]] = clave($c["nombre"] . " " . $c["apellido"]) . " (tipo \"" . $c["tipo"] . "\")";
             continue;
@@ -410,6 +507,33 @@ if (!$tieneTipo) {
             $db->rollback();
             fallo("No se insertaron relaciones (se revirtio todo): " . $e->getMessage());
         }
+    }
+}
+
+// =====================================================================
+// 3b. APLICAR EL TIPO DEL DOCX A LAS RELACIONES YA EXISTENTES
+// =====================================================================
+titulo("3b. Tipo del docx en relaciones existentes");
+
+if (!$tablaExiste && !$ejecutar) {
+    info("La tabla aun no existe: las relaciones nuevas ya se crean con el tipo del docx (paso 3)");
+} else {
+    $cambios = [];
+    foreach ($filas("SELECT cliente_id, tipo, COUNT(*) AS n FROM cliente_empleado GROUP BY cliente_id, tipo") as $r) {
+        $nuevo = $tipoPorCliente[(int) $r["cliente_id"]] ?? null;
+        if ($nuevo === null || $nuevo === $r["tipo"]) continue;
+        $cambios[] = [(int) $r["cliente_id"], $nuevo];
+        info(($nombresCliente[(int) $r["cliente_id"]] ?? "#" . $r["cliente_id"]) . ": {$r["n"]} relacion(es) \"{$r["tipo"]}\" -> \"$nuevo\"");
+    }
+    if (!$cambios) {
+        info("Nada que cambiar");
+    } elseif ($ejecutar) {
+        $stmt = $db->prepare("UPDATE cliente_empleado SET tipo = ? WHERE cliente_id = ?");
+        foreach ($cambios as [$clienteId, $nuevo]) {
+            $stmt->bind_param("si", $nuevo, $clienteId);
+            $stmt->execute();
+        }
+        info("-> Tipos actualizados en " . count(array_unique(array_column($cambios, 0))) . " cliente(s)");
     }
 }
 
