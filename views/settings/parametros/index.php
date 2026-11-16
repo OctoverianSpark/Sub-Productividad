@@ -91,14 +91,22 @@
                     <label for="hog_dominical">Valor hora dominical / festiva</label>
                     <input type="number" step="any" min="0" id="hog_dominical" name="nomina[hogar][valor_hora_dominical]" value="<?php echo $num($hog["valor_hora_dominical"] ?? $hog["valor_hora"]) ?>" required>
                 </div>
+                <div class="container-input">
+                    <label for="hog_ordinarias">Pagar horas ordinarias en domingo / festivo</label>
+                    <input type="checkbox" id="hog_ordinarias" name="nomina[hogar][pagar_ordinarias]" value="1" <?php echo !empty($hog["pagar_ordinarias"]) ? "checked" : "" ?>>
+                </div>
             </div>
-            <p class="parametros-ayuda-sm">Entre semana se pagan solo las horas extras (diurnas y nocturnas). En domingo o festivo se pagan todas las horas trabajadas, ordinarias y extras, al valor dominical.</p>
+            <p class="parametros-ayuda-sm">Entre semana se pagan solo las horas extras (diurnas y nocturnas). En domingo o festivo las extras se pagan al valor dominical; las ordinarias solo si esta marcado "Pagar horas ordinarias".</p>
 
             <h3>Venezuela - Oficina</h3>
             <div class="parametros-grid">
                 <div class="container-input">
                     <label for="ven_moneda">Moneda</label>
                     <input type="text" id="ven_moneda" name="nomina[venezuela_oficina][moneda]" value="<?php echo s($ven["moneda"]) ?>" maxlength="20" required>
+                </div>
+                <div class="container-input">
+                    <label for="ven_ordinarias">Pagar horas ordinarias en domingo / festivo</label>
+                    <input type="checkbox" id="ven_ordinarias" name="nomina[venezuela_oficina][pagar_ordinarias]" value="1" <?php echo !empty($ven["pagar_ordinarias"]) ? "checked" : "" ?>>
                 </div>
             </div>
             <p class="parametros-ayuda-sm">Valor de la hora extra segun el salario. Para salarios intermedios se calcula proporcionalmente entre las dos filas mas cercanas. Si la tabla tiene una sola fila, ese valor de hora extra se paga igual a todos sin importar el salario (el salario se puede dejar vacio).</p>

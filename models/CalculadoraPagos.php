@@ -71,8 +71,9 @@ class CalculadoraPagos
             $diurna = (float) $t["valor_hora"];
             $nocturna = (float) ($t["valor_hora_nocturna"] ?? $diurna);
             $dominicalValor = (float) ($t["valor_hora_dominical"] ?? $diurna);
+            if (empty($t["pagar_ordinarias"])) [$do, $no] = [0.0, 0.0];
 
-            // Domingo/festivo: todas las horas (ordinarias y extras, diurnas y nocturnas) al valor dominical
+            // Domingo/festivo: las extras (y las ordinarias si "pagar_ordinarias" esta activo) al valor dominical
             return [
                 "diurnas_monto" => $dominical ? ($do + $de) * $dominicalValor : $de * $diurna,
                 "nocturnas_monto" => $dominical ? ($no + $ne) * $dominicalValor : $ne * $nocturna,
@@ -88,6 +89,8 @@ class CalculadoraPagos
             $extra = count($tabla) === 1
                 ? round((float) $tabla[0]["valor_hora_extra"], 2)
                 : round($hora * self::factorVenezuela((float) $empleado->salario), 2);
+            // Por defecto Venezuela no paga horas ordinarias, ni en domingo/festivo
+            if (empty($t["pagar_ordinarias"])) [$do, $no] = [0.0, 0.0];
 
             return [
                 "diurnas_monto" => $dominical ? $do * $hora + $de * $extra : $de * $extra,
