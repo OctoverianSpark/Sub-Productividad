@@ -71,12 +71,11 @@ class CalculadoraPagos
             $diurna = (float) $t["valor_hora"];
             $nocturna = (float) ($t["valor_hora_nocturna"] ?? $diurna);
             $dominicalValor = (float) ($t["valor_hora_dominical"] ?? $diurna);
-            if (empty($t["pagar_ordinarias"])) [$do, $no] = [0.0, 0.0];
 
-            // Domingo/festivo: las extras (y las ordinarias si "pagar_ordinarias" esta activo) al valor dominical
+            // OPS no paga horas ordinarias; en domingo/festivo las extras van al valor dominical
             return [
-                "diurnas_monto" => $dominical ? ($do + $de) * $dominicalValor : $de * $diurna,
-                "nocturnas_monto" => $dominical ? ($no + $ne) * $dominicalValor : $ne * $nocturna,
+                "diurnas_monto" => $de * ($dominical ? $dominicalValor : $diurna),
+                "nocturnas_monto" => $ne * ($dominical ? $dominicalValor : $nocturna),
                 "moneda" => $t["moneda"],
             ];
         }
@@ -89,12 +88,11 @@ class CalculadoraPagos
             $extra = count($tabla) === 1
                 ? round((float) $tabla[0]["valor_hora_extra"], 2)
                 : round($hora * self::factorVenezuela((float) $empleado->salario), 2);
-            // Por defecto Venezuela no paga horas ordinarias, ni en domingo/festivo
-            if (empty($t["pagar_ordinarias"])) [$do, $no] = [0.0, 0.0];
 
+            // En Venezuela no hay horas ordinarias: todas las horas registradas se pagan como extras
             return [
-                "diurnas_monto" => $dominical ? $do * $hora + $de * $extra : $de * $extra,
-                "nocturnas_monto" => $dominical ? $no * $hora + $ne * $extra : $ne * $extra,
+                "diurnas_monto" => ($do + $de) * $extra,
+                "nocturnas_monto" => ($no + $ne) * $extra,
                 "moneda" => $t["moneda"],
             ];
         }

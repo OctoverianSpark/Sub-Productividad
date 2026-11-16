@@ -133,12 +133,8 @@ class Parametros
         $p["nomina"]["hogar"]["valor_hora"] = self::numero($hog["valor_hora"] ?? null, "Hogar: valor hora extra diurna", $errores);
         $p["nomina"]["hogar"]["valor_hora_nocturna"] = self::numero($hog["valor_hora_nocturna"] ?? null, "Hogar: valor hora extra nocturna", $errores);
         $p["nomina"]["hogar"]["valor_hora_dominical"] = self::numero($hog["valor_hora_dominical"] ?? null, "Hogar: valor hora dominical/festiva", $errores);
-        $p["nomina"]["hogar"]["pagar_ordinarias"] = !empty($hog["pagar_ordinarias"]);
-
         $ven = (array) ($n["venezuela_oficina"] ?? []);
-        $p["nomina"]["venezuela_oficina"]["moneda"] = self::texto($ven["moneda"] ?? "", "Moneda Venezuela oficina", $errores);
-        $p["nomina"]["venezuela_oficina"]["pagar_ordinarias"] = !empty($ven["pagar_ordinarias"]);
-        $filas = array_values(array_filter((array) ($ven["tabla"] ?? []), fn($f) =>
+        $p["nomina"]["venezuela_oficina"]["moneda"] = self::texto($ven["moneda"] ?? "", "Moneda Venezuela oficina", $errores);        $filas = array_values(array_filter((array) ($ven["tabla"] ?? []), fn($f) =>
             trim((string) ($f["salario"] ?? "")) !== "" || trim((string) ($f["valor_hora_extra"] ?? "")) !== ""));
         $tabla = [];
         foreach ($filas as $fila) {

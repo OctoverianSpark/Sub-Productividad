@@ -53,12 +53,10 @@
             "moneda": "Dolares",
             "valor_hora": 3.5,
             "valor_hora_nocturna": 3.5,
-            "valor_hora_dominical": 3.5,
-            "pagar_ordinarias": false
+            "valor_hora_dominical": 3.5
         },
         "venezuela_oficina": {
             "moneda": "Dolares",
-            "pagar_ordinarias": false,
             "tabla_valor_hora_extra": [
                 { "salario": 175, "valor_hora_extra": 1.7 },
                 { "salario": 350, "valor_hora_extra": 2.0 },
