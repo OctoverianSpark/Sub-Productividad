@@ -111,36 +111,10 @@ class Time extends BaseModel
                 $this->errores[] = "Almuerzo: Es igual o mayor que la jornada completa";
             } elseif ($registradas <= 0) {
                 $this->errores[] = "Horas: Registra al menos una hora";
-            } elseif ($otra = $this->registroSolapado()) {
-                $this->errores[] = "Jornada: Se cruza con otro registro de " . $this->empleado . " (" . $otra->inicio . " a " . $otra->final . ")";
             }
+            // Se permiten registros repetidos o que se crucen para el mismo empleado
         }
         return $this->errores;
-    }
-
-    // Otro registro del mismo empleado cuyo horario se cruza con este (evita cargar dos veces lo mismo)
-    private function registroSolapado(): ?static
-    {
-        $filas = self::consultarSQL(
-            "SELECT * FROM " . static::$tabla . " WHERE LOWER(empleado) = LOWER(?) AND inicio < ? AND final > ? AND id <> ? LIMIT 1",
-            [trim($this->empleado), $this->final, $this->inicio, (int) ($this->id ?? 0)]
-        );
-        return $filas[0] ?? null;
-    }
-
-    // Verifica que las entradas de un mismo envio no se crucen entre si
-    public static function solapadasEntreSi(array $horas): array
-    {
-        $errores = [];
-        foreach ($horas as $i => $a) {
-            foreach ($horas as $k => $b) {
-                if ($k <= $i || !$a->inicio || !$b->inicio) continue;
-                if (mb_strtolower(trim($a->empleado)) === mb_strtolower(trim($b->empleado)) && $a->inicio < $b->final && $b->inicio < $a->final) {
-                    $errores[] = "Entradas " . ($i + 1) . " y " . ($k + 1) . ": son del mismo empleado y sus horarios se cruzan";
-                }
-            }
-        }
-        return $errores;
     }
 
     // ==========

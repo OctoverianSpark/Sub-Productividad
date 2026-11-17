@@ -35,7 +35,6 @@ class Times
             if (!$horas) {
                 $errores[] = "No se recibieron horas para registrar";
             }
-            $errores = array_merge($errores, Time::solapadasEntreSi($horas));
 
             if (empty($errores)) {
                 foreach ($horas as $time) {
