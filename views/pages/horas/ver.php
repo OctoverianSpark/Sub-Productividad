@@ -75,12 +75,14 @@
                 <th>FECHA</th>
                 <th>EMPLEADO</th>
                 <th>CLIENTE</th>
-                <th>DIURNAS ORDINARIAS</th>
-                <th>NOCTURNAS ORDINARIAS</th>
-                <th>DIURNAS EXTRAS</th>
+                <th>DIURNAS</th>
                 <th>MONTO DIURNAS</th>
-                <th>NOCTURNAS EXTRAS</th>
+                <th>NOCTURNAS</th>
                 <th>MONTO NOCTURNAS</th>
+                <th>DIURNAS DOMINICALES</th>
+                <th>MONTO DIURNAS DOMINICALES</th>
+                <th>NOCTURNAS DOMINICALES</th>
+                <th>MONTO NOCTURNAS DOMINICALES</th>
                 <th>TOTAL</th>
                 <th>ACCIONES</th>
             </thead>
@@ -92,13 +94,11 @@
                             <td><?php echo s($hora["inicio"]) ?></td>
                             <td><?php echo s(mb_strtoupper($hora["empleado"])) ?></td>
                             <td><?php echo s(mb_strtoupper($hora["cliente"])) ?></td>
-                            <td><?php echo s($hora["diurnas_ordinarias"]) ?></td>
-                            <td><?php echo s($hora["nocturnas_ordinarias"]) ?></td>
-                            <td><?php echo s($hora["diurnas_extras"]) ?></td>
-                            <td>$ <?php echo s($hora["diurnas_monto"]) . " " . s($hora["moneda"]) ?></td>
-                            <td><?php echo s($hora["nocturnas_extras"]) ?></td>
-                            <td>$ <?php echo s($hora["nocturnas_monto"]) . " " . s($hora["moneda"]) ?></td>
-                            <td>$ <?php echo s((float) $hora["diurnas_monto"] + (float) $hora["nocturnas_monto"]) . " " . s($hora["moneda"]) ?></td>
+                            <?php foreach (\Models\CalculadoraPagos::CATEGORIAS_EMPLEADO as $categoria) { ?>
+                                <td><?php echo s($hora[$categoria . "_horas"]) ?></td>
+                                <td>$ <?php echo s($hora[$categoria . "_monto"]) . " " . s($hora["moneda"]) ?></td>
+                            <?php } ?>
+                            <td>$ <?php echo s($hora["total"]) . " " . s($hora["moneda"]) ?></td>
                             <td>
                                 <a href="/horas/ver/hora?id=<?php echo (int) $hora["id"] ?>" class="boton-morado-inline">Gestionar</a>
                             </td>
@@ -106,7 +106,7 @@
                     <?php } ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="11" style="text-align: center; padding: 20px;">
+                        <td colspan="13" style="text-align: center; padding: 20px;">
                             No se encontraron registros
                         </td>
                     </tr>

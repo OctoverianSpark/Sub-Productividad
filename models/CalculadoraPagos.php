@@ -21,10 +21,46 @@ class CalculadoraPagos
     // PAGO A EMPLEADOS
     // =================
 
+    public const CATEGORIAS_EMPLEADO = ["diurnas", "nocturnas", "diurnas_dominicales", "nocturnas_dominicales"];
+
     /**
-     * @return array{diurnas_monto: float, nocturnas_monto: float, moneda: string}
+     * Pago de una hora al empleado, en 4 categorias (horas y monto de cada una):
+     * diurnas / nocturnas (entre semana) y diurnas_dominicales / nocturnas_dominicales (domingo o festivo).
+     * Claves: {categoria}_horas, {categoria}_monto, total y moneda.
      */
     public static function pagoEmpleado(Time $time, ?Empleados $empleado): array
+    {
+        $dominical = self::esDominicalOFestivo($time);
+        $do = (float) $time->diurnas_ordinarias;
+        $no = (float) $time->nocturnas_ordinarias;
+        $de = (float) $time->diurnas_extras;
+        $ne = (float) $time->nocturnas_extras;
+
+        $montos = self::montosEmpleado($time, $empleado);
+
+        // Entre semana solo cuentan las extras; en domingo/festivo cuentan ordinarias y extras
+        $horas = $dominical
+            ? ["diurnas" => 0.0, "nocturnas" => 0.0, "diurnas_dominicales" => $do + $de, "nocturnas_dominicales" => $no + $ne]
+            : ["diurnas" => $de, "nocturnas" => $ne, "diurnas_dominicales" => 0.0, "nocturnas_dominicales" => 0.0];
+        $valores = $dominical
+            ? ["diurnas" => 0.0, "nocturnas" => 0.0, "diurnas_dominicales" => $montos["diurnas_monto"], "nocturnas_dominicales" => $montos["nocturnas_monto"]]
+            : ["diurnas" => $montos["diurnas_monto"], "nocturnas" => $montos["nocturnas_monto"], "diurnas_dominicales" => 0.0, "nocturnas_dominicales" => 0.0];
+
+        $resultado = [];
+        foreach (self::CATEGORIAS_EMPLEADO as $categoria) {
+            $resultado[$categoria . "_horas"] = $horas[$categoria];
+            $resultado[$categoria . "_monto"] = round($valores[$categoria], 2);
+        }
+        $resultado["total"] = round($montos["diurnas_monto"] + $montos["nocturnas_monto"], 2);
+        $resultado["moneda"] = $montos["moneda"];
+        return $resultado;
+    }
+
+    /**
+     * Monto diurno y nocturno de la hora segun modalidad/sede del empleado.
+     * @return array{diurnas_monto: float, nocturnas_monto: float, moneda: string}
+     */
+    private static function montosEmpleado(Time $time, ?Empleados $empleado): array
     {
         $vacio = ["diurnas_monto" => 0.0, "nocturnas_monto" => 0.0, "moneda" => ""];
 

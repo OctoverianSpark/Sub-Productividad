@@ -59,7 +59,7 @@ class Pages
 
 class ExportHandler
 {
-    private const EMPLEADO_HEADERS = ["EMPLEADO", "CLIENTE", "MODALIDAD", "INICIO DE JORNADA", "ALMUERZO", "FINAL DE JORNADA", "DIURNAS ORDINARIAS", "DIURNAS EXTRAS", "DIURNAS ORDINARIAS DOMINICALES", "NOCTURNAS ORDINARIAS", "NOCTURNAS EXTRAS", "NOCTURNAS ORDINARIAS DOMINICALES", "CENA", "TAXI", "MONTO EXTRAS DIURNAS", "MONTO EXTRAS NOCTURNAS", "TOTAL A PAGAR", "COMENTARIOS"];
+    private const EMPLEADO_HEADERS = ["EMPLEADO", "CLIENTE", "MODALIDAD", "INICIO DE JORNADA", "ALMUERZO", "FINAL DE JORNADA", "DIURNAS", "NOCTURNAS", "DIURNAS DOMINICALES", "NOCTURNAS DOMINICALES", "CENA", "TAXI", "MONTO DIURNAS", "MONTO NOCTURNAS", "MONTO DIURNAS DOMINICALES", "MONTO NOCTURNAS DOMINICALES", "TOTAL A PAGAR", "COMENTARIOS"];
     private const CLIENTE_HEADERS = ['CLIENTE', 'HORAS EXTRAS DIURNAS', 'HORAS EXTRAS DIURNAS DOMINICALES', 'HORAS ORDINARIAS DIURNAS DOMINICALES', 'HORAS EXTRAS NOCTURNAS', 'HORAS EXTRAS NOCTURNAS DOMINICALES', 'HORAS NOCTURNAS ORDINARIAS DOMINICALES', 'MONTO EXTRAS DIURNAS', 'MONTO EXTRAS NOCTURNAS', 'MONTO LOGISTICA', 'SUBTOTAL'];
     private const EMPLEADO_INFO_HEADERS = ['NOMBRE', 'APELLIDO', 'TIPO DE DOCUMENTO', 'DOCUMENTO', 'SEDE', 'CARGO', 'SALARIO'];
     private const CLIENTE = ['NOMBRE', 'APELLIDO', 'EMPLEADO', 'TIPO'];
@@ -230,28 +230,22 @@ class ExportHandler
     {
         $this->spreadsheet->setActiveSheetIndexByName($sheetName);
 
-        $dominical = CalculadoraPagos::esDominicalOFestivo(new Time($hora));
+        $categorias = CalculadoraPagos::CATEGORIAS_EMPLEADO;
 
-        $this->escribirFila([
-            strtoupper($hora["empleado"]),
-            strtoupper($hora["cliente"]),
-            strtoupper($empleado->modalidad),
-            $hora["inicio"],
-            (float) $hora["almuerzo"],
-            $hora["final"],
-            (float) $hora["diurnas_ordinarias"],
-            (float) $hora["diurnas_extras"],
-            $dominical ? (float) $hora["diurnas_ordinarias"] : 0.0,
-            (float) $hora["nocturnas_ordinarias"],
-            (float) $hora["nocturnas_extras"],
-            $dominical ? (float) $hora["nocturnas_ordinarias"] : 0.0,
-            strtoupper($hora["cena"]),
-            strtoupper($hora["taxi"]),
-            (float) $hora["diurnas_monto"],
-            (float) $hora["nocturnas_monto"],
-            (float) $hora["diurnas_monto"] + (float) $hora["nocturnas_monto"],
-            $hora["comentarios"],
-        ], $row);
+        $this->escribirFila(array_merge(
+            [
+                strtoupper($hora["empleado"]),
+                strtoupper($hora["cliente"]),
+                strtoupper($empleado->modalidad),
+                $hora["inicio"],
+                (float) $hora["almuerzo"],
+                $hora["final"],
+            ],
+            array_map(fn($c) => (float) $hora[$c . "_horas"], $categorias),
+            [strtoupper($hora["cena"]), strtoupper($hora["taxi"])],
+            array_map(fn($c) => (float) $hora[$c . "_monto"], $categorias),
+            [(float) $hora["total"], $hora["comentarios"]],
+        ), $row);
     }
 
     private function addClienteRow($hora, $row)
