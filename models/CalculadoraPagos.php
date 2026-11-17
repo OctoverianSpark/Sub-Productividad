@@ -72,10 +72,10 @@ class CalculadoraPagos
             $nocturna = (float) ($t["valor_hora_nocturna"] ?? $diurna);
             $dominicalValor = (float) ($t["valor_hora_dominical"] ?? $diurna);
 
-            // OPS no paga horas ordinarias; en domingo/festivo las extras van al valor dominical
+            // Entre semana solo las extras; en domingo/festivo las ordinarias tambien se pagan como extras, al valor dominical
             return [
-                "diurnas_monto" => $de * ($dominical ? $dominicalValor : $diurna),
-                "nocturnas_monto" => $ne * ($dominical ? $dominicalValor : $nocturna),
+                "diurnas_monto" => $dominical ? ($do + $de) * $dominicalValor : $de * $diurna,
+                "nocturnas_monto" => $dominical ? ($no + $ne) * $dominicalValor : $ne * $nocturna,
                 "moneda" => $t["moneda"],
             ];
         }
@@ -89,10 +89,10 @@ class CalculadoraPagos
                 ? round((float) $tabla[0]["valor_hora_extra"], 2)
                 : round($hora * self::factorVenezuela((float) $empleado->salario), 2);
 
-            // En Venezuela no hay horas ordinarias: todas las horas registradas se pagan como extras
+            // Entre semana solo las extras; en domingo/festivo las ordinarias tambien se pagan como extras
             return [
-                "diurnas_monto" => ($do + $de) * $extra,
-                "nocturnas_monto" => ($no + $ne) * $extra,
+                "diurnas_monto" => $dominical ? ($do + $de) * $extra : $de * $extra,
+                "nocturnas_monto" => $dominical ? ($no + $ne) * $extra : $ne * $extra,
                 "moneda" => $t["moneda"],
             ];
         }

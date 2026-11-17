@@ -92,7 +92,7 @@
                     <input type="number" step="any" min="0" id="hog_dominical" name="nomina[hogar][valor_hora_dominical]" value="<?php echo $num($hog["valor_hora_dominical"] ?? $hog["valor_hora"]) ?>" required>
                 </div>
             </div>
-            <p class="parametros-ayuda-sm">Solo se pagan las horas extras (diurnas y nocturnas), nunca las ordinarias. En domingo o festivo las extras se pagan al valor dominical.</p>
+            <p class="parametros-ayuda-sm">Entre semana se pagan solo las horas extras (diurnas y nocturnas). En domingo o festivo las ordinarias tambien se pagan como extras, todas al valor dominical.</p>
 
             <h3>Venezuela - Oficina</h3>
             <div class="parametros-grid">
@@ -101,7 +101,7 @@
                     <input type="text" id="ven_moneda" name="nomina[venezuela_oficina][moneda]" value="<?php echo s($ven["moneda"]) ?>" maxlength="20" required>
                 </div>
             </div>
-            <p class="parametros-ayuda-sm">En Venezuela no hay horas ordinarias: todas las horas registradas (ordinarias y extras, cualquier dia) se pagan al valor de hora extra. Valor de la hora extra segun el salario. Para salarios intermedios se calcula proporcionalmente entre las dos filas mas cercanas. Si la tabla tiene una sola fila, ese valor de hora extra se paga igual a todos sin importar el salario (el salario se puede dejar vacio).</p>
+            <p class="parametros-ayuda-sm">Entre semana se pagan solo las horas extras. En domingo o festivo las ordinarias tambien se pagan como extras. Valor de la hora extra segun el salario. Para salarios intermedios se calcula proporcionalmente entre las dos filas mas cercanas. Si la tabla tiene una sola fila, ese valor de hora extra se paga igual a todos sin importar el salario (el salario se puede dejar vacio).</p>
             <table class="tabla-parametros" data-tabla="venezuela">
                 <thead>
                     <tr><th>Salario mensual</th><th>Valor hora extra</th><th></th></tr>
