@@ -2,6 +2,8 @@
 
 /**
  * Crea la tabla cliente_empleado y migra el "tipo" del cliente a cada relacion cliente-empleado.
+ * Las relaciones salen de las horas cargadas y del Excel de ClickUp "CLIENTES CONTRATADOS"
+ * (migraciones/relaciones_clientes_2026-11.php); el tipo de cada una es el del cliente en el docx de tarifas.
  *
  * Uso (desde la raiz del proyecto):
  *   php database/migrar_cliente_empleado.php                         -> simulacion: solo muestra lo que haria
@@ -202,6 +204,8 @@ const MAPEO_TIPOS = ["viejo" => "tarifa_1", "nuevo" => "tarifa_2", "bilingue" =>
 
 // Tipo por cliente segun "Desglose de clientes activos por tarifa Noviembre 2026.docx"
 const ARCHIVO_TIPOS_CLIENTE = __DIR__ . "/migraciones/clientes_por_tarifa_2026-11.php";
+// Empleados asignados a cada cliente segun el Excel de ClickUp "CLIENTES CONTRATADOS"
+const ARCHIVO_RELACIONES = __DIR__ . "/migraciones/relaciones_clientes_2026-11.php";
 
 // Normaliza para comparar nombres: minusculas, sin tildes ni signos, espacios simples
 function normalizar(string $texto): string
@@ -212,11 +216,12 @@ function normalizar(string $texto): string
 }
 
 /**
- * Busca un nombre del docx entre los clientes. Devuelve [ids, "exacta"|"parcial"|"aproximada"|null].
- * exacta: mismo nombre | parcial: todas sus palabras estan en el cliente | aproximada: con errores de tipeo.
- * Solo se acepta si hay UN cliente candidato en ese nivel.
+ * Busca un nombre entre clientes o empleados ([id => nombre normalizado]).
+ * Devuelve [ids, "exacta"|"parcial"|"aproximada"|"ambigua"|null].
+ * exacta: mismo nombre | parcial: todas sus palabras estan en el registro | aproximada: con errores de tipeo.
+ * Solo se acepta si hay UN candidato en ese nivel.
  */
-function buscarCliente(string $nombre, array $clientesNorm): array
+function buscarNombre(string $nombre, array $clientesNorm): array
 {
     $palabras = explode(" ", normalizar($nombre));
     $buscado = implode(" ", $palabras);
@@ -372,7 +377,7 @@ foreach ($listaTipos as $tipo => $entradas) {
         $encontrados = [];
         $detalle = [];
         foreach (array_map("trim", explode("/", $entrada)) as $alternativa) {
-            [$ids, $nivel] = buscarCliente($alternativa, $clientesNorm);
+            [$ids, $nivel] = buscarNombre($alternativa, $clientesNorm);
             foreach ($ids as $id) {
                 $encontrados[$id] = true;
                 if ($nivel !== "exacta") $detalle[] = "\"$alternativa\" ~ {$nombresCliente[$id]} (coincidencia $nivel)";
@@ -534,6 +539,84 @@ if (!$tablaExiste && !$ejecutar) {
             $stmt->execute();
         }
         info("-> Tipos actualizados en " . count(array_unique(array_column($cambios, 0))) . " cliente(s)");
+    }
+}
+
+// =====================================================================
+// 3c. RELACIONES SEGUN EL EXCEL "CLIENTES CONTRATADOS" (ClickUp)
+// =====================================================================
+titulo("3c. Relaciones del Excel CLIENTES CONTRATADOS");
+
+// Tipo por defecto ya convertido (paso 1b); se usa si el cliente no esta en el docx
+$tipoDefecto = $defecto ?? strtolower((string) Config::get("clientes.tipo_defecto", ""));
+$tipoDefecto = MAPEO_TIPOS[$tipoDefecto] ?? $tipoDefecto;
+if (!in_array($tipoDefecto, $tiposConfig, true)) $tipoDefecto = $tiposConfig[0];
+
+$empleadosNorm = [];
+$nombresEmpleado = [];
+foreach ($filas("SELECT id, nombre, apellido FROM empleados ORDER BY id") as $e) {
+    $empleadosNorm[(int) $e["id"]] = normalizar($e["nombre"] . " " . $e["apellido"]);
+    $nombresEmpleado[(int) $e["id"]] = mb_strtoupper(clave($e["nombre"] . " " . $e["apellido"]));
+}
+
+// Busca probando cada alternativa separada por "/"; devuelve [id|null, avisos]
+$resolver = function (string $entrada, array $norm, array $nombres): array {
+    $avisos = [];
+    foreach (array_map("trim", explode("/", $entrada)) as $alternativa) {
+        [$ids, $nivel] = buscarNombre($alternativa, $norm);
+        if ($nivel === "ambigua") $avisos[] = "\"$alternativa\" coincide con varios registros: no se usa";
+        if (count($ids) === 1) {
+            if ($nivel !== "exacta") $avisos[] = "\"$alternativa\" ~ {$nombres[$ids[0]]} (coincidencia $nivel)";
+            return [$ids[0], $avisos];
+        }
+    }
+    return [null, $avisos];
+};
+
+$existentesExcel = $existeTabla("cliente_empleado") ? array_flip(array_map(
+    fn($r) => $r["cliente_id"] . ":" . $r["empleado_id"],
+    $filas("SELECT cliente_id, empleado_id FROM cliente_empleado")
+)) : [];
+
+$porInsertar = [];
+$yaExistian = 0;
+foreach (require ARCHIVO_RELACIONES as $entradaCliente => $entradasEmpleado) {
+    [$clienteId, $avisos] = $resolver($entradaCliente, $clientesNorm, $nombresCliente);
+    foreach ($avisos as $a) aviso("Revisar cliente: $a");
+    if ($clienteId === null) {
+        aviso("No se encontro el cliente \"$entradaCliente\": se omiten sus " . count($entradasEmpleado) . " empleado(s)");
+        continue;
+    }
+    $tipo = $tipoPorCliente[$clienteId] ?? $tipoDefecto;
+
+    foreach ($entradasEmpleado as $entradaEmpleado) {
+        [$empleadoId, $avisos] = $resolver($entradaEmpleado, $empleadosNorm, $nombresEmpleado);
+        foreach ($avisos as $a) aviso("Revisar empleado ({$nombresCliente[$clienteId]}): $a");
+        if ($empleadoId === null) {
+            aviso("No se encontro el empleado \"$entradaEmpleado\" de {$nombresCliente[$clienteId]}: asignalo a mano desde la pantalla del cliente");
+            continue;
+        }
+        $k = "$clienteId:$empleadoId";
+        if (isset($existentesExcel[$k]) || isset($porInsertar[$k])) { $yaExistian++; continue; }
+        $porInsertar[$k] = [$clienteId, $empleadoId, $tipo];
+        info("  + {$nombresCliente[$clienteId]} -> {$nombresEmpleado[$empleadoId]} = $tipo");
+    }
+}
+info(count($porInsertar) . " relaciones nuevas por insertar, $yaExistian ya existian (conservan su tipo)");
+
+if ($ejecutar && $porInsertar) {
+    $db->begin_transaction();
+    try {
+        $stmt = $db->prepare("INSERT IGNORE INTO cliente_empleado (cliente_id, empleado_id, tipo) VALUES (?, ?, ?)");
+        foreach ($porInsertar as [$clienteId, $empleadoId, $tipo]) {
+            $stmt->bind_param("iis", $clienteId, $empleadoId, $tipo);
+            $stmt->execute();
+        }
+        $db->commit();
+        info("-> " . count($porInsertar) . " relaciones insertadas");
+    } catch (Throwable $e) {
+        $db->rollback();
+        fallo("No se insertaron las relaciones del Excel (se revirtio este paso): " . $e->getMessage());
     }
 }
 
