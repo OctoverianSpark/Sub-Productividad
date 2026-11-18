@@ -125,7 +125,6 @@
                 <th>CLIENTE</th>
                 <th>HORAS EXTRAS DIURNAS</th>
                 <th>HORAS EXTRAS DIURNAS DOMINICALES</th>
-                <th>HORAS DIURNAS ORDINARIAS DOMINICALES</th>
                 <th>MONTO DIURNAS</th>
                 <th>HORAS NOCTURNAS</th>
                 <th>HORAS NOCTURNAS DOMINICALES</th>
@@ -142,7 +141,6 @@
                             <td><?php echo s(mb_strtoupper($hora["cliente"])) ?></td>
                             <td><?php echo s($hora["diurnas"]) ?></td>
                             <td><?php echo s($hora["diurnas_domingo"]) ?></td>
-                            <td><?php echo s($hora["diurnas_ordinarias_domingo"]) ?></td>
                             <td><?php echo s($hora["diurnas_monto"]) ?> <?php echo $moneda ?></td>
                             <td><?php echo s($hora["nocturnas"]) ?></td>
                             <td><?php echo s($hora["nocturnas_domingo"]) ?></td>
@@ -154,7 +152,7 @@
                     <?php } ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="11" style="text-align: center; padding: 20px;">
+                        <td colspan="10" style="text-align: center; padding: 20px;">
                             No se encontraron registros
                         </td>
                     </tr>

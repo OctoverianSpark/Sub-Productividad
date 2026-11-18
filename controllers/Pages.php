@@ -60,7 +60,7 @@ class Pages
 class ExportHandler
 {
     private const EMPLEADO_HEADERS = ["EMPLEADO", "CLIENTE", "MODALIDAD", "INICIO DE JORNADA", "ALMUERZO", "FINAL DE JORNADA", "DIURNAS", "NOCTURNAS", "DIURNAS DOMINICALES", "NOCTURNAS DOMINICALES", "CENA", "TAXI", "MONTO DIURNAS", "MONTO NOCTURNAS", "MONTO DIURNAS DOMINICALES", "MONTO NOCTURNAS DOMINICALES", "TOTAL A PAGAR", "COMENTARIOS"];
-    private const CLIENTE_HEADERS = ['CLIENTE', 'HORAS EXTRAS DIURNAS', 'HORAS EXTRAS DIURNAS DOMINICALES', 'HORAS ORDINARIAS DIURNAS DOMINICALES', 'HORAS EXTRAS NOCTURNAS', 'HORAS EXTRAS NOCTURNAS DOMINICALES', 'HORAS NOCTURNAS ORDINARIAS DOMINICALES', 'MONTO EXTRAS DIURNAS', 'MONTO EXTRAS NOCTURNAS', 'MONTO LOGISTICA', 'SUBTOTAL'];
+    private const CLIENTE_HEADERS = ['CLIENTE', 'HORAS EXTRAS DIURNAS', 'HORAS EXTRAS DIURNAS DOMINICALES', 'HORAS NOCTURNAS', 'HORAS NOCTURNAS DOMINICALES', 'MONTO EXTRAS DIURNAS', 'MONTO EXTRAS NOCTURNAS', 'MONTO LOGISTICA', 'SUBTOTAL'];
     private const EMPLEADO_INFO_HEADERS = ['NOMBRE', 'APELLIDO', 'TIPO DE DOCUMENTO', 'DOCUMENTO', 'SEDE', 'CARGO', 'SALARIO'];
     private const CLIENTE = ['NOMBRE', 'APELLIDO', 'EMPLEADO', 'TIPO'];
 
@@ -254,10 +254,8 @@ class ExportHandler
             strtoupper($hora["cliente"]),
             (float) $hora["diurnas"],
             (float) $hora["diurnas_domingo"],
-            (float) $hora["diurnas_ordinarias_domingo"],
             (float) $hora["nocturnas"],
             (float) $hora["nocturnas_domingo"],
-            (float) $hora["nocturnas_ordinarias_domingo"],
             (float) $hora["diurnas_monto"],
             (float) $hora["nocturnas_monto"],
             (float) $hora["logistica"],

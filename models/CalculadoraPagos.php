@@ -11,10 +11,16 @@ use MVC\Config;
  */
 class CalculadoraPagos
 {
-    // Domingo o marcado como festivo
+    // La jornada empieza un domingo
+    public static function esDomingo(Time $time): bool
+    {
+        return (new DateTime($time->inicio))->format("w") === "0";
+    }
+
+    // Domingo o marcado como festivo (festivos de Colombia): aplica al pago del empleado
     public static function esDominicalOFestivo(Time $time): bool
     {
-        return (new DateTime($time->inicio))->format("w") === "0" || strtolower($time->festivo) === "si";
+        return self::esDomingo($time) || strtolower($time->festivo) === "si";
     }
 
     // =================
@@ -182,10 +188,8 @@ class CalculadoraPagos
             "cliente" => $cliente,
             "diurnas" => 0,
             "diurnas_domingo" => 0,
-            "diurnas_ordinarias_domingo" => 0,
             "nocturnas" => 0,
             "nocturnas_domingo" => 0,
-            "nocturnas_ordinarias_domingo" => 0,
             "diurnas_monto" => 0,
             "nocturnas_monto" => 0,
             "logistica" => 0,
@@ -202,18 +206,17 @@ class CalculadoraPagos
         }
         $logistica = Config::get("clientes.logistica", []);
 
-        // Domingo o festivo, igual que en el pago al empleado
-        $domingo = self::esDominicalOFestivo($time);
+        // Al cliente solo se le cobra dominical el domingo real: los festivos de Colombia no aplican al cliente
+        $domingo = self::esDomingo($time);
         $de = (float) $time->diurnas_extras;
         $ne = (float) $time->nocturnas_extras;
         $do = (float) $time->diurnas_ordinarias;
         $no = (float) $time->nocturnas_ordinarias;
 
         if ($domingo) {
-            $resumen["diurnas_domingo"] += $de;
-            $resumen["diurnas_ordinarias_domingo"] += $do;
-            $resumen["nocturnas_domingo"] += $ne;
-            $resumen["nocturnas_ordinarias_domingo"] += $no;
+            // En domingo todas las horas (ordinarias y extras) son extras dominicales para el cliente
+            $resumen["diurnas_domingo"] += $de + $do;
+            $resumen["nocturnas_domingo"] += $ne + $no;
             $resumen["diurnas_monto"] += ($de + $do) * $tarifa["diurna_dominical"];
             $resumen["nocturnas_monto"] += ($ne + $no) * $tarifa["nocturna_dominical"];
         } else {
